@@ -13,8 +13,8 @@ namespace Inventory.API.Types
         {
             Name = "ServerInput";
             Field< NonNullGraphType<StringGraphType>>("Name");
-            Field< NonNullGraphType<IntGraphType>>("OperatingSystem");
-
+            Field<NonNullGraphType<StringGraphType>>("NetworkLocation");
+            Field<OperatingSystemEnum>("OperatingSystem");
         }
     }
 }

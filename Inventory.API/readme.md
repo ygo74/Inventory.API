@@ -16,3 +16,36 @@ add app.UseGraphQLMiddleware(); in configure method
 
 
 2) Create schema
+
+
+
+
+https://volosoft.com/Blog/Building-GraphQL-APIs-with-ASP.NET-Core
+
+
+## use Query
+query {
+	servers {
+		name
+		operatingSystem
+	}
+}
+
+## Use mutation :
+mutation createServer($server: ServerInput!) {
+   createServer(server: $server)
+	{
+		name
+		operatingSystem
+	}
+}
+
+variables:
+{
+  "server":
+  {
+    "name": "test10",
+    "networkLocation": "value",
+    "operatingSystem": "LINUX"
+  }
+}

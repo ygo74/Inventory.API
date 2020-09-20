@@ -16,6 +16,7 @@ namespace Inventory.API
         {
             Field<ServerType, Server>()
                 .Name("createServer")
+                .Description("Create New Server")
                 .Argument<NonNullGraphType<ServerInputType>>("server", "server input")
                 .Resolve(ctx =>
                 {

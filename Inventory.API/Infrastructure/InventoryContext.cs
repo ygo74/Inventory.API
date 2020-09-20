@@ -15,10 +15,12 @@ namespace Inventory.API.Infrastructure
         public InventoryContext(DbContextOptions<InventoryContext> options) : base(options) { }
 
         public DbSet<Server> Servers { get; set; }
+        public DbSet<Group>  Groups { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new ServerEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new ServerGroupTypeConfiguration() );
 
         }
 

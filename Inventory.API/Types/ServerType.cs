@@ -11,8 +11,12 @@ namespace Inventory.API.Types
     {
         public ServerType()
         {
+
+            Field(s => s.ServerId);
             Field(s => s.Name);
             //Field(s => s.OperatingSystem);
+            Field<OperatingSystemEnum>(nameof(Server.OperatingSystem));
+
         }
     }
 }

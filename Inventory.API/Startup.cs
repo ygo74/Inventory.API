@@ -12,7 +12,6 @@ using GraphQL.Server.Ui.Playground;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Inventory.API.Infrastructure;
-using Inventory.API.Middleware;
 using Inventory.API.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -25,7 +24,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
+using Inventory.API.Middlewares;
 
 namespace Inventory.API
 {
@@ -100,7 +99,9 @@ namespace Inventory.API
                   c.SwaggerEndpoint("/swagger/v1/swagger.json", "Inventory.API V1");
               });
 
+            //app.UseGraphQL<InventorySchema, GraphQLHttpMiddlewareWithLogs<InventorySchema>>("/graphql");
             app.UseGraphQL<InventorySchema>("/graphql");
+
             app.UseGraphQLPlayground(new GraphQLPlaygroundOptions
             {
                 Path = "/ui/playground",

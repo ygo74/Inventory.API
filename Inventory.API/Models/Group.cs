@@ -5,15 +5,12 @@ using System.Threading.Tasks;
 
 namespace Inventory.API.Models
 {
-    public class Server
+    public class Group
     {
-        public int ServerId { get; set; }
-        public string Name { get; set; }
+        public int GroupId { get; set; }
+        public String Name { get; set; }
 
-        public OsType OperatingSystem { get; set; }
-
-        public List<ServerGroup> Groups { get; set; }
-
+        public List<ServerGroup> Servers { get; set; }
         //public IDictionary<String, Object> Variables { get; set; }
 
     }

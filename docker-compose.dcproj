@@ -5,7 +5,7 @@
     <DockerTargetOS>Linux</DockerTargetOS>
     <ProjectGuid>ce1deb9a-c2e7-4560-8f9b-c8b7131c374e</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
-    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/</DockerServiceUrl>
+    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/ui/playground</DockerServiceUrl>
     <DockerServiceName>inventory.api</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>

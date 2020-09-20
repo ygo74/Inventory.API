@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.API.Models
 {
-    public enum OsType
+    public class Variable
     {
-        Windows = 0,
-        Linux = 1
     }
 }
