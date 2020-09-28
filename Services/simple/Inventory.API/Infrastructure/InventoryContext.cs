@@ -16,13 +16,16 @@ namespace Inventory.API.Infrastructure
 
         public DbSet<Server> Servers { get; set; }
         public DbSet<Group>  Groups { get; set; }
+        public DbSet<ServerGroup> ServerGroups { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new ServerEntityTypeConfiguration());
-            modelBuilder.ApplyConfiguration(new ServerGroupTypeConfiguration() );
 
+            modelBuilder.Entity<ServerGroup>().HasKey(sg => new { sg.ServerId, sg.GroupId });
         }
+
+        
 
     }
 }

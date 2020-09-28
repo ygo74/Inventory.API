@@ -25,6 +25,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Inventory.API.Middlewares;
+using Inventory.API.Repository;
+using GraphQL.Execution;
 
 namespace Inventory.API
 {
@@ -51,13 +53,21 @@ namespace Inventory.API
             services.AddSwagger()
                     .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddScoped<InventoryQuery>()
-                    .AddScoped<InventoryMutation>()
-                    .AddScoped<InventorySchema>();
+            services.AddSingleton<IInventoryRepository, InventoryRepository>();
+
+            services.AddSingleton<ServerGroupType>();
+            services.AddSingleton<ServerType>();
 
 
-            services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>()
-                    .AddSingleton<DataLoaderDocumentListener>()
+            services.AddSingleton<InventoryQuery>()
+                    .AddSingleton<InventoryMutation>()
+                    .AddSingleton<InventorySchema>();
+
+
+            services.AddSingleton<IDocumentExecuter, DocumentExecuter>()
+                    .AddSingleton<IDocumentWriter, DocumentWriter>()
+                    .AddSingleton<IDocumentExecutionListener, DataLoaderDocumentListener>()
+                    .AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>()
                     .AddGraphQL((options, provider) =>
                     {
                         options.EnableMetrics = Environment.IsDevelopment();
@@ -157,7 +167,7 @@ namespace Inventory.API
                                       sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), null);
                                   });
                 
-            });
+            }, ServiceLifetime.Singleton);
 
             return services;
         }

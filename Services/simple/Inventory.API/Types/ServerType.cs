@@ -1,5 +1,7 @@
-﻿using GraphQL.Types;
+﻿using GraphQL.DataLoader;
+using GraphQL.Types;
 using Inventory.API.Models;
+using Inventory.API.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +11,21 @@ namespace Inventory.API.Types
 {
     public class ServerType: ObjectGraphType<Server>
     {
-        public ServerType()
+        public ServerType(IInventoryRepository inventoryRepository, IDataLoaderContextAccessor accessor)
         {
 
             Field(s => s.ServerId);
             Field(s => s.Name);
-            //Field(s => s.OperatingSystem);
-            Field<OperatingSystemEnum>(nameof(Server.OperatingSystem));
+
+            //Group
+            Field<ListGraphType<GroupType>, IEnumerable<Group>>()
+                .Name("Groups")
+                .ResolveAsync(ctx =>
+                {
+                    var itemsloader = accessor.Context.GetOrAddCollectionBatchLoader<int, Group>("GetGroupsByServerId", inventoryRepository.GetgroupsByServerAsync);
+                    return itemsloader.LoadAsync(ctx.Source.ServerId);
+
+                });
 
         }
     }

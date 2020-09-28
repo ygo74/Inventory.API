@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Inventory.API.Infrastructure;
+using Inventory.API.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -37,13 +38,15 @@ namespace Inventory.API
                 {
                     var services = scope.ServiceProvider;
 
-                    var logger = services.GetRequiredService<ILogger<InventoryContext>>();
+                    var logger = services.GetRequiredService<ILogger<InventoryContextSeed>>();
 
                     var context = services.GetService<InventoryContext>();
 
+                                       
                     context.Database.EnsureCreated();
                     context.Database.Migrate();
 
+                    new InventoryContextSeed().SeedAsync(context, logger).Wait();
                 }
 
                 host.Run();
@@ -91,7 +94,6 @@ namespace Inventory.API
 
             return builder.Build();
         }
-
 
     }
 }

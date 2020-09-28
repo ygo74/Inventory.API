@@ -21,6 +21,14 @@ namespace Inventory.API
                {
                    return dbContext.Servers.ToListAsync();
                });
+
+
+            Field<ListGraphType<GroupType>, List<Group>>()
+                .Name("Groups")
+                .ResolveAsync(ctx =>
+                {
+                    return dbContext.Groups.ToListAsync();
+                });
         }
     }
 }
