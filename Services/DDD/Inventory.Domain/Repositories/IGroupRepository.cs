@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Inventory.Domain.Repositories
 {
-    public interface IInventoryRepository: IGenericRepository<Server>
+    public interface IGroupRepository : IGenericRepository<Group>
     {
-
     }
 }

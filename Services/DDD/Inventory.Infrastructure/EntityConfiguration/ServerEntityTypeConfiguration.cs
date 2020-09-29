@@ -13,7 +13,7 @@ namespace Inventory.Infrastructure.EntityConfiguration
         public void Configure(EntityTypeBuilder<Server> builder)
         {
             builder.ToTable("Server");
-            builder.HasKey(server => server.Id);
+            builder.HasKey(server => server.ServerId);
             builder.HasIndex(server => server.Name).IsUnique();
 
         }

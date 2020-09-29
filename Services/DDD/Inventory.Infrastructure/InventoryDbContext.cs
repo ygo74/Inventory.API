@@ -21,6 +21,18 @@ namespace Inventory.Infrastructure
         {
             modelBuilder.ApplyConfiguration(new ServerEntityTypeConfiguration());
 
+            modelBuilder.Entity<ServerGroup>().HasKey(sg => new { sg.ServerId, sg.GroupId });
+            modelBuilder.Entity<ServerGroup>()
+                        .HasOne(sg => sg.Server)
+                        .WithMany(s => s.ServerGroups)
+                        .HasForeignKey(sg => sg.ServerId);
+
+            modelBuilder.Entity<ServerGroup>()
+                        .HasOne(sg => sg.Group)
+                        .WithMany(g => g.ServerGroups)
+                        .HasForeignKey(sg => sg.GroupId);
+
+
         }
 
     }
