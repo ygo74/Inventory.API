@@ -52,3 +52,26 @@ variables:
 
 EF CORE : 
 https://www.entityframeworktutorial.net/efcore/saving-data-in-disconnected-scenario-in-ef-core.aspx
+
+
+1. Migration
+prerequisites : 
+  * Install command cli tools   
+     dotnet tool install --global dotnet-ef
+     dotnet add Inventory.API package Microsoft.EntityFrameworkCore.Design
+  * Configure DbContext
+     ```c#
+	  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseNpgsql("host=postgres_image;port=32774;database=blogdb;username=bloguser;password=bloguser");
+            }
+        }
+	 ```
+
+Create Initial Database description :
+  * dotnet ef migrations add InitialCreate -p Inventory.API -s Inventory.API
+
+Generate sql scripts :
+  * dotnet ef migrations script -p Inventory.API -s Inventory.API

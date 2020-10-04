@@ -39,17 +39,23 @@ namespace Inventory.Infrastructure
 
         }
 
-//        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-//        {
-//#if DEBUG
-//            var connectionStringBuilder = new SqliteConnectionStringBuilder { DataSource = "MyDb.db" };
-//            var connectionString = connectionStringBuilder.ToString();
-//            var connection = new SqliteConnection(connectionString);
+        //        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //        {
+        //#if DEBUG
+        //            var connectionStringBuilder = new SqliteConnectionStringBuilder { DataSource = "MyDb.db" };
+        //            var connectionString = connectionStringBuilder.ToString();
+        //            var connection = new SqliteConnection(connectionString);
 
-//            optionsBuilder.UseSqlite(connection);
-//#endif
-//        }
+        //            optionsBuilder.UseSqlite(connection);
+        //#endif
+        //        }
 
-
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseNpgsql("host=postgres_image;port=32774;database=blogdb;username=bloguser;password=bloguser");
+            }
+        }
     }
 }

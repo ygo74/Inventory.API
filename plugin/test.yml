@@ -1,0 +1,7 @@
+- name: test
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - debug: var=inventory_hostname
+    - debug: var=group_names

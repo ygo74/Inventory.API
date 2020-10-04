@@ -15,7 +15,7 @@ namespace Inventory.API.Types
         {
 
             Field(s => s.ServerId);
-            Field(s => s.Name);
+            Field(s => s.HostName);
 
             //Group
             Field<ListGraphType<GroupType>, IEnumerable<Group>>()

@@ -60,7 +60,7 @@ namespace Inventory.API.Controllers
                 return BadRequest();
             }
 
-            var item = await _inventoryContext.Servers.SingleOrDefaultAsync(server => server.Name == name);
+            var item = await _inventoryContext.Servers.SingleOrDefaultAsync(server => server.HostName == name);
 
             if (item != null)
             {
@@ -75,12 +75,12 @@ namespace Inventory.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created)]
         public async Task<ActionResult> CreateServerAsync([FromBody] Server server)
         {
-            var newServer = new Server(server.Name, server.OperatingSystem);
+            var newServer = new Server(server.HostName, server.OperatingSystem);
             _inventoryContext.Servers.Add(newServer);
 
             await _inventoryContext.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(ServerByName), new { name = newServer.Name }, null);
+            return CreatedAtAction(nameof(ServerByName), new { name = newServer.HostName }, null);
         }
 
         // PUT api/<ServersController>/5

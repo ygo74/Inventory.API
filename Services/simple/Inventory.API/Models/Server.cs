@@ -12,7 +12,8 @@ namespace Inventory.Domain.Models
         public int ServerId { get; private set; }
 
         [Required]
-        public string Name { get; private set; }
+        [ConcurrencyCheck]
+        public string HostName { get; private set; }
 
         //OS Familly
         public int OperatingSystemId { get; private set; }
@@ -29,7 +30,7 @@ namespace Inventory.Domain.Models
 
         public Server(String hostName, OperatingSystem operatingSystem) : this()
         {
-            Name = !String.IsNullOrEmpty(hostName) ? hostName.ToLower() : throw new ArgumentNullException(nameof(hostName));
+            HostName = !String.IsNullOrEmpty(hostName) ? hostName.ToLower() : throw new ArgumentNullException(nameof(hostName));
             OperatingSystem = operatingSystem ?? throw new ArgumentNullException(nameof(operatingSystem));
         }
 

@@ -14,7 +14,7 @@ namespace Inventory.Infrastructure.EntityConfiguration
         {
             builder.ToTable("Server");
             builder.HasKey(server => server.ServerId);
-            builder.HasIndex(server => server.Name).IsUnique();
+            builder.HasIndex(server => server.HostName).IsUnique();
 
         }
     }

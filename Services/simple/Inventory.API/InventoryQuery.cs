@@ -60,6 +60,19 @@ namespace Inventory.API
                     }
                 });
 
+            Field<GroupType, Group>()
+                .Name("Group")
+                .Argument<StringGraphType>("GroupName")
+                .Resolve(ctx =>
+                {
+                    var groupName = ctx.GetArgument<String>("GroupName");
+                    var parents = inventoryRepository.GetParentGroups(groupName);
+                    var childrens = inventoryRepository.GetChildrenGroups(groupName);
+
+                    return parents.Concat(childrens).Distinct().SingleOrDefault(g => g.Name == groupName);
+
+                });
+
 
         }
 
