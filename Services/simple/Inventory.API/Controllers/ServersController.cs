@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Inventory.API.Infrastructure;
-using Inventory.API.Models;
+using Inventory.Infrastructure;
+using Inventory.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,10 +18,10 @@ namespace Inventory.API.Controllers
     public class ServersController : ControllerBase
     {
 
-        private readonly InventoryContext _inventoryContext;
+        private readonly InventoryDbContext _inventoryContext;
         private readonly ILogger<ServersController> _logger;
 
-        public ServersController(InventoryContext context, ILogger<ServersController> logger)
+        public ServersController(InventoryDbContext context, ILogger<ServersController> logger)
         {
             _inventoryContext = context ?? throw new ArgumentNullException(nameof(context));
             _logger           = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -75,12 +75,7 @@ namespace Inventory.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created)]
         public async Task<ActionResult> CreateServerAsync([FromBody] Server server)
         {
-            var newServer = new Server
-            {
-                Name = server.Name,
-                OperatingSystem = server.OperatingSystem    
-            };
-
+            var newServer = new Server(server.Name, server.OperatingSystem);
             _inventoryContext.Servers.Add(newServer);
 
             await _inventoryContext.SaveChangesAsync();

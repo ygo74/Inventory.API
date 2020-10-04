@@ -4,19 +4,34 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Inventory.API.Models
+namespace Inventory.Domain.Models
 {
     public class Server
     {
 
-        public int ServerId { get; set; }
+        public int ServerId { get; private set; }
 
         [Required]
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
-        public OsType OperatingSystem { get; set; }
+        //OS Familly
+        public int OperatingSystemId { get; private set; }
+        public OperatingSystem OperatingSystem { get; private set; }
 
-        public IList<ServerGroup> ServerGroups { get; set; }
+        // Server Groups Link
+        private List<ServerGroup> _serverGroups;
+        public ICollection<ServerGroup> ServerGroups => _serverGroups.AsReadOnly();
+
+        protected Server()
+        {
+            _serverGroups = new List<ServerGroup>();
+        }
+
+        public Server(String hostName, OperatingSystem operatingSystem) : this()
+        {
+            Name = !String.IsNullOrEmpty(hostName) ? hostName.ToLower() : throw new ArgumentNullException(nameof(hostName));
+            OperatingSystem = operatingSystem ?? throw new ArgumentNullException(nameof(operatingSystem));
+        }
 
     }
 }

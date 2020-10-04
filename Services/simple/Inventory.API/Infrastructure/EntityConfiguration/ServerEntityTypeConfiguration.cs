@@ -1,4 +1,4 @@
-﻿using Inventory.API.Models;
+﻿using Inventory.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Inventory.API.Infrastructure.EntityConfiguration
+namespace Inventory.Infrastructure.EntityConfiguration
 {
     public class ServerEntityTypeConfiguration : IEntityTypeConfiguration<Server>
     {

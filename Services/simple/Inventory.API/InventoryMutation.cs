@@ -1,7 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using Inventory.API.Infrastructure;
-using Inventory.API.Models;
+using Inventory.Infrastructure;
+using Inventory.Domain.Models;
 using Inventory.API.Types;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace Inventory.API
 {
     public class InventoryMutation : ObjectGraphType
     {
-        public InventoryMutation(InventoryContext dbContext)
+        public InventoryMutation(InventoryDbContext dbContext)
         {
             Field<ServerType, Server>()
                 .Name("createServer")

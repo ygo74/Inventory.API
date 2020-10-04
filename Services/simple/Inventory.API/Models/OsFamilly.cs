@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Inventory.API.Models
+namespace Inventory.Domain.Models
 {
-    public enum OsType
+    public enum OsFamilly
     {
         Windows = 0,
         Linux = 1

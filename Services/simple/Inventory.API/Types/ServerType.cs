@@ -1,6 +1,6 @@
 ﻿using GraphQL.DataLoader;
 using GraphQL.Types;
-using Inventory.API.Models;
+using Inventory.Domain.Models;
 using Inventory.API.Repository;
 using System;
 using System.Collections.Generic;

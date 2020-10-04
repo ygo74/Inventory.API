@@ -1,7 +1,7 @@
 ﻿using GraphQL.DataLoader;
 using GraphQL.Types;
-using Inventory.API.Infrastructure;
-using Inventory.API.Models;
+using Inventory.Infrastructure;
+using Inventory.Domain.Models;
 using Inventory.API.Repository;
 using Microsoft.EntityFrameworkCore;
 using System;

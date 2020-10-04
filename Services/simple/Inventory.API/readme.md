@@ -49,3 +49,6 @@ variables:
     "operatingSystem": "LINUX"
   }
 }
+
+EF CORE : 
+https://www.entityframeworktutorial.net/efcore/saving-data-in-disconnected-scenario-in-ef-core.aspx

@@ -11,7 +11,7 @@ using GraphQL.Server;
 using GraphQL.Server.Ui.Playground;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
-using Inventory.API.Infrastructure;
+using Inventory.Infrastructure;
 using Inventory.API.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -27,6 +27,7 @@ using Microsoft.Extensions.Options;
 using Inventory.API.Middlewares;
 using Inventory.API.Repository;
 using GraphQL.Execution;
+using Microsoft.Data.Sqlite;
 
 namespace Inventory.API
 {
@@ -46,6 +47,44 @@ namespace Inventory.API
 
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        //public void ConfigureServices(IServiceCollection services)
+        //{
+        //    services.AddCustomDbContext(Configuration);
+
+        //    services.AddSwagger()
+        //            .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+        //    services.AddSingleton<IInventoryRepository, InventoryRepository>();
+
+        //    services.AddSingleton<ServerGroupType>();
+        //    services.AddSingleton<ServerType>();
+
+
+        //    services.AddSingleton<InventoryQuery>()
+        //            .AddSingleton<InventoryMutation>()
+        //            .AddSingleton<InventorySchema>();
+
+
+        //    services.AddSingleton<IDocumentExecuter, DocumentExecuter>()
+        //            .AddSingleton<IDocumentWriter, DocumentWriter>()
+        //            .AddSingleton<IDocumentExecutionListener, DataLoaderDocumentListener>()
+        //            .AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>()
+        //            .AddGraphQL((options, provider) =>
+        //            {
+        //                options.EnableMetrics = Environment.IsDevelopment();
+        //                var logger = provider.GetRequiredService<ILogger<Startup>>();
+        //                options.UnhandledExceptionDelegate = ctx => logger.LogError("{Error} occured", ctx.OriginalException.Message);
+
+        //            })
+        //            .AddSystemTextJson(deserializerSettings => { }, serializerSettings => { })
+        //            .AddDataLoader()
+        //            .AddGraphTypes(typeof(InventorySchema));
+
+
+
+        //}
+
+        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCustomDbContext(Configuration);
@@ -53,22 +92,18 @@ namespace Inventory.API
             services.AddSwagger()
                     .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddSingleton<IInventoryRepository, InventoryRepository>();
+            services.AddScoped<IInventoryRepository, InventoryRepository>();
 
-            services.AddSingleton<ServerGroupType>();
-            services.AddSingleton<ServerType>();
-
-
-            services.AddSingleton<InventoryQuery>()
-                    .AddSingleton<InventoryMutation>()
-                    .AddSingleton<InventorySchema>();
+            services.AddScoped<ServerGroupType>();
+            services.AddScoped<ServerType>();
 
 
-            services.AddSingleton<IDocumentExecuter, DocumentExecuter>()
-                    .AddSingleton<IDocumentWriter, DocumentWriter>()
-                    .AddSingleton<IDocumentExecutionListener, DataLoaderDocumentListener>()
-                    .AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>()
-                    .AddGraphQL((options, provider) =>
+            services.AddScoped<InventoryQuery>()
+                    .AddScoped<InventoryMutation>()
+                    .AddScoped<InventorySchema>();
+
+
+            services.AddGraphQL((options, provider) =>
                     {
                         options.EnableMetrics = Environment.IsDevelopment();
                         var logger = provider.GetRequiredService<ILogger<Startup>>();
@@ -77,11 +112,12 @@ namespace Inventory.API
                     })
                     .AddSystemTextJson(deserializerSettings => { }, serializerSettings => { })
                     .AddDataLoader()
-                    .AddGraphTypes(typeof(InventorySchema));
+                    .AddGraphTypes(ServiceLifetime.Scoped);
 
 
 
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
@@ -157,7 +193,19 @@ namespace Inventory.API
     {
         public static IServiceCollection AddCustomDbContext(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddEntityFrameworkNpgsql().AddDbContext<InventoryContext>(options =>
+#if !DEBUG
+            services.AddEntityFrameworkSqlite().AddDbContext<InventoryDbContext>(options =>
+            {
+                var connectionStringBuilder = new SqliteConnectionStringBuilder { DataSource = "MyDb.db" };
+                var connectionString = connectionStringBuilder.ToString();
+                var connection = new SqliteConnection(connectionString);
+
+                options.UseSqlite(connection);
+
+            }, ServiceLifetime.Scoped);
+#else
+
+            services.AddEntityFrameworkNpgsql().AddDbContext<InventoryDbContext>(options =>
             {
                 options.UseNpgsql(configuration.GetConnectionString("InventoryDbConnectionString"),
                                   npgsqlOptionsAction: sqlOptions =>
@@ -166,8 +214,10 @@ namespace Inventory.API
                                       //Configuring Connection Resiliency: https://docs.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency 
                                       sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), null);
                                   });
-                
-            }, ServiceLifetime.Singleton);
+
+        }, ServiceLifetime.Scoped);
+
+#endif
 
             return services;
         }

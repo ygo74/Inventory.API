@@ -1,6 +1,6 @@
 ﻿using GraphQL.DataLoader;
 using GraphQL.Types;
-using Inventory.API.Models;
+using Inventory.Domain.Models;
 using Inventory.API.Repository;
 using System;
 using System.Collections.Generic;
@@ -26,7 +26,44 @@ namespace Inventory.API.Types
 
                 });
 
+            //Parent
+            Field<ListGraphType<GroupType>, IEnumerable<Group>>()
+                .Name("Parents")
+                .Resolve(ctx =>
+                {
+                    if (null == ctx.Source.Parent) { return null; }
+                    return ctx.Source.Parent.TraverseParents();
+                });
+
+            //Children
+            Field<ListGraphType<GroupType>, IEnumerable<Group>>()
+                .Name("Children")
+                .Resolve(ctx =>
+                {
+                    return ctx.Source.Children;
+                });
 
         }
     }
+
+    public static class FlattenExtension
+    {
+        public static IEnumerable<Group> TraverseParents(this Group entity)
+        {
+            var stack = new Stack<Group>();
+            stack.Push(entity);
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+                yield return current;
+                if (null != current.Parent)
+                {
+                    stack.Push(current.Parent);
+                }
+
+            }
+
+        }
+    }
+
 }

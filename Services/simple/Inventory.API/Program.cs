@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Inventory.API.Infrastructure;
-using Inventory.API.Models;
+using Inventory.Infrastructure;
+using Inventory.Domain.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -40,7 +40,7 @@ namespace Inventory.API
 
                     var logger = services.GetRequiredService<ILogger<InventoryContextSeed>>();
 
-                    var context = services.GetService<InventoryContext>();
+                    var context = services.GetService<InventoryDbContext>();
 
                                        
                     context.Database.EnsureCreated();

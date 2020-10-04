@@ -1,4 +1,4 @@
-﻿using Inventory.API.Models;
+﻿using Inventory.Domain.Models;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
@@ -7,12 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Inventory.API.Infrastructure
+namespace Inventory.Infrastructure
 {
     public class InventoryContextSeed
     {
 
-        public async Task SeedAsync(InventoryContext context, ILogger<InventoryContextSeed> logger)
+        public async Task SeedAsync(InventoryDbContext context, ILogger<InventoryContextSeed> logger)
         {
             var policy = CreatePolicy(logger, nameof(InventoryContextSeed));
 
@@ -20,37 +20,17 @@ namespace Inventory.API.Infrastructure
             {
                 if (!context.Groups.Any())
                 {
-                    var servers = GetFakeServers();
+                    var operatingSystems = GetOperatingSystems();
+                    var servers = GetFakeServers(operatingSystems);
                     var groups = GetFakeGroups();
 
                     foreach (Server srv in servers)
                     {
-                        srv.ServerGroups = new List<ServerGroup>()
-                        {
-                            new ServerGroup()
-                            {
-                                Server = srv,
-                                Group  = groups.Where(g => g.Name == "operating_system").FirstOrDefault()
-                            },
-                            new ServerGroup()
-                            {
-                                Server = srv,
-                                Group  = groups.Where(g => g.Name == srv.OperatingSystem.ToString().ToLower()).FirstOrDefault()
-                            },
-                            new ServerGroup()
-                            {
-                                Server = srv,
-                                Group  = groups.Where(g => g.Name == "location").FirstOrDefault()
-                            },
-                            new ServerGroup()
-                            {
-                                Server = srv,
-                                Group  = groups.Where(g => g.Name == "france").FirstOrDefault()
-                            },
-                        };
-
+                        var group = groups.Single(grp => grp.Name == srv.OperatingSystem.Name);
+                        group.AddServer(srv);
                     }
 
+                    context.OperatingSystems.AddRange(operatingSystems);
                     context.Groups.AddRange(groups);
                     context.Servers.AddRange(servers);
 
@@ -74,65 +54,67 @@ namespace Inventory.API.Infrastructure
         }
 
 
-        private List<Server> GetFakeServers()
+        private List<Server> GetFakeServers(List<Domain.Models.OperatingSystem> operatingSystems)
         {
+
+            var windows2019 = operatingSystems.Single(os => os.Name.Equals("Windows 2019", StringComparison.OrdinalIgnoreCase));
+            var windows2016 = operatingSystems.Single(os => os.Name.Equals("Windows 2016", StringComparison.OrdinalIgnoreCase));
+            var rhel7 = operatingSystems.Single(os => os.Name.Equals("RHEL 7", StringComparison.OrdinalIgnoreCase));
+            var rhel8 = operatingSystems.Single(os => os.Name.Equals("RHEL 8", StringComparison.OrdinalIgnoreCase));
+
+
             return new List<Server>()
             {
-                new Server()
-                {
-                    ServerId = 1,
-                    Name   = "msTest1",
-                    OperatingSystem = OsType.Windows
-                },
-                new Server()
-                {
-                    ServerId = 2,
-                    Name   = "msTest2",
-                    OperatingSystem = OsType.Windows
-                },
-                new Server()
-                {
-                    ServerId = 3,
-                    Name   = "lxTest3",
-                    OperatingSystem = OsType.Linux
-                },
-                new Server()
-                {
-                    ServerId = 4,
-                    Name   = "lxTest4",
-                    OperatingSystem = OsType.Linux
-                }
+                new Server("msTest1", windows2019),
+                new Server("msTest2", windows2019),
+                new Server("msTest3", windows2016),
+                new Server("msTest4", windows2016),
+                new Server("lxTest1", rhel7),
+                new Server("lxTest2", rhel7),
+                new Server("lxTest3", rhel8),
+                new Server("lxTest4", rhel8)
             };
         }
 
         private List<Group> GetFakeGroups()
         {
-            return new List<Group>()
+
+            //OS Groups
+            var osGroups = new Group(name: "OperatingSystems", ansibleGroupName: "os");
+
+            var windowsGroups = new Group(name: "Windows");
+            var linuxGroups = new Group(name: "Linux");
+
+            osGroups.AddSubGroups(windowsGroups);
+            osGroups.AddSubGroups(linuxGroups);
+
+            windowsGroups.AddSubGroups(new Group("Windows 2019", "system_windows_2k19"));
+            windowsGroups.AddSubGroups(new Group("Windows 2016", "system_windows_2k16"));
+
+            linuxGroups.AddSubGroups(new Group("RHEL 7", "system_rhel_7"));
+            linuxGroups.AddSubGroups(new Group("RHEL 8", "system_rhel_8"));
+
+            var allgroups = new List<Group>()
             {
-                new Group() {
-                    GroupId = 1,
-                    Name = "operating_system"
-                },
-                new Group() {
-                    GroupId = 2,
-                    Name = "windows"
-                },
-                new Group() {
-                    GroupId = 3,
-                    Name = "linux"
-                },
-                new Group() {
-                    GroupId = 4,
-                    Name = "location"
-                },
-                new Group() {
-                    GroupId = 5,
-                    Name = "france"
-                },
-                new Group() {
-                    GroupId = 6,
-                    Name = "paris"
-                }
+                osGroups,
+                windowsGroups,
+                linuxGroups
+            };
+            allgroups.AddRange(windowsGroups.Children);
+            allgroups.AddRange(linuxGroups.Children);
+
+            return allgroups;
+
+        }
+
+        private List<Domain.Models.OperatingSystem> GetOperatingSystems()
+        {
+            return new List<Domain.Models.OperatingSystem>()
+            {
+                new Domain.Models.OperatingSystem("Windows 2019", OsFamilly.Windows),
+                new Domain.Models.OperatingSystem("Windows 2016", OsFamilly.Windows),
+                new Domain.Models.OperatingSystem("RHEL 7", OsFamilly.Linux),
+                new Domain.Models.OperatingSystem("RHEL 8", OsFamilly.Linux)
             };
         }
 

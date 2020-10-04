@@ -1,5 +1,5 @@
 ﻿using GraphQL.Types;
-using Inventory.API.Models;
+using Inventory.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ namespace Inventory.API.Types
             Name = "ServerInput";
             Field< NonNullGraphType<StringGraphType>>("Name");
             Field<NonNullGraphType<StringGraphType>>("NetworkLocation");
-            Field<OperatingSystemEnum>("OperatingSystem");
+            Field<OsFamillyEnum>("OperatingSystem");
         }
     }
 }
