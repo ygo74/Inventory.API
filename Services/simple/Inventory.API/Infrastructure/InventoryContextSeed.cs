@@ -24,8 +24,17 @@ namespace Inventory.Infrastructure
                     var servers = GetFakeServers(operatingSystems);
                     var groups = GetFakeGroups();
 
+                    var sv = new StringVariable() { Name = "a", Value = "a" };
+                    var nv = new NumericVariable() { Name = "b", Value = 1 };
+                    var lv = new List<Variable>() { sv, nv };
+
+                    groups[0].Variables = lv;
+
                     foreach (Server srv in servers)
                     {
+
+                        //srv.Variables = lv;
+
                         var group = groups.Single(grp => grp.Name == srv.OperatingSystem.Name);
                         group.AddServer(srv);
                     }
@@ -61,7 +70,6 @@ namespace Inventory.Infrastructure
             var windows2016 = operatingSystems.Single(os => os.Name.Equals("Windows 2016", StringComparison.OrdinalIgnoreCase));
             var rhel7 = operatingSystems.Single(os => os.Name.Equals("RHEL 7", StringComparison.OrdinalIgnoreCase));
             var rhel8 = operatingSystems.Single(os => os.Name.Equals("RHEL 8", StringComparison.OrdinalIgnoreCase));
-
 
             return new List<Server>()
             {

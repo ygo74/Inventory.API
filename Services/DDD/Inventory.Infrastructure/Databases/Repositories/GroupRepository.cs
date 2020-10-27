@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inventory.Infrastructure.Repositories
+namespace Inventory.Infrastructure.Databases.Repositories
 {
     public class GroupRepository : GenericRepository<Group>
     {

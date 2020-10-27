@@ -23,6 +23,8 @@ namespace Inventory.Domain.Models
         private List<ServerGroup> _serverGroups;
         public ICollection<ServerGroup> ServerGroups => _serverGroups.AsReadOnly();
 
+        //public List<Variable> Variables { get; set; }
+
         protected Server()
         {
             _serverGroups = new List<ServerGroup>();
@@ -33,6 +35,8 @@ namespace Inventory.Domain.Models
             HostName = !String.IsNullOrEmpty(hostName) ? hostName.ToLower() : throw new ArgumentNullException(nameof(hostName));
             OperatingSystem = operatingSystem ?? throw new ArgumentNullException(nameof(operatingSystem));
         }
+
+
 
     }
 }

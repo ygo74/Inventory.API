@@ -28,6 +28,8 @@ using Inventory.API.Middlewares;
 using Inventory.API.Repository;
 using GraphQL.Execution;
 using Microsoft.Data.Sqlite;
+using GraphQL.Utilities.Federation;
+using Inventory.Infrastructure.GroupVarsFiles;
 
 namespace Inventory.API
 {
@@ -93,9 +95,15 @@ namespace Inventory.API
                     .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddScoped<IInventoryRepository, InventoryRepository>();
+            services.AddScoped<InventoryRepository>();
+
+            services.AddScoped<IInventoryFilesContext, InventoryFilesContext>();
 
             services.AddScoped<ServerGroupType>();
             services.AddScoped<ServerType>();
+            services.AddScoped<VariableType>();
+
+            services.AddScoped<AnyScalarGraphType>();
 
 
             services.AddScoped<InventoryQuery>()

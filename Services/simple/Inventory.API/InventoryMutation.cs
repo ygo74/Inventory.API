@@ -7,12 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Inventory.API.Repository;
 
 namespace Inventory.API
 {
     public class InventoryMutation : ObjectGraphType
     {
-        public InventoryMutation(InventoryDbContext dbContext)
+        public InventoryMutation(InventoryDbContext dbContext, InventoryRepository inventoryRepository)
         {
             Field<ServerType, Server>()
                 .Name("createServer")
@@ -25,6 +26,21 @@ namespace Inventory.API
                     dbContext.SaveChanges();
                     return addedItem.Entity;
                 });
+
+            Field<GroupType, Group>()
+                .Name("CreateGroup")
+                .Description("Create New Group")
+                .Argument<NonNullGraphType<GroupInputType>>("group", "group definition")
+                .Resolve(ctx =>
+                {
+                    var item = ctx.GetArgument<Group>("group");
+                    var newGroup = inventoryRepository.CreateGroup(item.Name, item.Parent != null ? item.Parent.Name : null);
+                    inventoryRepository.SaveChangesAsync().Wait();
+                    return newGroup;
+
+                });
+
+
         }
     }
 }

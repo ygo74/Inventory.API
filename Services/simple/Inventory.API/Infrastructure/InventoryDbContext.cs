@@ -21,6 +21,10 @@ namespace Inventory.Infrastructure
         public DbSet<Group>  Groups { get; set; }
         public DbSet<ServerGroup> ServerGroups { get; set; }
 
+        //public DbSet<Variable> Variables { get; set; }
+        //public DbSet<NumericVariable> NumericVariables { get; set; }
+        //public DbSet<StringVariable> StringVariables { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new ServerEntityTypeConfiguration());
@@ -36,6 +40,10 @@ namespace Inventory.Infrastructure
                         .HasOne(sg => sg.Group)
                         .WithMany(g => g.ServerGroups)
                         .HasForeignKey(sg => sg.GroupId);
+
+
+            //modelBuilder.Entity<Variable>()
+            //    .Ignore(v => v.RawValue);
 
         }
 

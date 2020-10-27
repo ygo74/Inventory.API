@@ -14,11 +14,13 @@ services:
       - "postgres_image"
     networks:
       - dockerapi-dev
+    volumes:
+      - D:/devel/github/ansible_inventory/tests/inventories/:/inventories
 
   postgres_image:
     image: postgres:latest
     ports:
-      - "5432"
+      - "32780:5432"
     restart: always
 #    volumes:
 #      - db_volume:/var/lib/postgresql/data

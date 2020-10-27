@@ -92,11 +92,11 @@ namespace Inventory.API.Tests
         }
 
         [Test]
-        public async Task Can_Retrieve_Existing_Group()
+        public void Can_Retrieve_Existing_Group()
         {
 
-            var parents = await _inventoryRepository.GetParentGroups(4);
-            var childrens = await _inventoryRepository.GetChildrenGroups(4);
+            var parents = _inventoryRepository.GetParentGroups("SecondGroup");
+            var childrens = _inventoryRepository.GetChildrenGroups("SecondGroup");
 
             var all = parents.Concat(childrens).Distinct().ToList();
 
@@ -104,7 +104,7 @@ namespace Inventory.API.Tests
                 .Include(grp => grp.Parent).ToList();
 
 
-            var group = await _inventoryRepository.GetGroupById(1);
+            var group = _inventoryRepository.GetGroupById(1);
             Assert.IsNotNull(group);
         }
 

@@ -1,0 +1,27 @@
+---
+
+# -----------------------------------------------------------------------------
+# Global Variables
+# -----------------------------------------------------------------------------
+all_company_code: 'XXX'
+
+all_test_array:
+  - value1
+  - value2
+
+all_test_dict:
+  value1:
+    name: test value1
+    int_value: !!int 1
+    boolean_value: !!bool true
+  value2:
+    name: test value2
+    int_value: !!int 2
+    boolean_value: !!bool false
+
+---
+# -----------------------------------------------------------------------------
+# Test multiple documents
+# -----------------------------------------------------------------------------
+all_other_variable: value_other
+

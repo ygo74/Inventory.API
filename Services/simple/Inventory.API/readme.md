@@ -31,6 +31,27 @@ query {
 	}
 }
 
+query {
+	group(groupName: "windows")
+	{
+		name
+		parents {
+			name
+			parents {
+				name
+			}
+		}
+		children {
+			name
+			servers {
+				hostName
+			}		  
+		}
+		servers {hostName}
+	}
+}
+
+
 ## Use mutation :
 mutation createServer($server: ServerInput!) {
    createServer(server: $server)

@@ -34,7 +34,7 @@ namespace Inventory.Domain.Repositories
         /// <returns>The found entity or null.</returns>
         TEntity GetById(params object[] keyValues);
 
-        Task<TEntity> GetByIdAsync(Int64 id);
+        Task<TEntity> GetByIdAsync(int id);
 
         /// <summary>
         /// Gets the first or default entity based on a predicate, orderby and children inclusions.

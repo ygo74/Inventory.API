@@ -21,6 +21,9 @@ namespace Inventory.Infrastructure.EntityConfiguration
                    .HasForeignKey(g => g.ParentId)
                    .IsRequired(false)
                    .OnDelete(DeleteBehavior.Restrict);
+
+            //builder.OwnsMany(g => g.Variables);//.Ignore(v => v.RawValue);
+            builder.Ignore(g => g.Variables);
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Domain.Models
 {
-    public enum OsType
+    public enum OsFamilly
     {
         Windows = 0,
         Linux = 1

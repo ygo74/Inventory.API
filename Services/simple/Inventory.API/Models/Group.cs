@@ -27,6 +27,16 @@ namespace Inventory.Domain.Models
         private List<Group> _children = new List<Group>();
         public IEnumerable<Group> Children => _children.AsReadOnly();
 
+        public List<Variable> Variables { get; set; }
+
+
+        protected Group() { }
+
+        /// <summary>
+        /// Default Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="ansibleGroupName"></param>
         public Group(String name, String ansibleGroupName=null)
         {
             Name             = !String.IsNullOrEmpty(name)             ? name.ToLower()             : throw new ArgumentNullException(nameof(name));

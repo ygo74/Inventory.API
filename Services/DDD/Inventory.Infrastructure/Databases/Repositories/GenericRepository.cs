@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inventory.Infrastructure.Repositories
+namespace Inventory.Infrastructure.Databases.Repositories
 {
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : Entity
     {
@@ -169,7 +169,7 @@ namespace Inventory.Infrastructure.Repositories
             return _dbSet.Any(predicate);
         }
 
-        public async Task<TEntity> GetByIdAsync(Int64 id)
+        public async Task<TEntity> GetByIdAsync(int id)
         {
             //return _dbSet.Where(x => x.Id == id).FirstOrDefaultAsync();
             return await _dbSet.FindAsync(new Object[] { id });

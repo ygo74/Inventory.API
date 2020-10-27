@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Inventory.API.Repository;
+using GraphQL.Utilities.Federation;
 
 namespace Inventory.API
 {
@@ -72,7 +73,6 @@ namespace Inventory.API
                     return parents.Concat(childrens).Distinct().SingleOrDefault(g => g.Name == groupName);
 
                 });
-
 
         }
 

@@ -6,12 +6,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.Utilities.Federation;
+using System.Text.Json;
+using Inventory.Infrastructure.GroupVarsFiles;
 
 namespace Inventory.API.Types
 {
     public class GroupType : ObjectGraphType<Group>
     {
-        public GroupType(IInventoryRepository inventoryRepository, IDataLoaderContextAccessor accessor)
+        public GroupType(IInventoryRepository inventoryRepository, IInventoryFilesContext inventoryFilesContext, IDataLoaderContextAccessor accessor)
         {
             Field(g => g.GroupId);
             Field(g => g.Name);
@@ -42,6 +45,53 @@ namespace Inventory.API.Types
                 {
                     return ctx.Source.Children;
                 });
+
+            //Variables
+            //Field<ListGraphType<VariableType>, IEnumerable<Variable>>()
+            //    .Name("Variables")
+            //    .Resolve(ctx =>
+            //    {
+            //        return ctx.Source.Variables;
+            //    });
+
+            //Field<AnyScalarGraphType>()
+            //    .Name("Variables")
+            //    .Resolve(ctx =>
+            //    {
+            //        //var sv = new StringVariable() { Name = "a", Value = "a" };
+            //        //var nv = new NumericVariable() { Name = "b", Value = 1 };
+            //        //var lv = new List<Variable>() { sv, nv };
+            //        //return lv;
+            //        //return ctx.Source.Variables;
+
+            //        JsonDocument doc = JsonDocument.Parse(@"
+            //            {
+            //                ""test"": 1,
+            //                ""test2"": [""x"",""y""]
+            //            }
+            //        "
+            //        );
+
+            //        return doc.RootElement;
+
+            //    });
+
+            Field<AnyScalarGraphType>()
+                .Name("Variables")
+                .Resolve(ctx =>
+                {
+                    //var sv = new StringVariable() { Name = "a", Value = "a" };
+                    //var nv = new NumericVariable() { Name = "b", Value = 1 };
+                    //var lv = new List<Variable>() { sv, nv };
+                    //return lv;
+                    //return ctx.Source.Variables;
+
+                    var variables = inventoryFilesContext.GetVariables(@"/inventories/poc/group_vars");
+
+                    return JsonDocument.Parse(variables["all"].ToString()).RootElement;
+
+                });
+
 
         }
     }

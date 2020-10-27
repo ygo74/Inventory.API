@@ -17,5 +17,7 @@ namespace Inventory.API.Repository
         Task<ILookup<int, Group>> GetgroupsByServerAsync(IEnumerable<int> serverIds, CancellationToken token);
         List<Group> GetParentGroups(String groupName);
         List<Group> GetChildrenGroups(String groupName);
+
+        Group CreateGroup(String Name, String ParentName = null);
     }
 }

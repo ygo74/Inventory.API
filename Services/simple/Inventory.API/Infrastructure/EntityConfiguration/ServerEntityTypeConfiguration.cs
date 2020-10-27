@@ -16,6 +16,8 @@ namespace Inventory.Infrastructure.EntityConfiguration
             builder.HasKey(server => server.ServerId);
             builder.HasIndex(server => server.HostName).IsUnique();
 
+            //builder.OwnsMany(s => s.Variables);
+
         }
     }
 }
