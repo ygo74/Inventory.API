@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inventory.Domain.Repositories
+namespace Inventory.Domain.Repositories.Interfaces
 {
     // Dans cet article, les commentaires sont présents dans l'Interface mais ne le seront pas dans son implémentation
     public interface IGenericRepository<TEntity> where TEntity : Entity

@@ -1,30 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using GraphQL;
 using GraphQL.DataLoader;
 using GraphQL.Server;
 using GraphQL.Server.Ui.Playground;
-using GraphQL.SystemTextJson;
-using GraphQL.Types;
-using Inventory.API.Infrastructure;
-using Inventory.API.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Inventory.API.Middlewares;
+using Inventory.Infrastructure.Databases;
+using Inventory.Domain.Repositories.Interfaces;
+using Inventory.Domain.Models;
+using Inventory.Infrastructure.Databases.Repositories;
+using GraphQL.Utilities.Federation;
 
 namespace Inventory.API
 {
@@ -51,19 +44,23 @@ namespace Inventory.API
             services.AddSwagger()
                     .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+
+            services.AddScoped<IAsyncRepository<Server>, EfRepository<Server>>();
+
             services.AddScoped<InventoryQuery>()
                     .AddScoped<InventoryMutation>()
                     .AddScoped<InventorySchema>();
 
 
-            services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>()
+
+            services.AddScoped<AnyScalarGraphType>()
+                    .AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>()
                     .AddSingleton<DataLoaderDocumentListener>()
                     .AddGraphQL((options, provider) =>
                     {
                         options.EnableMetrics = Environment.IsDevelopment();
                         var logger = provider.GetRequiredService<ILogger<Startup>>();
                         options.UnhandledExceptionDelegate = ctx => logger.LogError("{Error} occured", ctx.OriginalException.Message);
-
                     })
                     .AddSystemTextJson(deserializerSettings => { }, serializerSettings => { })
                     .AddDataLoader()
@@ -147,7 +144,7 @@ namespace Inventory.API
     {
         public static IServiceCollection AddCustomDbContext(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddEntityFrameworkNpgsql().AddDbContext<InventoryContext>(options =>
+            services.AddEntityFrameworkNpgsql().AddDbContext<InventoryDbContext>(options =>
             {
                 options.UseNpgsql(configuration.GetConnectionString("InventoryDbConnectionString"),
                                   npgsqlOptionsAction: sqlOptions =>

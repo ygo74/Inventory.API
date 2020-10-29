@@ -16,7 +16,7 @@ namespace Inventory.Domain.Models
         {
             Name = !String.IsNullOrWhiteSpace(name) ? name : throw new ArgumentNullException(nameof(name));
             Size = size > 0 ? size : throw new ArgumentNullException(nameof(size));
-            Format = !String.IsNullOrWhiteSpace(format) ? name : throw new ArgumentNullException(nameof(format));
+            Format = !String.IsNullOrWhiteSpace(format) ? format : throw new ArgumentNullException(nameof(format));
         }
 
         public void SetSize(int size)

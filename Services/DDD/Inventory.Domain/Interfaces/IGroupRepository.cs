@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inventory.Domain.Repositories
+namespace Inventory.Domain.Repositories.Interfaces
 {
-    public interface IGroupRepository : IGenericRepository<Group>
+    public interface IGroupRepository : IAsyncRepository<Group>
     {
     }
 }

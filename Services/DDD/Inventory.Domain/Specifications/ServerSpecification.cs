@@ -10,6 +10,7 @@ namespace Inventory.Domain.Specifications
     {
         public ServerSpecification()
         {
+            Query.Include(s => s.OperatingSystem);
             Query.Include(s => s.ServerDisks);
             Query.Include(s => s.ServerEnvironments);
                 

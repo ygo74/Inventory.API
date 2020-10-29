@@ -1,9 +1,9 @@
 ﻿using GraphQL.Types;
-using Inventory.API.Models;
+using Inventory.Domain.Models;
 
 namespace Inventory.API.Types
 {
-    public class OperatingSystemEnum : EnumerationGraphType<OsType>
+    public class OperatingSystemEnum : EnumerationGraphType<OsFamilly>
     {
     }
 }

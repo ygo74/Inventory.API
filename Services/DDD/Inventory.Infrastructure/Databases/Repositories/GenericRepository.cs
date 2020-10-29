@@ -1,5 +1,5 @@
 ﻿using Inventory.Domain.Models;
-using Inventory.Domain.Repositories;
+using Inventory.Domain.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
