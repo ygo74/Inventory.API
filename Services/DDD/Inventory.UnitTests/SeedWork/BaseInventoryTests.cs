@@ -28,7 +28,7 @@ namespace Inventory.UnitTests
                                                                                     npgOptions => 
                                                                                     {
                                                                                         npgOptions.EnableRetryOnFailure();
-                                                                                    }).UseSnakeCaseNamingConvention()
+                                                                                    })//.UseSnakeCaseNamingConvention()
                                                                                     .Options;
 
 

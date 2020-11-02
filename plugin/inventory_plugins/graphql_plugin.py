@@ -15,66 +15,87 @@ import os
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.six import string_types
 from ansible.module_utils._text import to_native, to_text
-from ansible.module_utils.common._collections_compat import MutableMapping
-from ansible.plugins.inventory import BaseFileInventoryPlugin
+from ansible.module_utils.common._collections_compat import Mapping, MutableMapping
+from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 
 from gql import gql, Client, AIOHTTPTransport
 
 NoneType = type(None)
 
 
-class InventoryModule(BaseFileInventoryPlugin):
+class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     NAME = 'graphql_plugin'
 
     def __init__(self):
 
         super(InventoryModule, self).__init__()
+        self.api_server = ""
+        self.api_token = ""
+        self.main_group = ""
+
 
     def verify_file(self, path):
 
-        valid = True
+        valid = False
+        if super(InventoryModule, self).verify_file(path):
+            # base class verifies that file exists and is readable by current user
+            if path.endswith(('graphql_plugin.yaml', 'graphql_plugin.yml')):
+                valid = True
         return valid
 
     def parse(self, inventory, loader, path, cache=True):
         ''' parses the inventory file '''
 
-        super(InventoryModule, self).parse(inventory, loader, path)
-        self.set_options()
+        super(InventoryModule, self).parse(inventory, loader, path, cache)
+
+        self._options = self._read_config_data(path)
+        print(self._options)
+
+        self.api_server = self.get_option('api_server')
+        self.api_token  = self.get_option('api_token')
+        self.main_group = self.get_option('main_group')
+
+
+        # self.set_options()
 
         try:
 
             # Select your transport with a defined url endpoint
-            transport = AIOHTTPTransport(url="https://192.168.1.10:32778/graphql")
+            transport = AIOHTTPTransport(url="https://{}/graphql".format(self.api_server))
 
             # Create a GraphQL client using the defined transport
             client = Client(transport=transport, fetch_schema_from_transport=True)
 
             # Provide a GraphQL query
             query = gql(
-                """
+                '''
                 query {
-                    group(groupName: "windows 2019")
+                    groupByName(groupName: "''' + self.main_group + '''")
                     {
-                        name
+                        ansible_group_name
                         parents {
-                            name
+                            ansible_group_name
                         }
                         children {
-                            name
+                            ansible_group_name
                             servers {
-                                hostName
+                                hostname
+                                variables
                             }
                         }
-                        servers {hostName}
+                        servers {
+                            hostname
+                            variables
+                        }
                     }
                 }
-            """
+            '''
             )
 
             # Execute the query on the transport
             data = client.execute(query)
-            print(data["group"]["name"])
+            print(data["groupByName"]["ansible_group_name"])
 
             # self.inventory.add_group(data["group"]["name"])
             # self.inventory.add_host("test")
@@ -89,7 +110,7 @@ class InventoryModule(BaseFileInventoryPlugin):
             raise AnsibleParserError('Plugin configuration YAML file, not YAML inventory')
 
 
-        self._parse_group(data["group"]["name"], data["group"])
+        self._parse_group(data["groupByName"]["ansible_group_name"], data["groupByName"])
 
         # We expect top level keys to correspond to groups, iterate over them
         # to get host, vars and subgroups (which we iterate over recursivelly)
@@ -121,19 +142,26 @@ class InventoryModule(BaseFileInventoryPlugin):
                         #                              (section, group, type(group_data[section])))
                 if "children" in group_data:
                     for child in group_data["children"]:
-                        print(child["name"])
-                        subgroup = self._parse_group(child["name"], child)
+                        print(child["ansible_group_name"])
+                        subgroup = self._parse_group(child["ansible_group_name"], child)
                         self.inventory.add_child(group, subgroup)
 
                 if "servers" in group_data:
                     for host_pattern in group_data["servers"]:
-                        self.inventory.add_host(host_pattern["hostName"], group=group)
+                        self.inventory.add_host(host_pattern["hostname"], group=group)
+
+                        if isinstance(host_pattern["variables"], Mapping):
+                            variables = host_pattern["variables"]
+                            for k in variables:
+                                self.inventory.set_variable(host_pattern["hostname"], k, variables[k])
+
 
                 if "parents" in group_data:
-                    for parent in group_data["parents"]:
-                        print(parent["name"])
-                        parentGroup = self.inventory.add_group(parent["name"])
-                        self.inventory.add_child(parent["name"], group)
+                    if group_data["parents"] != None:
+                        for parent in group_data["parents"]:
+                            print(parent["ansible_group_name"])
+                            parentGroup = self.inventory.add_group(parent["ansible_group_name"])
+                            self.inventory.add_child(parent["ansible_group_name"], group)
 
         return group
 

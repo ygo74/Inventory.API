@@ -52,13 +52,23 @@ namespace Inventory.UnitTests
         }
 
         [Test]
-        public async Task GetAllGroups()
+        public async Task GetAllGroupsTest()
         {
             var repo = new EfRepository<Group>(this.DbContext);
             var groups = await repo.ListAllAsync();
 
             Assert.IsTrue(groups.Any());
         }
+
+        [Test]
+        public void GetAllLinkedGroupsTest()
+        {
+            var repo = new GroupRepository(this.DbContext);
+            var groups = repo.GetAllLinkedGroups("windows");
+
+            Assert.IsTrue(groups.Any());
+        }
+
 
     }
 

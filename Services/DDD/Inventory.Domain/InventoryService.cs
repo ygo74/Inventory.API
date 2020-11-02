@@ -10,25 +10,30 @@ using Inventory.Domain.Specifications;
 
 namespace Inventory.Domain
 {
-    public class InventoryService
+    public class InventoryService : IInventoryService
     {
 
         private readonly IAsyncRepository<Server> _serverRepository;
         private readonly IAsyncRepository<Group> _groupRepository;
         private readonly IAsyncRepository<Models.OperatingSystem> _osRepository;
         private readonly IAsyncRepository<Models.Environment> _envRepository;
+        private readonly IAsyncRepository<ServerGroup> _serverGroupRepository;
+
         private readonly ILogger<InventoryService> _logger;
 
-        public InventoryService(IAsyncRepository<Server> serverRepository, 
+        public InventoryService(IAsyncRepository<Server> serverRepository,
                                 IAsyncRepository<Group> groupRepository,
                                 IAsyncRepository<Models.OperatingSystem> osRepository,
                                 IAsyncRepository<Models.Environment> envRepository,
+                                IAsyncRepository<ServerGroup> serverGroupRepository,
                                 ILogger<InventoryService> logger)
         {
             _serverRepository = serverRepository ?? throw new ArgumentNullException(nameof(serverRepository));
             _groupRepository = groupRepository ?? throw new ArgumentNullException(nameof(groupRepository));
             _osRepository = osRepository ?? throw new ArgumentNullException(nameof(osRepository));
             _envRepository = envRepository ?? throw new ArgumentNullException(nameof(envRepository));
+            _serverGroupRepository = serverGroupRepository ?? throw new ArgumentNullException(nameof(serverGroupRepository));
+
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         }
@@ -53,6 +58,16 @@ namespace Inventory.Domain
         #endregion
 
 
+        #region Servers
+        public Task<IReadOnlyList<ServerGroup>> GetServersByGroupAsync(IEnumerable<int> groupIds)
+        {
+            var serverGroups = _serverGroupRepository.ListAsync(new ServerWithGroupsSpecification(groupIds));
+            return serverGroups;
+        }
+
+
+        #endregion
+
         public Task<Server> GetServerByIdAsync(int id)
         {
             _logger.LogDebug($"Get Server by id : '{id}'");
@@ -75,7 +90,7 @@ namespace Inventory.Domain
             var os = await this.GetorAddOperatingSystemByName(osFamilly, operatingSystemName);
             var env = await _envRepository.FirstAsync(new EnvironmentSpecification(environmentName));
 
-            var server = new Server(hostName, os, env, 2,4, System.Net.IPAddress.Parse("192.168.1.0"));
+            var server = new Server(hostName, os, env, 2, 4, System.Net.IPAddress.Parse("192.168.1.0"));
             var groupOS = await _groupRepository.FirstAsync(new GroupSpecification(os.Name));
 
             groupOS.AddServer(server);

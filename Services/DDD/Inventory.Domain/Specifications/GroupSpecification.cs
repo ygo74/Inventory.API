@@ -8,6 +8,11 @@ namespace Inventory.Domain.Specifications
 {
     public class GroupSpecification : Specification<Group>
     {
+        public GroupSpecification()
+        {
+        }
+
+
         public GroupSpecification(string name)
         {
             Query

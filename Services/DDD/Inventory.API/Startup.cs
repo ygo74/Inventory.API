@@ -18,6 +18,10 @@ using Inventory.Domain.Repositories.Interfaces;
 using Inventory.Domain.Models;
 using Inventory.Infrastructure.Databases.Repositories;
 using GraphQL.Utilities.Federation;
+using OperatingSystem = Inventory.Domain.Models.OperatingSystem;
+using Inventory.Domain;
+using Inventory.API.Infrastructure;
+using Inventory.API.Types;
 
 namespace Inventory.API
 {
@@ -46,8 +50,20 @@ namespace Inventory.API
 
 
             services.AddScoped<IAsyncRepository<Server>, EfRepository<Server>>();
+            services.AddScoped<IAsyncRepository<Group>, EfRepository<Group>>();
+            services.AddScoped<IAsyncRepository<ServerGroup>, EfRepository<ServerGroup>>();
+            services.AddScoped<IAsyncRepository<OperatingSystem>, EfRepository<OperatingSystem>>();
+            services.AddScoped<IAsyncRepository<Domain.Models.Environment>, EfRepository<Domain.Models.Environment>>();
+            services.AddScoped<IGroupRepository, GroupRepository >();
+
+
+            services.AddScoped<InventoryService >();
+            services.AddScoped<GraphQLService>();
 
             services.AddScoped<InventoryQuery>()
+                    .AddScoped<ServerQuery>()
+                    .AddScoped<GroupQuery>()
+                    .AddScoped<GroupType>()
                     .AddScoped<InventoryMutation>()
                     .AddScoped<InventorySchema>();
 

@@ -1,26 +1,31 @@
-﻿using Inventory.Domain.Models;
+﻿using Inventory.Domain;
+using Inventory.Domain.Models;
 using Inventory.Domain.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Inventory.API.Infrastructure
 {
-    public class GraphQLService
+    public class GraphQLService : IGraphQLService
     {
 
-        private readonly IAsyncRepository<Domain.Models.OperatingSystem> osRepository;
+        private readonly InventoryService _inventoryService;
 
-        public GraphQLService(IAsyncRepository<Domain.Models.OperatingSystem> _osRepository)
+        public GraphQLService(InventoryService inventoryService)
         {
-            _osRepository = osRepository ?? throw new ArgumentNullException(nameof(osRepository));
+            _inventoryService = inventoryService ?? throw new ArgumentNullException(nameof(inventoryService));
         }
 
 
-        #region "Operating System"
-
-
+        #region "Servers"
+        public async Task<ILookup<int, Server>> GetServersByGroupAsync(IEnumerable<int> groupIds, CancellationToken token)
+        {
+            var serverGroups = await _inventoryService.GetServersByGroupAsync(groupIds);
+            return serverGroups.ToLookup(s => s.GroupId, s => s.Server);
+        }
 
         #endregion
 
