@@ -4,5 +4,7 @@
 
   tasks:
     - debug: var=inventory_hostname
-    - debug: var=group_names
-    - debug: var=hostvars[inventory_hostname]
+    # - debug: var=group_names
+    - debug: var=zzz_all_test_value
+    - debug: var=all_company_code
+    # - debug: var=hostvars[inventory_hostname]

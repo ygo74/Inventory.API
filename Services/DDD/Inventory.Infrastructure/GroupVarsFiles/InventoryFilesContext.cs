@@ -19,9 +19,8 @@ namespace Inventory.Infrastructure.GroupVarsFiles
 
         private ILogger _logger;
 
-        public InventoryFilesContext(string inventoryPath, ILogger<InventoryFilesContext> logger)
+        public InventoryFilesContext(ILogger<InventoryFilesContext> logger)
         {
-            _inventoryPath = !String.IsNullOrWhiteSpace(inventoryPath) ? inventoryPath : throw new ArgumentNullException(nameof(inventoryPath));
             _logger = logger != null ? logger : throw new ArgumentNullException(nameof(logger));
         }
 
@@ -31,6 +30,12 @@ namespace Inventory.Infrastructure.GroupVarsFiles
         /// <returns></returns>
         public Task<Dictionary<String, JObject>> GetVariablesAsync()
         {
+            var variables = this.GetVariables("");
+            return Task.FromResult<Dictionary<String, JObject>>(variables);
+        }
+        public Dictionary<String, JObject> GetVariables(string inventoryPath)
+        {
+            _inventoryPath = !String.IsNullOrWhiteSpace(inventoryPath) ? inventoryPath : throw new ArgumentNullException(nameof(inventoryPath));
             _logger.LogInformation($"Search variables files in {_inventoryPath}");
 
             var directory = new DirectoryInfo(_inventoryPath);
@@ -46,7 +51,7 @@ namespace Inventory.Infrastructure.GroupVarsFiles
                 );
             }
 
-            return Task.FromResult<Dictionary<String, JObject>>(variables);
+            return variables;
 
         }
 
@@ -86,7 +91,7 @@ namespace Inventory.Infrastructure.GroupVarsFiles
                 DocumentEnd dummyEnd;
                 while (parser.TryConsume<DocumentStart>(out dummyStart))
                 {
-                    var yamlObject = deserializer.Deserialize<Dictionary<String,Object>>(parser);
+                    var yamlObject = deserializer.Deserialize(parser);
                     var serializer = new SerializerBuilder()
                         .JsonCompatible()
                         .Build();

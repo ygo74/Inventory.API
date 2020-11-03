@@ -65,23 +65,12 @@ namespace Inventory.Domain
             return serverGroups;
         }
 
-
-        #endregion
-
         public Task<Server> GetServerByIdAsync(int id)
         {
             _logger.LogDebug($"Get Server by id : '{id}'");
             var server = _serverRepository.FirstAsync(new ServerSpecification(id));
 
             return server;
-        }
-
-        public Task<Group> GetGroupByIdAsync(int id)
-        {
-            _logger.LogDebug($"Get Group by id : '{id}'");
-            var group = _groupRepository.GetByIdAsync(id);
-
-            return group;
         }
 
         public async Task<Server> AddServerAsync(string hostName, OsFamilly osFamilly, string operatingSystemName, string environmentName)
@@ -97,6 +86,21 @@ namespace Inventory.Domain
             await _groupRepository.UpdateAsync(groupOS);
             return server;
         }
+
+
+        #endregion
+
+        #region Groups
+        public Task<Group> GetGroupByIdAsync(int id)
+        {
+            _logger.LogDebug($"Get Group by id : '{id}'");
+            var group = _groupRepository.GetByIdAsync(id);
+
+            return group;
+        }
+
+        #endregion
+
 
 
     }

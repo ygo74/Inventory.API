@@ -24,10 +24,10 @@ namespace Inventory.UnitTests
 
 
         [Test]
-        public async Task GetVariablesTest()
+        public void GetVariablesTest()
         {
-            var ctx = new InventoryFilesContext(@"D:\devel\github\ansible_inventory\tests\inventories\poc\group_vars", _logger);
-            var variables = await ctx.GetVariablesAsync();
+            var ctx = new InventoryFilesContext(_logger);
+            var variables = ctx.GetVariables(@"D:\devel\github\ansible_inventory\tests\inventories\poc\group_vars");
 
         }
     }

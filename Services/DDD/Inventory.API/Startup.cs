@@ -22,6 +22,7 @@ using OperatingSystem = Inventory.Domain.Models.OperatingSystem;
 using Inventory.Domain;
 using Inventory.API.Infrastructure;
 using Inventory.API.Types;
+using Inventory.Infrastructure.GroupVarsFiles;
 
 namespace Inventory.API
 {
@@ -58,6 +59,7 @@ namespace Inventory.API
 
 
             services.AddScoped<InventoryService >();
+            services.AddScoped<InventoryFilesContext>();
             services.AddScoped<GraphQLService>();
 
             services.AddScoped<InventoryQuery>()
