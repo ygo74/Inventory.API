@@ -4,3 +4,4 @@ plugin: graphql_plugin
 api_server: 192.168.1.10:32872
 api_token:  todo
 main_group: windows
+environment: poc

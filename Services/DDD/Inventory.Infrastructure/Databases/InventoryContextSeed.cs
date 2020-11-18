@@ -70,18 +70,19 @@ namespace Inventory.Infrastructure.Databases
             var prd = environments.Single(env => env.Name == "prd");
             var sit = environments.Single(env => env.Name == "sit");
             var uat = environments.Single(env => env.Name == "uat");
+            var poc = environments.Single(env => env.Name == "poc");
 
 
             return new List<Server>()
             {
-                new Server("msTest1", windows2019, prd, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
+                new Server("msTest1", windows2019, poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
                 new Server("msTest2", windows2019, uat, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
-                new Server("msTest3", windows2016, uat, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
+                new Server("msTest3", windows2016, poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
                 new Server("msTest4", windows2016, sit, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
                 new Server("lxTest1", rhel7,       prd, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
-                new Server("lxTest2", rhel7,       prd, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
+                new Server("lxTest2", rhel7,       poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
                 new Server("lxTest3", rhel8,       sit, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
-                new Server("lxTest4", rhel8,       uat, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
+                new Server("lxTest4", rhel8,       poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
             };
         }
 
@@ -135,7 +136,8 @@ namespace Inventory.Infrastructure.Databases
                 new Domain.Models.Environment("drp", true),
                 new Domain.Models.Environment("dev", false),
                 new Domain.Models.Environment("sit", false),
-                new Domain.Models.Environment("uat", false)
+                new Domain.Models.Environment("uat", false),
+                new Domain.Models.Environment("poc", false)
             };
         }
 

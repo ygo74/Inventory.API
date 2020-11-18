@@ -22,6 +22,11 @@ namespace Inventory.Infrastructure.Databases.Repositories
             _dbContext = dbContext;
         }
 
+        public InventoryDbContext DbContext
+        {
+            get { return _dbContext;  }
+        }
+
         public virtual async Task<T> GetByIdAsync(int id)
         {
             return await _dbContext.Set<T>().FindAsync(id);

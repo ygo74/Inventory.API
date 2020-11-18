@@ -1,4 +1,5 @@
 ﻿using Inventory.Infrastructure.GroupVarsFiles;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
@@ -26,8 +27,10 @@ namespace Inventory.UnitTests
         [Test]
         public void GetVariablesTest()
         {
-            var ctx = new InventoryFilesContext(_logger);
-            var variables = ctx.GetVariables(@"D:\devel\github\ansible_inventory\tests\inventories\poc\group_vars");
+            var memoryCache = new MemoryCache(new MemoryCacheOptions());
+
+            var ctx = new InventoryFilesContext(memoryCache, _logger);
+            var variables = ctx.GetGroupVariables(@"D:\devel\github\ansible_inventory\tests\inventories\poc\group_vars", "windows" );
 
         }
     }

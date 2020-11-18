@@ -1,5 +1,7 @@
 using Inventory.Domain;
+using Inventory.Domain.Extensions;
 using Inventory.Domain.Models;
+using Inventory.Domain.Specifications;
 using Inventory.Infrastructure.Databases;
 using Inventory.Infrastructure.Databases.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +20,6 @@ namespace Inventory.UnitTests
 {
     public class EfRepositoryTests : BaseInventoryTests<EfRepository<Server>>
     {
-
 
         [Test]
         public async Task GetAllEnvironmentsTest()
@@ -68,6 +69,42 @@ namespace Inventory.UnitTests
 
             Assert.IsTrue(groups.Any());
         }
+
+        [Test]
+        public async Task GetServersByGroupsTest()
+        {
+            var groupName = "windows";
+
+            // Find all Allowed groups and child groups
+            var repo = new GroupRepository(this.DbContext);
+
+            var allGroups = await repo.ListAllAsync();
+
+            var x = allGroups.Single(g => g.Name == "windows");
+            var y = x.FlattenChildrends();
+
+            var childGroups = repo.GetChildrenGroups(groupName);
+            var allGroupNames = childGroups.Select(g => g.Name).ToArray();
+
+            // Find all servers for these groups
+            var repoSrv = new EfRepository<Server>(this.DbContext);
+            //var servers = await repoSrv.ListAsync(new ServerWithGroupsSpecification(allGroupNames));
+            var servers = await repoSrv.ListAsync(new ServerSpecification(allGroupNames,"poc"));
+
+            foreach(Server srv in servers)
+            {
+                foreach(ServerGroup sg in srv.ServerGroups)
+                {
+                    var parentGroups = sg.Group.TraverseParents();
+
+                }
+            }
+
+            Assert.IsTrue(childGroups.Any());
+
+        }
+
+
 
 
     }

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Npgsql.Logging;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -23,13 +24,17 @@ namespace Inventory.UnitTests
         //                                                                    .UseInMemoryDatabase(databaseName: "in-memory")
         //                                                                    .Options;
 
-        private readonly DbContextOptions<InventoryDbContext> _dbOptions = new DbContextOptionsBuilder<InventoryDbContext>()
-                                                                                    .UseNpgsql("host=localhost;port=55432;database=blogdb;username=bloguser;password=bloguser",
-                                                                                    npgOptions => 
-                                                                                    {
-                                                                                        npgOptions.EnableRetryOnFailure();
-                                                                                    })//.UseSnakeCaseNamingConvention()
-                                                                                    .Options;
+
+        //private static ILoggerFactory loggerFactory = new LoggerFactory();
+
+        //private readonly DbContextOptions<InventoryDbContext> _dbOptions = new DbContextOptionsBuilder<InventoryDbContext>()
+        //                                                                            .UseNpgsql("host=localhost;port=55432;database=blogdb;username=bloguser;password=bloguser",
+        //                                                                            npgOptions => 
+        //                                                                            {
+        //                                                                                npgOptions.EnableRetryOnFailure();
+        //                                                                            })//.UseSnakeCaseNamingConvention()
+        //                                                                            .UseLoggerFactory(loggerFactory)
+        //                                                                            .Options;
 
 
         private InventoryDbContext _dbContext;
@@ -47,7 +52,20 @@ namespace Inventory.UnitTests
 
         public BaseInventoryTests()
         {
-            _dbContext = new InventoryDbContext(_dbOptions);
+
+            var loggerFactory = LoggerFactory.Create(builder => builder.AddDebug());
+
+            var _dbOptions = new DbContextOptionsBuilder<InventoryDbContext>()
+                                                                                    .UseNpgsql("host=localhost;port=55432;database=blogdb;username=bloguser;password=bloguser",
+                                                                                    npgOptions =>
+                                                                                    {
+                                                                                        npgOptions.EnableRetryOnFailure();
+                                                                                    })//.UseSnakeCaseNamingConvention()
+                                                                                    .UseLoggerFactory(loggerFactory)
+                                                                                    .Options;
+
+
+        _dbContext = new InventoryDbContext(_dbOptions);
             _logger = new Logger<T>(new NullLoggerFactory());
 
             if (_dbContext.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
@@ -66,7 +84,7 @@ namespace Inventory.UnitTests
 
         public void Dispose()
         {
-            _dbContext.Database.EnsureDeleted();
+            //_dbContext.Database.EnsureDeleted();
             _dbContext.Dispose();
         }
     }

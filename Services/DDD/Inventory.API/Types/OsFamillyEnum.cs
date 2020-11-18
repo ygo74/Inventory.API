@@ -3,7 +3,7 @@ using Inventory.Domain.Models;
 
 namespace Inventory.API.Types
 {
-    public class OperatingSystemEnum : EnumerationGraphType<OsFamilly>
+    public class OsFamillyEnum : EnumerationGraphType<OsFamilly>
     {
     }
 }

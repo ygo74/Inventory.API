@@ -46,6 +46,7 @@ namespace Inventory.Domain
             {
                 os = new Models.OperatingSystem(name, osFamilly);
                 await _osRepository.AddAsync(os);
+                await this.GetorAddGroupAsync(name, osFamilly.ToString());
             }
 
             return os;
@@ -61,7 +62,7 @@ namespace Inventory.Domain
         #region Servers
         public Task<IReadOnlyList<ServerGroup>> GetServersByGroupAsync(IEnumerable<int> groupIds)
         {
-            var serverGroups = _serverGroupRepository.ListAsync(new ServerWithGroupsSpecification(groupIds));
+            var serverGroups = _serverGroupRepository.ListAsync(new ServerByGroupsSpecification(groupIds));
             return serverGroups;
         }
 
@@ -73,19 +74,24 @@ namespace Inventory.Domain
             return server;
         }
 
-        public async Task<Server> AddServerAsync(string hostName, OsFamilly osFamilly, string operatingSystemName, string environmentName)
+        public async Task<Server> AddServerAsync(string hostName, OsFamilly osFamilly, string operatingSystemName, string environmentName, System.Net.IPAddress subnetIP)
         {
 
             var os = await this.GetorAddOperatingSystemByName(osFamilly, operatingSystemName);
             var env = await _envRepository.FirstAsync(new EnvironmentSpecification(environmentName));
 
-            var server = new Server(hostName, os, env, 2, 4, System.Net.IPAddress.Parse("192.168.1.0"));
+            var server = new Server(hostName, os, env, 2, 4, subnetIP);
             var groupOS = await _groupRepository.FirstAsync(new GroupSpecification(os.Name));
 
             groupOS.AddServer(server);
             await _groupRepository.UpdateAsync(groupOS);
             return server;
         }
+
+        //public Task<IReadOnlyList<Group>> GetServerGroups(Server server)
+        //{
+
+        //}
 
 
         #endregion
@@ -99,8 +105,31 @@ namespace Inventory.Domain
             return group;
         }
 
-        #endregion
+        public async Task<Group> GetorAddGroupAsync(string name, String parentName, string ansibleGroupName = null)
+        {
+            var parentGroup = await _groupRepository.FirstAsync(new GroupSpecification(parentName));
+            return await this.GetorAddGroupAsync(name, parentGroup, ansibleGroupName);
+        }
 
+
+        public async Task<Group> GetorAddGroupAsync(string name, Group parent,  string ansibleGroupName=null)
+        {
+            var group = await _groupRepository.FirstOrDefaultAsync(new GroupSpecification(name));
+            if (null == group)
+            {
+                group = new Group(name, ansibleGroupName);
+                if (parent != null)
+                {
+                    parent.AddSubGroups(group);
+                }
+                
+                await _groupRepository.AddAsync(group);
+            }
+
+            return group;
+        }
+
+        #endregion
 
 
     }

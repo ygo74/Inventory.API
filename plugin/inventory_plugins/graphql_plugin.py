@@ -17,6 +17,7 @@ from ansible.module_utils.six import string_types
 from ansible.module_utils._text import to_native, to_text
 from ansible.module_utils.common._collections_compat import Mapping, MutableMapping
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
+from ansible.utils.vars import combine_vars
 
 from gql import gql, Client, AIOHTTPTransport
 
@@ -33,6 +34,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.api_server = ""
         self.api_token = ""
         self.main_group = ""
+        self.environment = ""
 
 
     def verify_file(self, path):
@@ -50,14 +52,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         super(InventoryModule, self).parse(inventory, loader, path, cache)
 
         self._options = self._read_config_data(path)
-        print(self._options)
+        # print(self._options)
 
         self.api_server = self.get_option('api_server')
         self.api_token  = self.get_option('api_token')
         self.main_group = self.get_option('main_group')
-
-
-        # self.set_options()
+        self.environment = self.get_option('environment')
 
         try:
 
@@ -70,32 +70,33 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             # Provide a GraphQL query
             query = gql(
                 '''
-                query {
-                    groupByName(groupName: "''' + self.main_group + '''")
-                    {
-                        ansible_group_name
-                        parents {
+                query inventory {
+                    inventory(groupName: "''' + self.main_group + '''", environment: "''' + self.environment + '''"){
+                        groups
+                        {
                             ansible_group_name
-                        }
-                        children {
-                            ansible_group_name
-                            servers {
-                                hostname
-                                variables
+                            variables
+                            parent
+                            {
+                                ansible_group_name
                             }
                         }
-                        servers {
+                        servers
+                        {
                             hostname
                             variables
+                            group_names
                         }
                     }
                 }
+
             '''
             )
 
             # Execute the query on the transport
             data = client.execute(query)
-            print(data["groupByName"]["ansible_group_name"])
+            # print(data["inventory'"]["servers"])
+            # print("hello")
 
             # self.inventory.add_group(data["group"]["name"])
             # self.inventory.add_host("test")
@@ -110,7 +111,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             raise AnsibleParserError('Plugin configuration YAML file, not YAML inventory')
 
 
-        self._parse_group(data["groupByName"]["ansible_group_name"], data["groupByName"])
+        # self._parse_group(data["groupByName"]["ansible_group_name"], data["groupByName"])
+        self._parse_servers(data["inventory"]["servers"], data["inventory"]["groups"])
 
         # We expect top level keys to correspond to groups, iterate over them
         # to get host, vars and subgroups (which we iterate over recursivelly)
@@ -119,105 +121,52 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         #         self._parse_group(group_name, data[group_name])
         # else:
         #     raise AnsibleParserError("Invalid data from file, expected dictionary and got:\n\n%s" % to_native(data))
+    def _parse_servers(self, servers, groups):
 
-    def _parse_group(self, group, group_data):
+        # Create groups
+        if isinstance(groups, list):
+            # Create all groups
+            for group in groups:
+                groupName = group["ansible_group_name"]
+                try:
+                    self.inventory.add_group(groupName)
+                except AnsibleError as e:
+                    raise AnsibleParserError("Unable to add group %s: %s" % (group, to_text(e)))
 
-        if isinstance(group_data, (MutableMapping, NoneType)):
+                if "variables" in group.keys() and isinstance(group["variables"], dict):
+                    variables = group["variables"]
+                    for k in variables:
+                        self.inventory.set_variable(groupName, k, variables[k])
 
-            try:
-                group = self.inventory.add_group(group)
-            except AnsibleError as e:
-                raise AnsibleParserError("Unable to add group %s: %s" % (group, to_text(e)))
+            # Create relation ships
+            for group in groups:
+                if "parent" in group.keys() and group["parent"] != None:
+                    groupName = group["ansible_group_name"]
+                    parentGroupName = group["parent"]["ansible_group_name"]
 
-            if group_data is not None:
-                # make sure they are dicts
-                for section in ['children', 'servers']:
-                    if section in group_data:
-                        # convert strings to dicts as these are allowed
-                        if isinstance(group_data[section], string_types):
-                            group_data[section] = {group_data[section]: None}
-
-                        # if not isinstance(group_data[section], (MutableMapping, NoneType)):
-                        #     raise AnsibleParserError('Invalid "%s" entry for "%s" group, requires a dictionary, found "%s" instead.' %
-                        #                              (section, group, type(group_data[section])))
-                if "children" in group_data:
-                    for child in group_data["children"]:
-                        print(child["ansible_group_name"])
-                        subgroup = self._parse_group(child["ansible_group_name"], child)
-                        self.inventory.add_child(group, subgroup)
-
-                if "servers" in group_data:
-                    for host_pattern in group_data["servers"]:
-                        self.inventory.add_host(host_pattern["hostname"], group=group)
-
-                        if isinstance(host_pattern["variables"], Mapping):
-                            variables = host_pattern["variables"]
-                            for k in variables:
-                                self.inventory.set_variable(host_pattern["hostname"], k, variables[k])
+                    if parentGroupName in self.inventory.groups.keys():
+                        self.inventory.add_child( parentGroupName, groupName )
 
 
-                if "parents" in group_data:
-                    if group_data["parents"] != None:
-                        for parent in group_data["parents"]:
-                            print(parent["ansible_group_name"])
-                            parentGroup = self.inventory.add_group(parent["ansible_group_name"])
-                            self.inventory.add_child(parent["ansible_group_name"], group)
+        # Create Servers
+        if isinstance(servers, list):
+            for server in servers:
+                try:
+                    hostName = server["hostname"]
+                    host = self.inventory.add_host(hostName)
 
-        return group
+                    # link server to groups
+                    for group in server["group_names"]:
+                        if group in self.inventory.groups.keys():
+                            self.inventory.add_child( group, host )
 
-    def _parse_group2(self, group, group_data):
+                    # Add hostvars
+                    if "variables" in server.keys() and isinstance(server["variables"], dict):
+                        variables = server["variables"]
+                        for k in variables:
+                            self.inventory.set_variable(hostName, k, variables[k])
 
-        if isinstance(group_data, (MutableMapping, NoneType)):
 
-            try:
-                group = self.inventory.add_group(group)
-            except AnsibleError as e:
-                raise AnsibleParserError("Unable to add group %s: %s" % (group, to_text(e)))
+                except AnsibleError as e:
+                    raise AnsibleParserError("Unable to add server %s: %s" % (server, to_text(e)))
 
-            if group_data is not None:
-                # make sure they are dicts
-                for section in ['vars', 'children', 'hosts']:
-                    if section in group_data:
-                        # convert strings to dicts as these are allowed
-                        if isinstance(group_data[section], string_types):
-                            group_data[section] = {group_data[section]: None}
-
-                        if not isinstance(group_data[section], (MutableMapping, NoneType)):
-                            raise AnsibleParserError('Invalid "%s" entry for "%s" group, requires a dictionary, found "%s" instead.' %
-                                                     (section, group, type(group_data[section])))
-
-                for key in group_data:
-
-                    if not isinstance(group_data[key], (MutableMapping, NoneType)):
-                        self.display.warning('Skipping key (%s) in group (%s) as it is not a mapping, it is a %s' % (key, group, type(group_data[key])))
-                        continue
-
-                    if isinstance(group_data[key], NoneType):
-                        self.display.vvv('Skipping empty key (%s) in group (%s)' % (key, group))
-                    elif key == 'vars':
-                        for var in group_data[key]:
-                            self.inventory.set_variable(group, var, group_data[key][var])
-                    elif key == 'children':
-                        for subgroup in group_data[key]:
-                            subgroup = self._parse_group(subgroup, group_data[key][subgroup])
-                            self.inventory.add_child(group, subgroup)
-
-                    elif key == 'hosts':
-                        for host_pattern in group_data[key]:
-                            hosts, port = self._parse_host(host_pattern)
-                            self._populate_host_vars(hosts, group_data[key][host_pattern] or {}, group, port)
-                    else:
-                        self.display.warning('Skipping unexpected key (%s) in group (%s), only "vars", "children" and "hosts" are valid' % (key, group))
-
-        else:
-            self.display.warning("Skipping '%s' as this is not a valid group definition" % group)
-
-        return group
-
-    def _parse_host(self, host_pattern):
-        '''
-        Each host key can be a pattern, try to process it and add variables as needed
-        '''
-        (hostnames, port) = self._expand_hostpattern(host_pattern)
-
-        return hostnames, port

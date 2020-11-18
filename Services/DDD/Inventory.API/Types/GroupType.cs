@@ -107,8 +107,15 @@ namespace Inventory.API.Types
                 .Name("Variables")
                 .Resolve(ctx =>
                 {
-                    var variables = inventoryFilesContext.GetVariables(@"/inventories/poc/group_vars");
-                    return JsonDocument.Parse(variables["all"].ToString()).RootElement;
+
+                    if (!ctx.UserContext.ContainsKey("environment")) return null;
+
+
+                    var env = ctx.UserContext["environment"];
+                    var result = inventoryFilesContext.GetGroupVariables($"/inventories/{env}/group_vars", ctx.Source.AnsibleGroupName);
+                    if (result == null) { return null; }
+                    return JsonDocument.Parse(result.ToString()).RootElement;
+
                 });
 
 

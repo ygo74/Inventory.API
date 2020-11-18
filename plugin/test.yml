@@ -4,7 +4,14 @@
 
   tasks:
     - debug: var=inventory_hostname
-    # - debug: var=group_names
-    - debug: var=zzz_all_test_value
-    - debug: var=all_company_code
-    # - debug: var=hostvars[inventory_hostname]
+    - debug: var=hostvars[inventory_hostname]
+    - debug: var=group_names
+
+    - name: Check variables
+      assert:
+          that:
+            - zzz_all_test_value is defined
+            - all_company_code is defined
+            - server_disks is defined
+            - windows_sccm_server is defined
+          fail_msg: "Missing variables from graphql source or local inventory group_vars"

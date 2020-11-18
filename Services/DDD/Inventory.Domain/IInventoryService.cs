@@ -6,7 +6,7 @@ namespace Inventory.Domain
 {
     public interface IInventoryService
     {
-        Task<Server> AddServerAsync(string hostName, OsFamilly osFamilly, string operatingSystemName, string environmentName);
+        Task<Server> AddServerAsync(string hostName, OsFamilly osFamilly, string operatingSystemName, string environmentName, System.Net.IPAddress subnetIP);
         Task<Group> GetGroupByIdAsync(int id);
         Task<OperatingSystem> GetorAddOperatingSystemByName(OsFamilly osFamilly, string name);
         Task<Server> GetServerByIdAsync(int id);

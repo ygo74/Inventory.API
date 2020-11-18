@@ -10,14 +10,14 @@ namespace Inventory.Domain.Models
     public class Server : Entity
     {
 
-        private const string WINDOWS_DISK_SYSTEM_NAME   = "system";
-        private const char   WINDOWS_DISK_SYSTEM_LETTER = 'C';
-        private const int    WINDOWS_DISK_SYSTEM_SIZE   = 100;
+        private const string WINDOWS_DISK_SYSTEM_NAME = "system";
+        private const char WINDOWS_DISK_SYSTEM_LETTER = 'C';
+        private const int WINDOWS_DISK_SYSTEM_SIZE = 100;
 
-        private const string LINUX_DISK_SYSTEM_NAME   = "root";
+        private const string LINUX_DISK_SYSTEM_NAME = "root";
         private const string LINUX_DISK_SYSTEM_DATAVG = "datavg-root";
-        private const string LINUX_DISK_SYSTEM_PATH   = "/";
-        private const int    LINUX_DISK_SYSTEM_SIZE   = 100;
+        private const string LINUX_DISK_SYSTEM_PATH = "/";
+        private const int LINUX_DISK_SYSTEM_SIZE = 100;
 
         protected Server()
         {
@@ -26,11 +26,11 @@ namespace Inventory.Domain.Models
 
         public Server(String hostName, OperatingSystem operatingSystem, Environment environment, int cpu, int ram, System.Net.IPAddress subnet) : this()
         {
-            HostName        = !String.IsNullOrEmpty(hostName) ? hostName.ToLower() : throw new ArgumentNullException(nameof(hostName));
-            OperatingSystem = operatingSystem                 ??                     throw new ArgumentNullException(nameof(operatingSystem));
-            Subnet          = subnet                          ??                     throw new ArgumentNullException(nameof(subnet));
-            CPU             = cpu > 0                         ? cpu :                throw new ArgumentNullException(nameof(cpu));
-            RAM             = ram > 0                         ? ram :                throw new ArgumentNullException(nameof(ram));
+            HostName = !String.IsNullOrEmpty(hostName) ? hostName.ToLower() : throw new ArgumentNullException(nameof(hostName));
+            OperatingSystem = operatingSystem ?? throw new ArgumentNullException(nameof(operatingSystem));
+            Subnet = subnet ?? throw new ArgumentNullException(nameof(subnet));
+            CPU = cpu > 0 ? cpu : throw new ArgumentNullException(nameof(cpu));
+            RAM = ram > 0 ? ram : throw new ArgumentNullException(nameof(ram));
 
             // Add system disk to new server
             if (operatingSystem.Familly == OsFamilly.Windows)
@@ -48,14 +48,11 @@ namespace Inventory.Domain.Models
         }
 
         public int ServerId { get; private set; }
-
         public string HostName { get; private set; }
-
 
         public int CPU { get; private set; }
         public int RAM { get; private set; }
         public System.Net.IPAddress Subnet { get; private set; }
-
 
         //OS Familly
         public int OperatingSystemId { get; private set; }
@@ -74,23 +71,9 @@ namespace Inventory.Domain.Models
         public ICollection<BaseDisk> ServerDisks => _serverDisks.AsReadOnly();
 
 
-        // Server Variables as Json representation
-        private String _variables; 
-        public JsonDocument Variables { 
-            get
-            {
-                return JsonDocument.Parse(_variables);
-            }
-            set
-            {
-                _variables = value.RootElement.ToString();
-            }
-        }
-
-
         #region Managed disks
 
-        public void AddOrUpdateWindowsDisk(string name, int size, char DriveLetter, string label="")
+        public void AddOrUpdateWindowsDisk(string name, int size, char DriveLetter, string label = "")
         {
 
             var existingDisk = _serverDisks.FirstOrDefault(d => (d as WindowsDisk).Letter == DriveLetter);
@@ -104,7 +87,7 @@ namespace Inventory.Domain.Models
                 existingDisk.SetSize(size);
                 if (!String.IsNullOrWhiteSpace(label))
                 {
-                    ((WindowsDisk)existingDisk).SetLabel(label); 
+                    ((WindowsDisk)existingDisk).SetLabel(label);
                 }
             }
 
@@ -177,7 +160,7 @@ namespace Inventory.Domain.Models
             variables.Add("server_ram", RAM);
 
             var diskArray = new Dictionary<String, Object>[ServerDisks.Count];
-            for (Int16 i=0; i < ServerDisks.Count; i++)
+            for (Int16 i = 0; i < ServerDisks.Count; i++)
             {
                 diskArray[i] = GetAnsibleDiskVariables(ServerDisks.ElementAt(i));
             }

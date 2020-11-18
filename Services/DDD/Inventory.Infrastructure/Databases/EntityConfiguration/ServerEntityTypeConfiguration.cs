@@ -35,7 +35,7 @@ namespace Inventory.Infrastructure.Databases.EntityConfiguration
 
             // Ignore server Properties
             //Variables
-            builder.Ignore(s => s.Variables);
+            //builder.Ignore(s => s.Variables);
             //builder.Property<String>("_variables");
             //builder.OwnsMany(s => s.Variables);
 

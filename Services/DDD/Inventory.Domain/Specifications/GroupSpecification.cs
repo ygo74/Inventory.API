@@ -10,6 +10,7 @@ namespace Inventory.Domain.Specifications
     {
         public GroupSpecification()
         {
+            Query.Include(g => g.Parent);
         }
 
 

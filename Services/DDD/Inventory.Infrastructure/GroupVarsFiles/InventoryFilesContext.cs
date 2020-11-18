@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -18,21 +20,71 @@ namespace Inventory.Infrastructure.GroupVarsFiles
         private string _inventoryPath;
 
         private ILogger _logger;
+        private readonly IMemoryCache _cache;
+        private readonly IFileProvider _fileProvider;
 
-        public InventoryFilesContext(ILogger<InventoryFilesContext> logger)
+        public InventoryFilesContext(IMemoryCache cache, ILogger<InventoryFilesContext> logger)
         {
+            _cache = cache != null ? cache : throw new ArgumentNullException(nameof(cache));
+            _logger = logger != null ? logger : throw new ArgumentNullException(nameof(logger));
+        }
+
+
+        public InventoryFilesContext(IMemoryCache cache, IFileProvider fileProvider, ILogger<InventoryFilesContext> logger)
+        {
+            _cache = cache != null ? cache : throw new ArgumentNullException(nameof(cache));
+            _fileProvider = fileProvider != null ? fileProvider : throw new ArgumentNullException(nameof(fileProvider));
             _logger = logger != null ? logger : throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
-        /// Get all variables by fileName in the inventory path
+        /// Get variables by group in the inventory path
         /// </summary>
         /// <returns></returns>
-        public Task<Dictionary<String, JObject>> GetVariablesAsync()
+        public JObject GetGroupVariables(string inventoryPath, string groupName)
         {
-            var variables = this.GetVariables("");
-            return Task.FromResult<Dictionary<String, JObject>>(variables);
+            _inventoryPath = !String.IsNullOrWhiteSpace(inventoryPath) ? inventoryPath : throw new ArgumentNullException(nameof(inventoryPath));
+            _logger.LogInformation($"Get Group '{groupName}' variables files in repository Path '{_inventoryPath}'");
+
+            var fileName = $"{groupName.ToLower()}.yml";
+            var filePath = System.IO.Path.Combine(inventoryPath, fileName);
+
+
+            JObject groupVars;
+
+            //Try to obtain the variables from the cache
+            if (_cache.TryGetValue(filePath, out groupVars))
+            {
+                return groupVars;
+            }
+
+            // if file doesn't exist, return empty dictionary
+            if (!System.IO.File.Exists(filePath))
+            {
+                return null;
+            }
+
+            var cacheEntryOptions = new MemoryCacheEntryOptions();
+                                            //.SetSlidingExpiration(TimeSpan.FromMinutes(5))
+
+
+            if (null != _fileProvider)
+            {
+                var changeToken = _fileProvider.Watch(fileName);
+                cacheEntryOptions.AddExpirationToken(changeToken);
+            }
+
+
+            JObject fileContent = this.ParseFile(filePath);
+            groupVars = fileContent;
+            _cache.Set(filePath, groupVars, cacheEntryOptions);
+
+            return groupVars;
+
         }
+
+
+
         public Dictionary<String, JObject> GetVariables(string inventoryPath)
         {
             _inventoryPath = !String.IsNullOrWhiteSpace(inventoryPath) ? inventoryPath : throw new ArgumentNullException(nameof(inventoryPath));
