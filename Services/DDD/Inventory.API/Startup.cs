@@ -172,7 +172,7 @@ namespace Inventory.API
         {
             services.AddEntityFrameworkNpgsql().AddDbContext<InventoryDbContext>(options =>
             {
-                options.UseNpgsql(configuration.GetConnectionString("InventoryDbConnectionString"),
+                options.UseNpgsql(configuration.GetConnectionString("InventoryDatabase"),
                                   npgsqlOptionsAction: sqlOptions =>
                                   {
                                       sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);

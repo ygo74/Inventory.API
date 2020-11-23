@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Inventory.Domain.Repositories.Interfaces;
 using System.Data;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace Inventory.Infrastructure.Databases
 {
@@ -135,9 +138,35 @@ namespace Inventory.Infrastructure.Databases
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql("host=localhost;port=55432;database=blogdb;username=bloguser;password=bloguser");
+                //optionsBuilder.UseNpgsql("host=localhost;port=55432;database=blogdb;username=bloguser;password=bloguser");
             }
         }
 
     }
+
+    public class InventoryDbContextDesignFactory : IDesignTimeDbContextFactory<InventoryDbContext>
+    {
+        public InventoryDbContext CreateDbContext(string[] args)
+        {
+            // Get environment
+            string environment = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+
+            // Build config
+            IConfiguration config = new ConfigurationBuilder()
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../Inventory.API"))
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment}.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
+
+            // Get connection string
+            var optionsBuilder = new DbContextOptionsBuilder<InventoryDbContext>();
+            var connectionString = config.GetConnectionString("InventoryDatabase");
+            optionsBuilder.UseNpgsql(connectionString);
+
+            return new InventoryDbContext(optionsBuilder.Options);
+        }
+    }
+
 }

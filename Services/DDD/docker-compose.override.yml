@@ -5,7 +5,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ConnectionStrings__InventoryDbConnectionString=host=postgres_image;port=5432;database=blogdb;username=bloguser;password=bloguser
+      - ConnectionStrings__InventoryDatabase=host=postgres_image;port=5432;database=blogdb;username=bloguser;password=bloguser
     ports:
       - "32873:80"
       - "32872:443"
