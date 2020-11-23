@@ -1,4 +1,5 @@
-﻿using Inventory.API.Dto;
+﻿using AutoMapper;
+using Inventory.API.Dto;
 using Inventory.Domain;
 using Inventory.Domain.Extensions;
 using Inventory.Domain.Models;
@@ -22,22 +23,47 @@ namespace Inventory.API.Infrastructure
         private readonly IAsyncRepository<Server> _serverRepository;
         private readonly IMemoryCache _cache;
 
+        private readonly IMapper _mapper;
 
-        public GraphQLService(InventoryService inventoryService, IGroupRepository groupRepository, IAsyncRepository<Server> serverRepository, IMemoryCache cache)
+
+        public GraphQLService(InventoryService inventoryService, IGroupRepository groupRepository, IAsyncRepository<Server> serverRepository, IMemoryCache cache, IMapper mapper)
         {
             _inventoryService = inventoryService ?? throw new ArgumentNullException(nameof(inventoryService));
             _groupRepository = groupRepository ?? throw new ArgumentNullException(nameof(groupRepository));
             _serverRepository = serverRepository ?? throw new ArgumentNullException(nameof(serverRepository));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
         }
 
 
         #region "Servers"
-        public async Task<ILookup<int, Server>> GetServersByGroupAsync(IEnumerable<int> groupIds, CancellationToken token)
+        public async Task<ILookup<int, ServerDto>> GetServersByGroupAsync(IEnumerable<int> groupIds, CancellationToken token)
         {
             var serverGroups = await _inventoryService.GetServersByGroupAsync(groupIds);
-            return serverGroups.ToLookup(s => s.GroupId, s => s.Server);
+            return serverGroups.ToLookup(s => s.GroupId, s =>
+            {
+                var dtoServer = GetOrFillServerData(s.Server);
+                dtoServer.Wait();
+                return dtoServer.Result;
+            });
+
+        }
+
+
+        public async Task<IReadOnlyList<ServerDto>> GetAllServersAsync()
+        {
+            var servers = await _serverRepository.ListAsync(new ServerSpecification());
+            // Load Server Additional Data and calculate list of groups in this inventory
+            var serversDto = new System.Collections.Concurrent.ConcurrentBag<ServerDto>();
+
+            Parallel.ForEach<Server>(servers, async currentServer =>
+            {
+                var serverDto = await GetOrFillServerData(currentServer);
+                serversDto.Add(serverDto);
+            });
+
+            return serversDto.ToList();
 
         }
 
@@ -116,39 +142,39 @@ namespace Inventory.API.Infrastructure
             var customGroups = new List<Group>();
             customGroups.Add(new Group("all"));
 
+            // Load Server Additional Data and calculate list of groups in this inventory
+            var serversDto = new System.Collections.Concurrent.ConcurrentBag<ServerDto>();
+            var serverGroups = new System.Collections.Concurrent.ConcurrentDictionary<String, Group>();
 
-            var serversDtoTasks = new List<Task<ServerDto>>();
-            foreach (Server server in servers)
+            Parallel.ForEach<Server>(servers, async currentServer =>
             {
-                var serverDto = GetOrFillServerData(server);
-                serversDtoTasks.Add(serverDto);
-            }
-
-            var results = await Task.WhenAll<ServerDto>(serversDtoTasks);
-
-            var serverGroups = new List<Group>();
-            var serversDto = new List<ServerDto>();
-            foreach (ServerDto serverDto in results)
-            {
+                var serverDto = await GetOrFillServerData(currentServer);
                 serversDto.Add(serverDto);
-                //serverGroups.AddRange(server.GetInternalServerGroups());
-
                 foreach (Group group in serverDto.Groups)
                 {
-                    var refGroup = allInventoryGroups.First(g => g.GroupId == group.GroupId);
-                    serverGroups.Add(refGroup);
-                    serverGroups.AddRange(refGroup.TraverseParents());
-                    //dtoServer.Groups.AddRange(refGroup.TraverseParents());
-                    //dtoServer.Groups.Add(refGroup);
 
+                    if (group.GroupId <= 0)
+                    {
+                        serverGroups.GetOrAdd(group.Name, group);
+                    }
+                    else
+                    {
+                        var refGroup = allInventoryGroups.First(g => g.GroupId == group.GroupId);
+                        serverGroups.GetOrAdd(refGroup.Name, refGroup);
+                        foreach (Group parentGroup in refGroup.TraverseParents())
+                        {
+                            serverGroups.GetOrAdd(parentGroup.Name, parentGroup);
+                        }
+                    }
                 }
-            }
+            });
 
-           var allGroups = customGroups.Concat(serverGroups).Distinct();
+
+           var allGroups = customGroups.Concat(serverGroups.Values).Distinct();
 
             var inventory = new InventoryDto()
             {
-                Servers = serversDto,
+                Servers = serversDto.ToList(),
                 Groups = allGroups.ToList()
             };
 
@@ -168,17 +194,14 @@ namespace Inventory.API.Infrastructure
 
         private async Task<ServerDto> PopulateServerDtoData(Server server)
         {
-            // Get AllGroups
-            var allInventoryGroups = await this.GetAllGroupAsync();
-
-            var dtoServer = new ServerDto();
-            dtoServer.HostName = server.HostName;
+            var dtoServer = _mapper.Map<ServerDto>(server);
             dtoServer.Variables = server.GetAnsibleVariables();
 
-            // Read groups
-            foreach (ServerGroup group in server.ServerGroups)
+            // Add custom Information
+            // Groups
+            if (server.Status == ServerStatus.To_be_Created)
             {
-                dtoServer.Groups.Add(group.Group);
+                dtoServer.Groups.Add(new Group("New"));
             }
 
             return dtoServer;

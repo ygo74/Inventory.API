@@ -5,18 +5,84 @@ using System.Threading.Tasks;
 using Inventory.Infrastructure.Databases.EntityConfiguration;
 using Inventory.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Inventory.Domain.Repositories.Interfaces;
+using System.Data;
 
 namespace Inventory.Infrastructure.Databases
 {
-    public class InventoryDbContext : DbContext
+    public class InventoryDbContext : DbContext, IUnitOfWork
     {
         public InventoryDbContext() : base() { }
 
         public InventoryDbContext(DbContextOptions<InventoryDbContext> options) : base(options) { }
 
+        #region Transactions
+        private IDbContextTransaction _currentTransaction;
+        public IDbContextTransaction GetCurrentTransaction() => _currentTransaction;
+
+        public bool HasActiveTransaction => _currentTransaction != null;
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            if (_currentTransaction != null) return null;
+
+            _currentTransaction = await Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+
+            return _currentTransaction;
+        }
+
+        public async Task CommitTransactionAsync(IDbContextTransaction transaction)
+        {
+            if (transaction == null) throw new ArgumentNullException(nameof(transaction));
+            if (transaction != _currentTransaction) throw new InvalidOperationException($"Transaction {transaction.TransactionId} is not current");
+
+            try
+            {
+                await SaveChangesAsync();
+                transaction.Commit();
+            }
+            catch
+            {
+                RollbackTransaction();
+                throw;
+            }
+            finally
+            {
+                if (_currentTransaction != null)
+                {
+                    _currentTransaction.Dispose();
+                    _currentTransaction = null;
+                }
+            }
+        }
+
+        public void RollbackTransaction()
+        {
+            try
+            {
+                _currentTransaction?.Rollback();
+            }
+            finally
+            {
+                if (_currentTransaction != null)
+                {
+                    _currentTransaction.Dispose();
+                    _currentTransaction = null;
+                }
+            }
+        }
+
+        #endregion
+
+
+        #region IUnitOfWork
+
+        #endregion
+
         // COnfiguration tables
         public DbSet<Domain.Models.OperatingSystem> OperatingSystems { get; set; }
         public DbSet<Domain.Models.Environment> Environments { get; set; }
+        public DbSet<Location> Locations { get; set; }
 
 
         // Inventory variables

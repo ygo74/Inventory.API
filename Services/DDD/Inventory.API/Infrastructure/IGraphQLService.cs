@@ -9,7 +9,7 @@ namespace Inventory.API.Infrastructure
 {
     public interface IGraphQLService
     {
-        Task<ILookup<int, Server>> GetServersByGroupAsync(IEnumerable<int> groupIds, CancellationToken token);
+        Task<ILookup<int, ServerDto>> GetServersByGroupAsync(IEnumerable<int> groupIds, CancellationToken token);
         Task<InventoryDto> GetInventoryForGroupAsync(string groupName, string environment);
     }
 }

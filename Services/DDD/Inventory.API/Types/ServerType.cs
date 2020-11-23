@@ -16,25 +16,6 @@ namespace Inventory.API.Types
         public ServerType()
         {
 
-            //Field(s => s.ServerId);
-            //Field(s => s.HostName).Name("hostname");
-            //Field(s => s.CPU).Name("cpu");
-            //Field(s => s.RAM).Name("ram");
-
-            //Field<StringGraphType>()
-            //    .Name("os")
-            //    .Resolve(ctx => 
-            //    {
-            //        return ctx.Source.OperatingSystem.Name;
-            //    });
-
-            //Field<OsFamillyEnum>()
-            //    .Name("osFamilly")
-            //    .Resolve(ctx =>
-            //    {
-            //        return ctx.Source.OperatingSystem.Familly;
-            //    });
-
             //Field<AnyScalarGraphType>()
             //    .Name("group_names")
             //    .Resolve(ctx =>
@@ -60,6 +41,22 @@ namespace Inventory.API.Types
 
 
             Field(s => s.HostName).Name("hostname");
+            Field(s => s.CPU).Name("cpu");
+            Field(s => s.RAM).Name("ram");
+
+            Field<StringGraphType>()
+                .Name("os")
+                .Resolve(ctx =>
+                {
+                    return ctx.Source.OperatingSystem.Name;
+                });
+
+            Field<OsFamillyEnum>()
+                .Name("osFamilly")
+                .Resolve(ctx =>
+                {
+                    return ctx.Source.OperatingSystem.Familly;
+                });
 
             Field<AnyScalarGraphType>()
                 .Name("group_names")

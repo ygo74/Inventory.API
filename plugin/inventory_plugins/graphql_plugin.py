@@ -121,6 +121,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         #         self._parse_group(group_name, data[group_name])
         # else:
         #     raise AnsibleParserError("Invalid data from file, expected dictionary and got:\n\n%s" % to_native(data))
+
+
     def _parse_servers(self, servers, groups):
 
         # Create groups

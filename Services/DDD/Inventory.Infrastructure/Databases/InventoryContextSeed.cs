@@ -27,15 +27,15 @@ namespace Inventory.Infrastructure.Databases
 
                     foreach (Server srv in servers)
                     {
-
-                        //srv.Variables = lv;
-
                         var group = groups.Single(grp => grp.Name == srv.OperatingSystem.Name);
                         group.AddServer(srv);
                     }
 
+
+                    context.Locations.AddRange(GetLocations());
                     context.Environments.AddRange(environments);
                     context.OperatingSystems.AddRange(operatingSystems);
+
                     context.Groups.AddRange(groups);
                     context.Servers.AddRange(servers);
 
@@ -130,16 +130,28 @@ namespace Inventory.Infrastructure.Databases
 
         private List<Domain.Models.Environment> GetEnvironments()
         {
+
             return new List<Domain.Models.Environment>()
             {
-                new Domain.Models.Environment("prd", true),
-                new Domain.Models.Environment("drp", true),
-                new Domain.Models.Environment("dev", false),
-                new Domain.Models.Environment("sit", false),
-                new Domain.Models.Environment("uat", false),
-                new Domain.Models.Environment("poc", false)
+                new Domain.Models.Environment("prd", EnvironmentFamilly.Production),
+                new Domain.Models.Environment("drp", EnvironmentFamilly.Production),
+                new Domain.Models.Environment("dev", EnvironmentFamilly.Developoment),
+                new Domain.Models.Environment("sit", EnvironmentFamilly.Tests),
+                new Domain.Models.Environment("uat", EnvironmentFamilly.Tests),
+                new Domain.Models.Environment("poc", EnvironmentFamilly.Developoment)
+            };               
+        }
+
+        private List<Location> GetLocations()
+        {
+
+            return new List<Location>()
+            {
+                new Location("Paris", "fr", "par"),
+                new Location("Geneva", "ch", "gva")
             };
         }
+
 
     }
 }

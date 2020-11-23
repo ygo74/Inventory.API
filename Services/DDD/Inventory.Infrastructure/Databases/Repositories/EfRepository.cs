@@ -27,6 +27,14 @@ namespace Inventory.Infrastructure.Databases.Repositories
             get { return _dbContext;  }
         }
 
+        public IUnitOfWork UnitOfWork
+        {
+            get
+            {
+                return _dbContext;
+            }
+        }
+
         public virtual async Task<T> GetByIdAsync(int id)
         {
             return await _dbContext.Set<T>().FindAsync(id);

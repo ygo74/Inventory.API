@@ -23,11 +23,11 @@ namespace Inventory.API
             //Field<ServerQuery>("server", resolve: context => new { });
             //Field<GroupQuery> ("group", resolve: context => new { });
 
-            Field<ListGraphType<ServerType>, IReadOnlyList<Server>>()
+            Field<ListGraphType<ServerType>, IReadOnlyList<ServerDto>>()
                 .Name("Servers")
                 .ResolveAsync(ctx =>
                 {
-                    return serverRepository.ListAsync(new ServerSpecification());
+                    return graphQLService.GetAllServersAsync();
                 });
 
             Field<ListGraphType<GroupType>, IReadOnlyList<Group>>()
@@ -37,13 +37,13 @@ namespace Inventory.API
                     return groupRepository.ListAsync(new GroupSpecification());
                 });
 
-            Field<GroupType, Group>()
+            Field<ListGraphType<GroupType>, IReadOnlyList<Group>>()
                 .Name("GroupByName")
                 .Argument<NonNullGraphType<StringGraphType>>("GroupName")
                 .Resolve(ctx =>
                 {
                     var groupName = ctx.GetArgument<String>("GroupName");
-                    return groupRepository.GetAllLinkedGroups(groupName).SingleOrDefault(g => g.Name == groupName);
+                    return groupRepository.GetAllLinkedGroups(groupName);
 
                 });
 

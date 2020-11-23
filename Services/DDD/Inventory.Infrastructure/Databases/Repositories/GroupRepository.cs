@@ -1,6 +1,7 @@
 ﻿using Inventory.Domain.Models;
 using Inventory.Domain.Repositories;
 using Inventory.Domain.Repositories.Interfaces;
+using Inventory.Domain.Specifications;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,10 +18,15 @@ namespace Inventory.Infrastructure.Databases.Repositories
 
         public List<Group> GetAllLinkedGroups(String groupName)
         {
-            var parents = this.GetParentGroups(groupName);
+            var result = new List<Group>();
+            var groupTask = this.FirstAsync(new GroupSpecification(groupName));
+            groupTask.Wait();
+            result.Add(groupTask.Result);
+
+            //var parents = this.GetParentGroups(groupName);
             var childrens = this.GetChildrenGroups(groupName);
 
-            return parents.Concat(childrens).Distinct().ToList();
+            return result.Concat(childrens).Distinct().ToList();
 
         }
 

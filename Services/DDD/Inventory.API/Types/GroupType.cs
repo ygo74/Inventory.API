@@ -9,6 +9,7 @@ using System.Linq;
 using Inventory.Infrastructure.GroupVarsFiles;
 using GraphQL.Utilities.Federation;
 using System.Text.Json;
+using Inventory.API.Dto;
 
 namespace Inventory.API.Types
 {
@@ -22,11 +23,11 @@ namespace Inventory.API.Types
 
 
             //Servers
-            Field<ListGraphType<ServerType>, IEnumerable<Server>>()
+            Field<ListGraphType<ServerType>, IEnumerable<ServerDto>>()
                 .Name("Servers")
                 .ResolveAsync(ctx =>
                 {
-                    var itemsloader = accessor.Context.GetOrAddCollectionBatchLoader<int, Server>("GetServersByGroupId", graphQLService.GetServersByGroupAsync);
+                    var itemsloader = accessor.Context.GetOrAddCollectionBatchLoader<int, ServerDto>("GetServersByGroupId", graphQLService.GetServersByGroupAsync);
                     return itemsloader.LoadAsync(ctx.Source.GroupId);
 
                 });

@@ -8,17 +8,21 @@ namespace Inventory.Domain.Models
     {
         public int    EnvironmentId { get; private set; }
         public string Name { get; private set; }
-        public bool   IsProduction { get; private set; }
+
+        // Environment Familly
+        public EnvironmentFamilly EnvironmentFamilly { get; private set; }
 
         // Many to Many Environments
         private List<ServerEnvironment> _serverEnvironments = new List<ServerEnvironment>();
         public ICollection<ServerEnvironment> ServerEnvironments => _serverEnvironments.AsReadOnly();
 
+        protected Environment()
+        { }
 
-        public Environment(string name, bool isProduction=false)
+        public Environment(string name, EnvironmentFamilly environmentFamilly)
         {
             Name = !String.IsNullOrEmpty(name) ? name : throw new ArgumentNullException(nameof(name));
-            IsProduction = isProduction;
+            EnvironmentFamilly = environmentFamilly;
         }
 
 

@@ -31,6 +31,7 @@ namespace Inventory.Domain.Models
             Subnet = subnet ?? throw new ArgumentNullException(nameof(subnet));
             CPU = cpu > 0 ? cpu : throw new ArgumentNullException(nameof(cpu));
             RAM = ram > 0 ? ram : throw new ArgumentNullException(nameof(ram));
+            Status = ServerStatus.To_be_Created;
 
             // Add system disk to new server
             if (operatingSystem.Familly == OsFamilly.Windows)
@@ -53,6 +54,8 @@ namespace Inventory.Domain.Models
         public int CPU { get; private set; }
         public int RAM { get; private set; }
         public System.Net.IPAddress Subnet { get; private set; }
+
+        public ServerStatus Status { get; private set; }
 
         //OS Familly
         public int OperatingSystemId { get; private set; }
@@ -120,10 +123,10 @@ namespace Inventory.Domain.Models
         public void LinkToEnvironment(Environment environment)
         {
             // Server can belong only to one Production Server and server can't be linked to Production and non production Server
-            var existingProdEnvironment = _serverEnvironments.FirstOrDefault(e => e.Environment.IsProduction);
+            var existingProdEnvironment = _serverEnvironments.FirstOrDefault(e => e.Environment.EnvironmentFamilly == EnvironmentFamilly.Production);
             if (null != existingProdEnvironment)
             {
-                if (environment.IsProduction)
+                if (environment.EnvironmentFamilly == EnvironmentFamilly.Production)
                 {
                     if (String.Compare(existingProdEnvironment.Environment.Name, environment.Name, StringComparison.InvariantCultureIgnoreCase) != 0)
                     {

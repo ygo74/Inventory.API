@@ -58,7 +58,7 @@ namespace Inventory.UnitTests
             var svc = new InventoryService(_serverRepository, _groupRepository, _osRepository, _envRepository, _serverGroupRepository, this.Logger);
 
             string hostName = $"srv-{Guid.NewGuid()}";
-            var server = await svc.AddServerAsync(hostName, OsFamilly.Windows, "windows 2016", "prd");
+            var server = await svc.AddServerAsync(hostName, OsFamilly.Windows, "windows 2016", "prd", System.Net.IPAddress.Parse("10.0.0.1"));
 
             var test = server.GetAnsibleVariables();
 
