@@ -13,7 +13,8 @@ namespace Inventory.Domain.Specifications
         {
             Query.Include(s => s.OperatingSystem);
             Query.Include(s => s.ServerDisks);
-            Query.Include(s => s.ServerEnvironments);                
+            Query.Include(s => s.ServerEnvironments);
+            Query.Include(s => s.ServerGroups).ThenInclude(sg => sg.Group);
         }
 
         public ServerSpecification(string hostName):this()
@@ -30,7 +31,6 @@ namespace Inventory.Domain.Specifications
 
         public ServerSpecification(string[] groupNames, string environment) : this()
         {
-            Query.Include(s => s.ServerGroups).ThenInclude(sg => sg.Group);
             Query.Where(s => s.ServerGroups.Any(sg => groupNames.Contains(sg.Group.Name)) 
                         && s.ServerEnvironments.Any(se => se.Environment.Name == environment));
         }
@@ -41,7 +41,6 @@ namespace Inventory.Domain.Specifications
         /// <param name="serverIds"></param>
         public ServerSpecification(IEnumerable<int> serverIds) : this()
         {
-            Query.Include(s => s.ServerGroups);
             Query.Where(s => serverIds.Contains(s.ServerId));
         }
 

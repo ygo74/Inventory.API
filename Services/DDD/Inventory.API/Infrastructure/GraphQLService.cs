@@ -53,6 +53,7 @@ namespace Inventory.API.Infrastructure
 
         public async Task<IReadOnlyList<ServerDto>> GetAllServersAsync()
         {
+
             var servers = await _serverRepository.ListAsync(new ServerSpecification());
             // Load Server Additional Data and calculate list of groups in this inventory
             var serversDto = new System.Collections.Concurrent.ConcurrentBag<ServerDto>();
