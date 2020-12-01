@@ -1,7 +1,9 @@
 ﻿using GraphQL.Types;
+using Inventory.API.Graphql.InputTypes;
+using Inventory.API.Graphql.Types;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Inventory.API.Types
+namespace Inventory.API.Graphql.InputTypes
 {
     public class ServerInputType : InputObjectGraphType
     {
@@ -13,6 +15,8 @@ namespace Inventory.API.Types
             Field<NonNullGraphType<StringGraphType>>().Name("os");
             Field<NonNullGraphType<StringGraphType>>().Name("environment");
             Field<NonNullGraphType<StringGraphType>>().Name("subnetIP");
+
+            Field<ListGraphType<DiskInputType>>().Name("Disks");
 
         }
     }

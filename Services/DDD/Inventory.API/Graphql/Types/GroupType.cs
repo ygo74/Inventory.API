@@ -11,7 +11,7 @@ using GraphQL.Utilities.Federation;
 using System.Text.Json;
 using Inventory.API.Dto;
 
-namespace Inventory.API.Types
+namespace Inventory.API.Graphql.Types
 {
     public class GroupType : ObjectGraphType<Group>
     {

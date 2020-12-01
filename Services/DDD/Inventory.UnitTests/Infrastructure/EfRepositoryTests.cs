@@ -37,9 +37,11 @@ namespace Inventory.UnitTests
         {
 
             var repo = new EfRepository<Server>(this.DbContext);
-            var server = await repo.GetByIdAsync(1);
+            var serverRef = this.DbContext.Servers.FirstOrDefault();
 
-            Assert.AreEqual(1, server.ServerId);
+            var serverCheck = await repo.GetByIdAsync(serverRef.ServerId);
+
+            Assert.AreEqual(serverRef.ServerId, serverCheck.ServerId);
         }
 
         [Test]

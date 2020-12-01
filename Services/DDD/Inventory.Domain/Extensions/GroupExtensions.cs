@@ -25,10 +25,18 @@ namespace Inventory.Domain.Extensions
             }
         }
 
+        /// <summary>
+        /// Get group and all its children
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public static IEnumerable<Group> FlattenChildrends(this Group entity)
         {
 
+            // Init group with entity
             List<Group> allChildrendGroups = new List<Group>();
+
+            // Add child group
             foreach(Group childGroup in entity.Children)
             {
                 allChildrendGroups.Add(childGroup);

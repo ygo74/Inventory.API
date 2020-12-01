@@ -1,15 +1,13 @@
 ﻿using GraphQL.Types;
 using GraphQL.Utilities.Federation;
 using Inventory.API.Dto;
-using Inventory.Domain.Extensions;
-using Inventory.Domain.Models;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Inventory.API.Types
+namespace Inventory.API.Graphql.Types
 {
     public class ServerType: ObjectGraphType<ServerDto>
     {

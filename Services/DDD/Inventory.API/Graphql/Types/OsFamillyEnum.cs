@@ -1,7 +1,7 @@
 ﻿using GraphQL.Types;
 using Inventory.Domain.Models;
 
-namespace Inventory.API.Types
+namespace Inventory.API.Graphql.Types
 {
     public class OsFamillyEnum : EnumerationGraphType<OsFamilly>
     {

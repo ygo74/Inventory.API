@@ -1,12 +1,14 @@
-﻿using Inventory.Domain.Models;
+﻿using Inventory.API.Dto;
+using Inventory.Domain.Models;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Inventory.API.Dto
+namespace Inventory.API.Commands
 {
-    public class CreateServerDto
+    public class CreateServerCommand : IRequest<ServerDto>
     {
         public String HostName { get; set; }
         public OsFamilly OsFamilly { get; set; }
@@ -14,5 +16,6 @@ namespace Inventory.API.Dto
         public String Environment { get; set; }
         public String SubnetIp { get; set; }
         public IEnumerable<DiskDto> Disks { get; set; }
+
     }
 }

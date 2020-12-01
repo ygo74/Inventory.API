@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 using Inventory.Domain.Repositories.Interfaces;
 using Inventory.Domain.Specifications;
 
+using MediatR;
+using Inventory.Domain.Events;
+
 namespace Inventory.Domain
 {
     public class InventoryService : IInventoryService
@@ -19,6 +22,8 @@ namespace Inventory.Domain
         private readonly IAsyncRepository<Models.Environment> _envRepository;
         private readonly IAsyncRepository<ServerGroup> _serverGroupRepository;
 
+        private readonly IMediator _mediator;
+
         private readonly ILogger<InventoryService> _logger;
 
         public InventoryService(IAsyncRepository<Server> serverRepository,
@@ -26,7 +31,8 @@ namespace Inventory.Domain
                                 IAsyncRepository<Models.OperatingSystem> osRepository,
                                 IAsyncRepository<Models.Environment> envRepository,
                                 IAsyncRepository<ServerGroup> serverGroupRepository,
-                                ILogger<InventoryService> logger)
+                                ILogger<InventoryService> logger,
+                                IMediator mediator)
         {
             _serverRepository = serverRepository ?? throw new ArgumentNullException(nameof(serverRepository));
             _groupRepository = groupRepository ?? throw new ArgumentNullException(nameof(groupRepository));
@@ -35,15 +41,18 @@ namespace Inventory.Domain
             _serverGroupRepository = serverGroupRepository ?? throw new ArgumentNullException(nameof(serverGroupRepository));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
 
         }
 
         #region Operating Systems
-        public async Task<Models.OperatingSystem> GetorAddOperatingSystemByName(OsFamilly osFamilly, string name)
+        public async Task<Models.OperatingSystem> GetorAddOperatingSystemByNameAsync(OsFamilly osFamilly, string name)
         {
+            _logger.LogDebug($"Get Or Add Operating System for {osFamilly} by : '{name}'");
             var os = await _osRepository.FirstOrDefaultAsync(new OsSpecification(name));
             if (null == os)
             {
+                _logger.LogDebug($"Create Operating System for {osFamilly} with name : '{name}'");
                 os = new Models.OperatingSystem(name, osFamilly);
                 await _osRepository.AddAsync(os);
                 await this.GetorAddGroupAsync(name, osFamilly.ToString());
@@ -77,7 +86,7 @@ namespace Inventory.Domain
         public async Task<Server> AddServerAsync(string hostName, OsFamilly osFamilly, string operatingSystemName, string environmentName, System.Net.IPAddress subnetIP)
         {
 
-            var os = await this.GetorAddOperatingSystemByName(osFamilly, operatingSystemName);
+            var os = await this.GetorAddOperatingSystemByNameAsync(osFamilly, operatingSystemName);
             var env = await _envRepository.FirstAsync(new EnvironmentSpecification(environmentName));
 
             var server = new Server(hostName, os, env, 2, 4, subnetIP);
@@ -124,6 +133,7 @@ namespace Inventory.Domain
                 }
                 
                 await _groupRepository.AddAsync(group);
+                await _mediator.Publish(new GroupChangedEvent(group.GroupId));
             }
 
             return group;

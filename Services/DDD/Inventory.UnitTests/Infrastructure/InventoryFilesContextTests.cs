@@ -31,6 +31,10 @@ namespace Inventory.UnitTests
 
             var ctx = new InventoryFilesContext(memoryCache, _logger);
             var variables = ctx.GetGroupVariables(@"D:\devel\github\ansible_inventory\tests\inventories\poc\group_vars", "windows" );
+            Assert.IsNotNull(variables);
+
+            Dictionary<String, Object> result = variables.ToObject<Dictionary<String, Object>>();
+            Assert.IsTrue(result.Count > 0);
 
         }
     }

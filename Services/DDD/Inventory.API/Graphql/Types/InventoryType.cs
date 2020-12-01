@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Inventory.API.Types
+namespace Inventory.API.Graphql.Types
 {
     public class InventoryType : ObjectGraphType<InventoryDto>
     {

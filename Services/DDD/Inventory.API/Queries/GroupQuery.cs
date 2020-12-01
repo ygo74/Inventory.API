@@ -2,7 +2,7 @@
 using GraphQL.Types;
 using Inventory.Domain.Models;
 using Inventory.Domain.Repositories.Interfaces;
-using Inventory.API.Types;
+using Inventory.API.Graphql.Types;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

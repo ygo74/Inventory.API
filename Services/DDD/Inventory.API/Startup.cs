@@ -21,9 +21,10 @@ using GraphQL.Utilities.Federation;
 using OperatingSystem = Inventory.Domain.Models.OperatingSystem;
 using Inventory.Domain;
 using Inventory.API.Infrastructure;
-using Inventory.API.Types;
+using Inventory.API.Graphql.Types;
 using Inventory.Infrastructure.GroupVarsFiles;
 using AutoMapper;
+using MediatR;
 
 namespace Inventory.API
 {
@@ -47,8 +48,10 @@ namespace Inventory.API
         {
 
             services.AddAutoMapper(typeof(Startup));
-
             services.AddMemoryCache();
+            services.AddMediatR(typeof(Startup));
+            services.AddScoped<IMediator, Mediator>();
+            services.AddScoped<ServiceFactory>(p => p.GetService);
 
             services.AddCustomDbContext(Configuration);
 

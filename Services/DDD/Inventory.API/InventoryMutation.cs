@@ -1,17 +1,20 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using Inventory.Domain.Models;
-using Inventory.API.Types;
+using Inventory.API.Graphql.Types;
 using Inventory.Domain;
 using Inventory.API.Dto;
 using System.ComponentModel.DataAnnotations;
 using Inventory.API.Infrastructure;
+using Inventory.API.Graphql.InputTypes;
+using Inventory.API.Commands;
+using MediatR;
 
 namespace Inventory.API
 {
     public class InventoryMutation : ObjectGraphType
     {
-        public InventoryMutation(InventoryService inventoryService, GraphQLService graphQLService)
+        public InventoryMutation(IMediator mediator)
         {
             Field<ServerType, ServerDto>()
                 .Name("createServer")
@@ -19,12 +22,10 @@ namespace Inventory.API
                 .Argument<NonNullGraphType<ServerInputType>>("server", "server input")
                 .ResolveAsync(async ctx =>
                 {
-                    var item = ctx.GetArgument<CreateServerDto>("server");
+                    var item = ctx.GetArgument<CreateServerCommand>("server");
 
-                    var subnetIp = System.Net.IPAddress.Parse(item.SubnetIp);
-                    var server = await inventoryService.AddServerAsync(item.HostName, item.OsFamilly, item.Os, item.Environment, subnetIp);
-
-                    return await graphQLService.GetOrFillServerData(server);
+                    var serverDto = await mediator.Send(item);
+                    return serverDto;
                 });
         }
     }
