@@ -1,4 +1,5 @@
-﻿using Inventory.API.Dto;
+﻿using FluentResults;
+using Inventory.API.Dto;
 using Inventory.API.Infrastructure;
 using Inventory.Domain;
 using Inventory.Domain.Models;
@@ -32,10 +33,17 @@ namespace Inventory.API.Commands
 
         public async Task<ServerDto> Handle(CreateServerCommand request, CancellationToken cancellationToken)
         {
+
+            //var validator = new CreateServerValidator();
+            //var validationResults = validator.Validate(request);
+
             var subnetIp = System.Net.IPAddress.Parse(request.SubnetIp);
             var server = await _inventoryService.AddServerAsync(request.HostName, request.OsFamilly, request.Os, request.Environment, subnetIp);
 
-            return await _graphQLService.GetOrFillServerData(server);
+            var serverDto = await _graphQLService.GetOrFillServerData(server);
+            //return Result.Ok(serverDto);
+            return serverDto;
+
         }
     }
 }

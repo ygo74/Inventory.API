@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Inventory.API
+namespace Inventory.API.Graphql
 {
     public class InventorySchema : Schema
     {

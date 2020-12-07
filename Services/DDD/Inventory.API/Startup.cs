@@ -25,6 +25,10 @@ using Inventory.API.Graphql.Types;
 using Inventory.Infrastructure.GroupVarsFiles;
 using AutoMapper;
 using MediatR;
+using Inventory.API.Graphql;
+using Inventory.API.Commands.Application.Behaviors;
+using Inventory.API.Commands;
+using FluentValidation;
 
 namespace Inventory.API
 {
@@ -52,12 +56,15 @@ namespace Inventory.API
             services.AddMediatR(typeof(Startup));
             services.AddScoped<IMediator, Mediator>();
             services.AddScoped<ServiceFactory>(p => p.GetService);
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorBehavior<,>));
 
             services.AddCustomDbContext(Configuration);
 
             services.AddSwagger()
                     .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            //services.AddTransient<IValidator<CreateServerCommand>, CreateServerValidator>();
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 
             services.AddScoped<IAsyncRepository<Server>, EfRepository<Server>>();

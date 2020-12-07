@@ -13,7 +13,7 @@ using GraphQL;
 using Inventory.API.Infrastructure;
 using Inventory.API.Dto;
 
-namespace Inventory.API
+namespace Inventory.API.Graphql
 {
     public class InventoryQuery : ObjectGraphType
     {
