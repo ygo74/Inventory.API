@@ -1,30 +1,25 @@
 ﻿using GraphQL.DataLoader;
 using GraphQL.Types;
-using Inventory.Domain.Models;
-using Inventory.Domain.Repositories.Interfaces;
+using Inventory.API.Application.Dto;
 using Inventory.API.Graphql.Types;
-using Microsoft.EntityFrameworkCore;
-using System;
+using Inventory.API.Infrastructure;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Inventory.Domain.Specifications;
 
-namespace Inventory.API
+namespace Inventory.API.Graphql.Queries
 {
     public class ServerQuery : ObjectGraphType
     {
-        public ServerQuery(IDataLoaderContextAccessor accessor, IAsyncRepository<Server> serverRepository)
+
+        public ServerQuery(IDataLoaderContextAccessor accessor, GraphQLService graphQLService)
         {
 
-            Name = "Server";
+            Field<ListGraphType<ServerType>, IReadOnlyList<ServerDto>>()
+                    .Name("Servers")
+                    .ResolveAsync(ctx =>
+                    {
+                        return graphQLService.GetAllServersAsync();
+                    });
 
-            Field<ListGraphType<ServerType>, IReadOnlyList<Server>>()
-                .Name("Servers")
-                .ResolveAsync(ctx =>
-               {
-                   return serverRepository.ListAsync(new ServerSpecification());
-               });
         }
     }
 }

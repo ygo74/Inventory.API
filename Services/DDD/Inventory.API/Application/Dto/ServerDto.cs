@@ -1,14 +1,11 @@
 ﻿using Inventory.Domain.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Inventory.API.Dto
+namespace Inventory.API.Application.Dto
 {
     public class ServerDto
     {
-        public String HostName { get; set; }
+        public string HostName { get; set; }
         public int CPU { get; private set; }
         public int RAM { get; private set; }
         public System.Net.IPAddress Subnet { get; private set; }
@@ -19,6 +16,6 @@ namespace Inventory.API.Dto
         private List<Group> _groups = new List<Group>();
         public List<Group> Groups => _groups;
 
-        public Dictionary<String, Object> Variables { get; set; }
+        public Dictionary<string, object> Variables { get; set; }
     }
 }

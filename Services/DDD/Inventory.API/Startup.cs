@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Autofac;
 using GraphQL.DataLoader;
 using GraphQL.Server;
 using GraphQL.Server.Ui.Playground;
@@ -29,6 +28,7 @@ using Inventory.API.Graphql;
 using Inventory.API.Commands.Application.Behaviors;
 using Inventory.API.Commands;
 using FluentValidation;
+using Inventory.API.Graphql.Extensions;
 
 namespace Inventory.API
 {
@@ -37,8 +37,6 @@ namespace Inventory.API
 
         public IConfiguration Configuration { get; }
         public IWebHostEnvironment Environment { get; }
-
-        public ILifetimeScope AutofacContainer { get; private set; }
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
@@ -79,30 +77,7 @@ namespace Inventory.API
             services.AddScoped<InventoryFilesContext>();
             services.AddScoped<GraphQLService>();
 
-            services.AddScoped<InventoryQuery>()
-                    .AddScoped<ServerQuery>()
-                    .AddScoped<GroupQuery>()
-                    .AddScoped<GroupType>()
-                    .AddScoped<InventoryType>()
-                    .AddScoped<InventoryMutation>()
-                    .AddScoped<InventorySchema>();
-
-
-
-            services.AddScoped<AnyScalarGraphType>()
-                    .AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>()
-                    .AddSingleton<DataLoaderDocumentListener>()
-                    .AddGraphQL((options, provider) =>
-                    {
-                        options.EnableMetrics = Environment.IsDevelopment();
-                        var logger = provider.GetRequiredService<ILogger<Startup>>();
-                        options.UnhandledExceptionDelegate = ctx => logger.LogError("{Error} occured", ctx.OriginalException.Message);
-                    })
-                    .AddSystemTextJson(deserializerSettings => { }, serializerSettings => { })
-                    .AddDataLoader()
-                    .AddGraphTypes(typeof(InventorySchema));
-
-
+            services.ResolveGraphDependencies(Environment);
 
         }
 

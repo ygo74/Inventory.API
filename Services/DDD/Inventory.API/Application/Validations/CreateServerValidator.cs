@@ -1,11 +1,8 @@
 ﻿using FluentValidation;
+using Inventory.API.Application.Commands;
 using Inventory.Domain.Models;
 using Inventory.Domain.Repositories.Interfaces;
 using Inventory.Domain.Specifications;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Inventory.API.Commands
 {

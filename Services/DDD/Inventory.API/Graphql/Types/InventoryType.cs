@@ -1,12 +1,7 @@
-﻿using GraphQL.DataLoader;
-using GraphQL.Types;
-using Inventory.API.Dto;
-using Inventory.API.Infrastructure;
+﻿using GraphQL.Types;
+using Inventory.API.Application.Dto;
 using Inventory.Domain.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Inventory.API.Graphql.Types
 {

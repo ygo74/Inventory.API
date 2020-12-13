@@ -1,22 +1,19 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using Inventory.Domain.Models;
 using Inventory.API.Graphql.Types;
-using Inventory.Domain;
-using Inventory.API.Dto;
+using Inventory.API.Graphql.InputTypes;
+using Inventory.API.Application.Dto;
+using Inventory.API.Application.Commands;
 using FluentValidation;
 using FluentValidation.Results;
-using Inventory.API.Infrastructure;
-using Inventory.API.Graphql.InputTypes;
-using Inventory.API.Commands;
 using MediatR;
 using System;
 
-namespace Inventory.API.Graphql
+namespace Inventory.API.Graphql.Mutations
 {
-    public class InventoryMutation : ObjectGraphType
+    public class ServerMutation : ObjectGraphType
     {
-        public InventoryMutation(IMediator mediator)
+        public ServerMutation(IMediator mediator)
         {
             Field<ServerType, ServerDto>()
                 .Name("createServer")

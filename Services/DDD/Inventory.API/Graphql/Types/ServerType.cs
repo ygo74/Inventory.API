@@ -1,11 +1,7 @@
 ﻿using GraphQL.Types;
 using GraphQL.Utilities.Federation;
-using Inventory.API.Dto;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
+using Inventory.API.Application.Dto;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Inventory.API.Graphql.Types
 {

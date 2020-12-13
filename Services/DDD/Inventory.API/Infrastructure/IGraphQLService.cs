@@ -1,5 +1,4 @@
-﻿using Inventory.API.Dto;
-using Inventory.Domain.Models;
+﻿using Inventory.API.Application.Dto;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;

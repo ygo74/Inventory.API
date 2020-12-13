@@ -7,7 +7,7 @@ using Inventory.Domain.Events;
 using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Inventory.API.EventHandlers
+namespace Inventory.API.Application.EventHandlers
 {
     public class GroupEventChangedHandler : INotificationHandler<GroupChangedEvent>
     {

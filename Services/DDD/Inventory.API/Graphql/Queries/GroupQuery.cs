@@ -9,22 +9,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Inventory.Domain.Specifications;
+using GraphQL;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Inventory.API
+namespace Inventory.API.Graphql.Queries
 {
     public class GroupQuery : ObjectGraphType
     {
-        public GroupQuery(IDataLoaderContextAccessor accessor, IAsyncRepository<Group> groupRepository)
+        public GroupQuery(IDataLoaderContextAccessor accessor, IGroupRepository groupRepository)
         {
-
-            Name = "Group";
 
             Field<ListGraphType<GroupType>, IReadOnlyList<Group>>()
                 .Name("Groups")
                 .ResolveAsync(ctx =>
-               {
-                   return groupRepository.ListAsync(new GroupSpecification());
-               });
+                {
+                    return groupRepository.ListAsync(new GroupSpecification());
+                });
+
+            Field<ListGraphType<GroupType>, IReadOnlyList<Group>>()
+                .Name("GroupByName")
+                .Argument<NonNullGraphType<StringGraphType>>("GroupName")
+                .Resolve(ctx =>
+                {
+                    var groupName = ctx.GetArgument<String>("GroupName");
+                    return groupRepository.GetAllLinkedGroups(groupName);
+
+                });
+
         }
     }
 }

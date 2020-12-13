@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
-using Inventory.API.Dto;
+using Inventory.API.Application.Dto;
 using Inventory.Domain;
 using Inventory.Domain.Extensions;
 using Inventory.Domain.Models;
 using Inventory.Domain.Repositories.Interfaces;
 using Inventory.Domain.Specifications;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
@@ -134,7 +133,10 @@ namespace Inventory.API.Infrastructure
             // Find all Allowed groups and child groups
             //var childGroups = _groupRepository.GetChildrenGroups(groupName);
             var childGroups = allInventoryGroups.Single(s => s.AnsibleGroupName == groupName.ToLower()).FlattenChildrends();
-            var allGroupNames = childGroups.Select(g => g.Name).ToArray();
+            var allGroupNames = new List<string>() { groupName }
+                                    .Concat(
+                                        childGroups.Select(g => g.Name)
+                                    ).ToArray();
 
             // Find all servers for these groups
             var servers = await _serverRepository.ListAsync(new ServerSpecification(allGroupNames, environment));
@@ -171,7 +173,7 @@ namespace Inventory.API.Infrastructure
             });
 
 
-           var allGroups = customGroups.Concat(serverGroups.Values).Distinct();
+            var allGroups = customGroups.Concat(serverGroups.Values).Distinct();
 
             var inventory = new InventoryDto()
             {

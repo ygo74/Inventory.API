@@ -18,6 +18,8 @@ namespace Inventory.API.Graphql.InputTypes
 
             Field<ListGraphType<DiskInputType>>().Name("Disks");
 
+            Field<ListGraphType<StringGraphType>>().Name("Groups");
+
         }
     }
 }

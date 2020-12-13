@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
-using Inventory.API.Dto;
+using Inventory.API.Application.Dto;
 using Inventory.Domain.Models;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace Inventory.API.Mapper
+namespace Inventory.API.Application.Mapper
 {
     public class ServerProfile : Profile
     {

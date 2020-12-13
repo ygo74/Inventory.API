@@ -9,7 +9,7 @@ using System.Linq;
 using Inventory.Infrastructure.GroupVarsFiles;
 using GraphQL.Utilities.Federation;
 using System.Text.Json;
-using Inventory.API.Dto;
+using Inventory.API.Application.Dto;
 
 namespace Inventory.API.Graphql.Types
 {
