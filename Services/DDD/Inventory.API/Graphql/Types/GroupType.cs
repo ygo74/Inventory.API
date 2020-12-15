@@ -10,12 +10,13 @@ using Inventory.Infrastructure.GroupVarsFiles;
 using GraphQL.Utilities.Federation;
 using System.Text.Json;
 using Inventory.API.Application.Dto;
+using Microsoft.Extensions.Configuration;
 
 namespace Inventory.API.Graphql.Types
 {
     public class GroupType : ObjectGraphType<Group>
     {
-        public GroupType(GraphQLService graphQLService, IDataLoaderContextAccessor accessor, InventoryFilesContext inventoryFilesContext)
+        public GroupType(GraphQLService graphQLService, IDataLoaderContextAccessor accessor, InventoryFilesContext inventoryFilesContext, IConfiguration configuration)
         {
             Field(g => g.GroupId);
             Field(g => g.Name);
@@ -111,9 +112,11 @@ namespace Inventory.API.Graphql.Types
 
                     if (!ctx.UserContext.ContainsKey("environment")) return null;
 
-
                     var env = ctx.UserContext["environment"];
-                    var result = inventoryFilesContext.GetGroupVariables($"/inventories/{env}/group_vars", ctx.Source.AnsibleGroupName);
+                    var envPath = configuration.GetValue<string>("InventoryPath");
+                    envPath = string.Format(envPath, env);
+
+                    var result = inventoryFilesContext.GetGroupVariables(envPath, ctx.Source.AnsibleGroupName);
                     if (result == null) { return null; }
                     return JsonDocument.Parse(result.ToString()).RootElement;
 
