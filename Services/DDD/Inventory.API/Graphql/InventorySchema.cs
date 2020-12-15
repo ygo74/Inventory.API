@@ -20,6 +20,7 @@ namespace Inventory.API.Graphql
             this.AddQuery<GroupQuery>(resolver);
 
             this.AddMutation<ServerMutation>(resolver);
+            this.AddMutation<GroupMutation>(resolver);
         }
 
     }

@@ -116,19 +116,14 @@ namespace Inventory.Domain
 
         public async Task<Group> GetorAddGroupAsync(string name, String parentName, string ansibleGroupName = null)
         {
-            var parentGroup = await _groupRepository.FirstAsync(new GroupSpecification(parentName));
-            return await this.GetorAddGroupAsync(name, parentGroup, ansibleGroupName);
-        }
-
-
-        public async Task<Group> GetorAddGroupAsync(string name, Group parent,  string ansibleGroupName=null)
-        {
             var group = await _groupRepository.FirstOrDefaultAsync(new GroupSpecification(name));
             if (null == group)
             {
                 group = new Group(name, ansibleGroupName);
-                if (parent != null)
+
+                if (!String.IsNullOrWhiteSpace(parentName))
                 {
+                    var parent = await _groupRepository.FirstAsync(new GroupSpecification(parentName));
                     parent.AddSubGroups(group);
                 }
                 
