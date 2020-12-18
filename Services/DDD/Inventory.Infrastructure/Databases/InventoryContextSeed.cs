@@ -35,6 +35,7 @@ namespace Inventory.Infrastructure.Databases
                     context.Locations.AddRange(GetLocations());
                     context.Environments.AddRange(environments);
                     context.OperatingSystems.AddRange(operatingSystems);
+                    context.TrustLevels.AddRange(GetTrustLevels());
 
                     context.Groups.AddRange(groups);
                     context.Servers.AddRange(servers);
@@ -152,6 +153,18 @@ namespace Inventory.Infrastructure.Databases
             };
         }
 
+        private List<TrustLevel> GetTrustLevels()
+        {
+
+            return new List<TrustLevel>()
+            {
+                new TrustLevel("Confidential", "COM"),
+                new TrustLevel("Secure", "SEC"),
+                new TrustLevel("Administration", "ADM"),
+                new TrustLevel("Internet", "INT"),
+                new TrustLevel("Extranet", "EXT")
+            };
+        }
 
     }
 }

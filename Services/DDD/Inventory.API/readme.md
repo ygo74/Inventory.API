@@ -24,6 +24,26 @@ https://volosoft.com/Blog/Building-GraphQL-APIs-with-ASP.NET-Core
 
 
 ## use Query
+
+### Configurations
+query allLocations
+{
+	locations
+	{
+		name
+		cityCode
+		countryCode
+	}
+}
+
+query allTrustLevels{
+	trustLevels{
+		name
+		code
+	}
+}
+
+# Inventory
 query {
 	servers {
 		name

@@ -82,11 +82,11 @@ namespace Inventory.Infrastructure.Databases
 
         #endregion
 
-        // COnfiguration tables
+        // Configuration tables
         public DbSet<Domain.Models.OperatingSystem> OperatingSystems { get; set; }
         public DbSet<Domain.Models.Environment> Environments { get; set; }
         public DbSet<Location> Locations { get; set; }
-
+        public DbSet<TrustLevel> TrustLevels { get; set; }
 
         // Inventory variables
         public DbSet<Server> Servers { get; set; }

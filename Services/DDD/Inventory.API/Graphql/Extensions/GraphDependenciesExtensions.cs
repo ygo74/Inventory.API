@@ -23,6 +23,9 @@ namespace Inventory.API.Graphql.Extensions
                     .AddScoped<InventoryType>()
                     .AddScoped<ServerMutation>()
                     .AddScoped<GroupMutation>()
+                    .AddScoped<LocationType>()
+                    .AddScoped<TrustLevelType>()
+                    .AddScoped<ConfigurationQuery>()
                     .AddScoped<InventorySchema>();
 
 

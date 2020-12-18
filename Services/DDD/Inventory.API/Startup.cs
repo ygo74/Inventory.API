@@ -65,13 +65,15 @@ namespace Inventory.API
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 
+            services.AddScoped<IAsyncRepository<Location>, EfRepository<Location>>();
+            services.AddScoped<IAsyncRepository<TrustLevel>, EfRepository<TrustLevel>>();
+            services.AddScoped<IAsyncRepository<OperatingSystem>, EfRepository<OperatingSystem>>();
+            services.AddScoped<IAsyncRepository<Domain.Models.Environment>, EfRepository<Domain.Models.Environment>>();
+
             services.AddScoped<IAsyncRepository<Server>, EfRepository<Server>>();
             services.AddScoped<IAsyncRepository<Group>, EfRepository<Group>>();
             services.AddScoped<IAsyncRepository<ServerGroup>, EfRepository<ServerGroup>>();
-            services.AddScoped<IAsyncRepository<OperatingSystem>, EfRepository<OperatingSystem>>();
-            services.AddScoped<IAsyncRepository<Domain.Models.Environment>, EfRepository<Domain.Models.Environment>>();
             services.AddScoped<IGroupRepository, GroupRepository >();
-
 
             services.AddScoped<InventoryService >();
             services.AddScoped<InventoryFilesContext>();

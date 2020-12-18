@@ -15,6 +15,8 @@ namespace Inventory.API.Graphql
     {
         public InventorySchema(IServiceProvider resolver) : base(resolver)
         {
+            this.AddQuery<ConfigurationQuery>(resolver);
+
             this.AddQuery<InventoryQuery>(resolver);
             this.AddQuery<ServerQuery>(resolver);
             this.AddQuery<GroupQuery>(resolver);
