@@ -2,8 +2,10 @@
 using Ardalis.Specification.EntityFrameworkCore;
 using Inventory.Domain.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Inventory.Infrastructure.Databases.Repositories
@@ -48,6 +50,16 @@ namespace Inventory.Infrastructure.Databases.Repositories
         public async Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec)
         {
             var specificationResult = ApplySpecification(spec);
+            return await specificationResult.ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec, Expression<Func<T, object>> selector = null)
+        {
+            var specificationResult = ApplySpecification(spec);
+            if (selector != null)
+            {
+                specificationResult.Select(selector);
+            }
             return await specificationResult.ToListAsync();
         }
 

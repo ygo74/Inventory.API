@@ -15,6 +15,7 @@ namespace Inventory.API.Graphql.Mutations
     {
         public ServerMutation(IMediator mediator)
         {
+            //Create New Server
             Field<ServerType, ServerDto>()
                 .Name("createServer")
                 .Description("Create New Server")
@@ -43,6 +44,12 @@ namespace Inventory.API.Graphql.Mutations
                         return null;
                     }
                 });
+
+
+            //Link Server to Application
+
+
+
         }
     }
 }

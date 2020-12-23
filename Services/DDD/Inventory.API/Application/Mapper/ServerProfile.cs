@@ -13,6 +13,10 @@ namespace Inventory.API.Application.Mapper
                 .ForMember(s => s.Groups, opt =>
                 {
                     opt.MapFrom(s => s.ServerGroups.Select(sg => sg.Group));
+                })
+                .ForMember(s => s.Environments, opt =>
+                {
+                    opt.MapFrom(s => s.ServerEnvironments.Select(se => se.Environment));
                 });
         }
     }

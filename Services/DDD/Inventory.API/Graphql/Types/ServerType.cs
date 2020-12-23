@@ -60,6 +60,13 @@ namespace Inventory.API.Graphql.Types
                 });
 
             Field<AnyScalarGraphType>()
+                .Name("environments")
+                .Resolve(ctx =>
+                {
+                    return ctx.Source.Environments.Select(e => e.Name).ToArray();
+                });
+
+            Field<AnyScalarGraphType>()
                 .Name("Variables")
                 .Resolve(ctx =>
                 {

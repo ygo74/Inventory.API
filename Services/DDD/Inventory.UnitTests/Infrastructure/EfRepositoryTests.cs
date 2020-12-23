@@ -25,7 +25,7 @@ namespace Inventory.UnitTests
         public async Task GetAllEnvironmentsTest()
         {
 
-            var repo = new EfRepository<Domain.Models.Environment>(this.DbContext);
+            var repo = new EfRepository<Inventory.Domain.Models.Environment>(this.DbContext);
             var environments = await repo.ListAllAsync();
 
             Assert.IsTrue(environments.Any());

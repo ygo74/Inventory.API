@@ -24,8 +24,8 @@ namespace Inventory.UnitTests
 
         private readonly IAsyncRepository<Server> _serverRepository;
         private readonly IAsyncRepository<Group> _groupRepository;
-        private readonly IAsyncRepository<Domain.Models.OperatingSystem> _osRepository;
-        private readonly IAsyncRepository<Domain.Models.Environment> _envRepository;
+        private readonly IAsyncRepository<Inventory.Domain.Models.OperatingSystem> _osRepository;
+        private readonly IAsyncRepository<Inventory.Domain.Models.Environment> _envRepository;
         private readonly IAsyncRepository<ServerGroup> _serverGroupRepository;
         private readonly Mock<IMediator> _mediator;
         private readonly InventoryService _inventoryService;
@@ -35,8 +35,8 @@ namespace Inventory.UnitTests
         {
             _groupRepository = new EfRepository<Group>(this.DbContext);
             _serverRepository = new EfRepository<Server>(this.DbContext);
-            _osRepository = new EfRepository<Domain.Models.OperatingSystem>(this.DbContext);
-            _envRepository = new EfRepository<Domain.Models.Environment>(this.DbContext);
+            _osRepository = new EfRepository<Inventory.Domain.Models.OperatingSystem>(this.DbContext);
+            _envRepository = new EfRepository<Inventory.Domain.Models.Environment>(this.DbContext);
             _serverGroupRepository = new EfRepository<ServerGroup>(this.DbContext);
             _mediator = new Mock<IMediator>();
 

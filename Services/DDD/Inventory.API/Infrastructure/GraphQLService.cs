@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Inventory.API.Application.Dto;
+using Inventory.API.Graphql.Filters;
 using Inventory.Domain;
 using Inventory.Domain.Extensions;
+using Inventory.Domain.Filters;
 using Inventory.Domain.Models;
 using Inventory.Domain.Repositories.Interfaces;
 using Inventory.Domain.Specifications;
@@ -49,11 +51,32 @@ namespace Inventory.API.Infrastructure
 
         }
 
-
-        public async Task<IReadOnlyList<ServerDto>> GetAllServersAsync()
+        public async Task<ILookup<int, ServerDto>> GetServersByEnvironmentAsync(IEnumerable<int> environmentIds, CancellationToken token)
         {
+            var serverFilter = new ServerFilter()
+            {
+                EnvironmentIds = environmentIds.ToArray()
+            };
 
-            var servers = await _serverRepository.ListAsync(new ServerSpecification());
+            var serverGroups = await _serverRepository.ListAsync(new ServerSpecification(serverFilter));
+            var groupBy = serverGroups.SelectMany(s => s.ServerEnvironments, (s, se) => new { se.EnvironmentId, se.Server });
+
+            return groupBy.ToLookup(s => s.EnvironmentId, s =>
+            {
+                var dtoServer = GetOrFillServerData(s.Server);
+                dtoServer.Wait();
+                return dtoServer.Result;
+            });
+
+        }
+
+
+
+        public async Task<IReadOnlyList<ServerDto>> GetAllServersAsync(ServerFilter filter)
+        {
+            var serverSpec = new ServerSpecification(filter);
+            var servers = await _serverRepository.ListAsync(serverSpec);
+
             // Load Server Additional Data and calculate list of groups in this inventory
             var serversDto = new System.Collections.Concurrent.ConcurrentBag<ServerDto>();
 

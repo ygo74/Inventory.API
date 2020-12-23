@@ -1,4 +1,5 @@
 ﻿using Ardalis.Specification;
+using Inventory.Domain.Filters;
 using Inventory.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace Inventory.Domain.Specifications
 {
     public class ServerSpecification : Specification<Server>
     {
-        public ServerSpecification()
+        public ServerSpecification() 
         {
             Query.Include(s => s.OperatingSystem);
             Query.Include(s => s.ServerDisks);
@@ -44,6 +45,30 @@ namespace Inventory.Domain.Specifications
             Query.Where(s => serverIds.Contains(s.ServerId));
         }
 
+        public ServerSpecification(ServerFilter filter) : this()
+        {
+            if (filter.LoadChildren)
+            {
+                Query.Include(s => s.OperatingSystem);
+                Query.Include(s => s.ServerDisks);
+                Query.Include(s => s.ServerEnvironments);
+                Query.Include(s => s.ServerGroups).ThenInclude(sg => sg.Group);
+            }
+
+            if (filter.IsPagingEnabled)
+            {
+                Query.Skip(filter.Skip);
+                Query.Take(filter.Take);
+            }
+
+            if (filter.EnvironmentIds != null)
+            {
+                Query.Include(s => s.ServerEnvironments).ThenInclude(se => se.Environment);
+                Query.Where(s => s.ServerEnvironments.Any(se => filter.EnvironmentIds.Contains(se.EnvironmentId)));
+                
+            }
+            
+        }
 
     }
 }
