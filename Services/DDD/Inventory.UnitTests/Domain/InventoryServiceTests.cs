@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.UnitTests
 {
-    public class InventoryServiceTests : BaseInventoryTests<InventoryService>
+    public class InventoryServiceTests : BaseDbInventoryTests<InventoryService>
     {
 
         private readonly IAsyncRepository<Server> _serverRepository;

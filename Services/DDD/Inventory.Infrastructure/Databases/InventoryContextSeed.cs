@@ -24,15 +24,23 @@ namespace Inventory.Infrastructure.Databases
                     var environments = GetEnvironments();
                     var servers = GetFakeServers(operatingSystems, environments);
                     var groups = GetDefaultGroups();
+                    var locations = GetLocations();
+                    var location = locations.FirstOrDefault();
+                    var applications = GetFakeApplications();
+                    var application = applications.FirstOrDefault();
 
                     foreach (Server srv in servers)
                     {
                         var group = groups.Single(grp => grp.Name == srv.OperatingSystem.Name);
                         group.AddServer(srv);
+
+                        location.AddServer(srv);
+
+                        application.AddServer(srv);
                     }
 
-
-                    context.Locations.AddRange(GetLocations());
+                    context.Applications.AddRange(applications);
+                    context.Locations.AddRange(locations);
                     context.Environments.AddRange(environments);
                     context.OperatingSystems.AddRange(operatingSystems);
                     context.TrustLevels.AddRange(GetTrustLevels());
@@ -84,6 +92,16 @@ namespace Inventory.Infrastructure.Databases
                 new Server("lxTest2", rhel7,       poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
                 new Server("lxTest3", rhel8,       sit, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
                 new Server("lxTest4", rhel8,       poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
+            };
+        }
+
+
+        private List<Application> GetFakeApplications()
+        {
+            return new List<Application>()
+            {
+                new Application("MyApp1", "ap1"),
+                new Application("MyApp2", "ap2")
             };
         }
 

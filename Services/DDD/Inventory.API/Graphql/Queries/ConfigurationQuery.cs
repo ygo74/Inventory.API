@@ -16,7 +16,8 @@ namespace Inventory.API.Graphql.Queries
 
         public ConfigurationQuery(IDataLoaderContextAccessor accessor, IAsyncRepository<Location> locationRepository,
                                                                        IAsyncRepository<TrustLevel> trustLevelRepository,
-                                                                       IAsyncRepository<Inventory.Domain.Models.Environment> environmentRepository)
+                                                                       IAsyncRepository<Inventory.Domain.Models.Environment> environmentRepository,
+                                                                       IAsyncRepository<Inventory.Domain.Models.Application> applicationRepository)
         {
 
             Field<ListGraphType<LocationType>, IReadOnlyList<Location>>()
@@ -49,6 +50,20 @@ namespace Inventory.API.Graphql.Queries
                             var envSpec = new EnvironmentSpecification(envName);
                             return environmentRepository.ListAsync(envSpec);
                         }
+                    });
+
+            Field<ListGraphType<ApplicationType>, IReadOnlyList<Inventory.Domain.Models.Application>>()
+                    .Name("Applications")
+                    .Argument<StringGraphType>("name")
+                    .Argument<StringGraphType>("code")
+                    .ResolveAsync(ctx =>
+                    {
+                        var appSpec = new ApplicationSpecification();
+                        appSpec.Name = ctx.GetArgument<string>("name");
+                        appSpec.Code = ctx.GetArgument<string>("code");
+                        return applicationRepository.ListAsync(appSpec);
+                        //return applicationRepository.ListAllAsync();
+
                     });
 
         }

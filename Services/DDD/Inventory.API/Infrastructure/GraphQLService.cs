@@ -22,16 +22,20 @@ namespace Inventory.API.Infrastructure
         private readonly InventoryService _inventoryService;
         private readonly IGroupRepository _groupRepository;
         private readonly IAsyncRepository<Server> _serverRepository;
+        private readonly IAsyncRepository<Inventory.Domain.Models.Application> _applicationRepository;
         private readonly IMemoryCache _cache;
 
         private readonly IMapper _mapper;
 
 
-        public GraphQLService(InventoryService inventoryService, IGroupRepository groupRepository, IAsyncRepository<Server> serverRepository, IMemoryCache cache, IMapper mapper)
+        public GraphQLService(InventoryService inventoryService, IGroupRepository groupRepository, IAsyncRepository<Server> serverRepository,
+                                IAsyncRepository<Inventory.Domain.Models.Application> applicationRepository,
+                                IMemoryCache cache, IMapper mapper)
         {
             _inventoryService = inventoryService ?? throw new ArgumentNullException(nameof(inventoryService));
             _groupRepository = groupRepository ?? throw new ArgumentNullException(nameof(groupRepository));
             _serverRepository = serverRepository ?? throw new ArgumentNullException(nameof(serverRepository));
+            _applicationRepository = applicationRepository ?? throw new ArgumentNullException(nameof(applicationRepository));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
@@ -70,6 +74,22 @@ namespace Inventory.API.Infrastructure
 
         }
 
+        public async Task<ILookup<int, ServerDto>> GetServersByApplicationAsync(IEnumerable<int> applicationIds, CancellationToken token)
+        {
+            var appSpec = new ApplicationSpecification()
+            {
+                ApplicationIds = applicationIds.ToArray()
+            };
+
+            var applicationsServers = await _applicationRepository.ListAsync(appSpec);
+            return applicationsServers.SelectMany(a => a.Servers, (a, srv) => new { a.ApplicationId, srv }).ToLookup(a => a.ApplicationId, a =>
+            {
+                var dtoServer = GetOrFillServerData(a.srv);
+                dtoServer.Wait();
+                return dtoServer.Result;
+            });
+
+        }
 
 
         public async Task<IReadOnlyList<ServerDto>> GetAllServersAsync(ServerFilter filter)

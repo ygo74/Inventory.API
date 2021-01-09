@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.UnitTests
 {
-    public class BaseInventoryTests<T> : IDisposable
+    public class BaseDbInventoryTests<T> : IDisposable
     {
         //private readonly DbContextOptions<InventoryDbContext> _dbOptions = new DbContextOptionsBuilder<InventoryDbContext>()
         //                                                                    .UseInMemoryDatabase(databaseName: "in-memory")
@@ -50,7 +50,7 @@ namespace Inventory.UnitTests
             get { return _logger;  }
         }
 
-        public BaseInventoryTests()
+        public BaseDbInventoryTests()
         {
 
             var loggerFactory = LoggerFactory.Create(builder => builder.AddDebug());
@@ -80,11 +80,15 @@ namespace Inventory.UnitTests
 
             var logger = new Logger<InventoryContextSeed>(new NullLoggerFactory());
             new InventoryContextSeed().SeedAsync(_dbContext, logger).Wait();
+
+
+
+
         }
 
         public void Dispose()
         {
-            _dbContext.Database.EnsureDeleted();
+            //_dbContext.Database.EnsureDeleted();
             _dbContext.Dispose();
         }
     }

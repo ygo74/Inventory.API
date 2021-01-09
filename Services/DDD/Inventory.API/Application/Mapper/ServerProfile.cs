@@ -17,7 +17,8 @@ namespace Inventory.API.Application.Mapper
                 .ForMember(s => s.Environments, opt =>
                 {
                     opt.MapFrom(s => s.ServerEnvironments.Select(se => se.Environment));
-                });
+                })
+                .ForMember(s => s.Disks, opt => opt.MapFrom(s => s.ServerDisks));
         }
     }
 }

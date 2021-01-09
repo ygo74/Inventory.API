@@ -1,6 +1,7 @@
 ﻿using GraphQL.Types;
 using GraphQL.Utilities.Federation;
 using Inventory.API.Application.Dto;
+using Inventory.API.Graphql.Types.Disks;
 using System.Linq;
 
 namespace Inventory.API.Graphql.Types
@@ -52,6 +53,13 @@ namespace Inventory.API.Graphql.Types
                     return ctx.Source.OperatingSystem.Familly;
                 });
 
+            Field<LocationType>()
+                .Name("location")
+                .Resolve(ctx =>
+                {
+                    return ctx.Source.Location;
+                });
+
             Field<AnyScalarGraphType>()
                 .Name("group_names")
                 .Resolve(ctx =>
@@ -64,6 +72,14 @@ namespace Inventory.API.Graphql.Types
                 .Resolve(ctx =>
                 {
                     return ctx.Source.Environments.Select(e => e.Name).ToArray();
+                });
+
+
+            Field<ListGraphType<DiskInterfaceGraphType>>()
+                .Name("disks")
+                .Resolve(ctx =>
+                {
+                    return ctx.Source.Disks;
                 });
 
             Field<AnyScalarGraphType>()

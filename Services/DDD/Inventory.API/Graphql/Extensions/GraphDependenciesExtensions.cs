@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
 using System;
 using Microsoft.AspNetCore.Hosting;
+using Inventory.API.Graphql.Types.Disks;
 
 namespace Inventory.API.Graphql.Extensions
 {
@@ -16,16 +17,23 @@ namespace Inventory.API.Graphql.Extensions
     {
         public static void ResolveGraphDependencies(this IServiceCollection services, IWebHostEnvironment environment)
         {
-            services.AddScoped<InventoryQuery>()
-                    .AddScoped<ServerQuery>()
-                    .AddScoped<GroupQuery>()
-                    .AddScoped<GroupType>()
+
+            services.AddScoped<GroupType>()
                     .AddScoped<InventoryType>()
-                    .AddScoped<ServerMutation>()
-                    .AddScoped<GroupMutation>()
                     .AddScoped<LocationType>()
                     .AddScoped<TrustLevelType>()
                     .AddScoped<EnvironmentType>()
+                    .AddScoped<ApplicationType>()
+                    .AddScoped<DiskInterfaceGraphType>()
+                    .AddScoped<BaseDiskType>()
+                    .AddScoped<LinuxDiskType>()
+                    .AddScoped<WindowsDiskType>();
+
+            services.AddScoped<InventoryQuery>()
+                    .AddScoped<ServerQuery>()
+                    .AddScoped<GroupQuery>()
+                    .AddScoped<ServerMutation>()
+                    .AddScoped<GroupMutation>()
                     .AddScoped<ConfigurationQuery>()
                     .AddScoped<InventorySchema>();
 

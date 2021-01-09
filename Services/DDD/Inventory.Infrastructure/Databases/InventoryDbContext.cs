@@ -89,6 +89,7 @@ namespace Inventory.Infrastructure.Databases
         public DbSet<TrustLevel> TrustLevels { get; set; }
 
         // Inventory variables
+        public DbSet<Application> Applications { get; set; }
         public DbSet<Server> Servers { get; set; }
         public DbSet<Group>  Groups { get; set; }
         //public DbSet<ServerGroup> ServerGroups { get; set; }

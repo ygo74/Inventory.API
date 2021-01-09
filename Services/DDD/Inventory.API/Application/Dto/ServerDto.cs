@@ -16,8 +16,14 @@ namespace Inventory.API.Application.Dto
         public ServerStatus Status { get; private set; }
         public Domain.Models.OperatingSystem OperatingSystem { get; private set; }
 
+        public Location Location { get; private set; }
+
         private List<Group> _groups = new List<Group>();
         public List<Group> Groups => _groups;
+
+
+        private List<BaseDisk> _disks = new List<BaseDisk>();
+        public List<BaseDisk> Disks => _disks;
 
         public Dictionary<string, object> Variables { get; set; }
     }

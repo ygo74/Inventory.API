@@ -2,25 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Inventory.Domain.Models
 {
-    public class Location
+    public class Application
     {
-        public int LocationId { get; private set; }
+        public int ApplicationId { get; private set; }
         public string Name { get; private set; }
-        public string CountryCode { get; private set; }
-        public string CityCode { get; private set; }
+        public string Code { get; private set; }
 
         // List of Servers
         private List<Server> _servers = new List<Server>();
         public ICollection<Server> Servers => _servers.AsReadOnly();
 
-        public Location(string name, string countryCode, string cityCode)
+
+        public Application()
+        { }
+
+        public Application(string name, string code)
         {
-            Name = !String.IsNullOrEmpty(name) ? name : throw new ArgumentNullException(nameof(name));
-            CountryCode = !String.IsNullOrEmpty(countryCode) ? countryCode : throw new ArgumentNullException(nameof(countryCode));
-            CityCode = !String.IsNullOrEmpty(cityCode) ? cityCode : throw new ArgumentNullException(nameof(cityCode));
+            Name = !String.IsNullOrEmpty(name) ? name.ToLower() : throw new ArgumentNullException(nameof(name));
+            Code = !String.IsNullOrEmpty(code) ? code.ToUpper() : throw new ArgumentNullException(nameof(code));
         }
 
         public void AddServer(Server server)

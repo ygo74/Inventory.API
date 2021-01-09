@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.UnitTests
 {
-    public class EfRepositoryTests : BaseInventoryTests<EfRepository<Server>>
+    public class EfRepositoryTests : BaseDbInventoryTests<EfRepository<Server>>
     {
 
         [Test]
@@ -71,6 +71,41 @@ namespace Inventory.UnitTests
 
             Assert.IsTrue(groups.Any());
         }
+
+        [Test]
+        public async Task GetAllApplicationsTest()
+        {
+            var repo = new EfRepository<Application>(this.DbContext);
+            var applications = await repo.ListAllAsync();
+
+            Assert.IsTrue(applications.Any());
+        }
+
+        [Test]
+        public async Task GetApplicationsByNameTest()
+        {
+
+            var appSpec = new ApplicationSpecification();
+            appSpec.Name = "MyApp1";
+            var repo = new EfRepository<Application>(this.DbContext);
+            var applications = await repo.ListAsync(appSpec);
+
+            Assert.IsTrue(applications.Any());
+        }
+
+        [Test]
+        public async Task GetApplicationsByNameAndCodeTest()
+        {
+
+            var appSpec = new ApplicationSpecification();
+            appSpec.Name = "MyApp1";
+            appSpec.Code = "ap1";
+            var repo = new EfRepository<Application>(this.DbContext);
+            var applications = await repo.ListAsync(appSpec);
+
+            Assert.IsTrue(applications.Any());
+        }
+
 
         [Test]
         public async Task GetServersByGroupsTest()

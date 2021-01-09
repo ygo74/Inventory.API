@@ -68,6 +68,7 @@ namespace Inventory.API
             services.AddScoped<IAsyncRepository<Location>, EfRepository<Location>>()
                     .AddScoped<IAsyncRepository<TrustLevel>, EfRepository<TrustLevel>>()
                     .AddScoped<IAsyncRepository<OperatingSystem>, EfRepository<OperatingSystem>>()
+                    .AddScoped<IAsyncRepository<Domain.Models.Application>, EfRepository<Domain.Models.Application>>()
                     .AddScoped<IAsyncRepository<Domain.Models.Environment>, EfRepository<Domain.Models.Environment>>();
 
             services.AddScoped<IAsyncRepository<Server>, EfRepository<Server>>();

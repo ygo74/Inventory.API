@@ -69,10 +69,17 @@ namespace Inventory.Domain.Models
         private List<ServerEnvironment> _serverEnvironments = new List<ServerEnvironment>();
         public ICollection<ServerEnvironment> ServerEnvironments => _serverEnvironments.AsReadOnly();
 
+        // Many to Many Applications
+        private List<Application> _applications = new List<Application>();
+        public ICollection<Application> Applications => _applications.AsReadOnly();
+
         //Disk
         private List<BaseDisk> _serverDisks = new List<BaseDisk>();
         public ICollection<BaseDisk> ServerDisks => _serverDisks.AsReadOnly();
 
+        //Location
+        public int LocationId { get; private set; }
+        public Location Location { get; private set; }
 
         #region Managed disks
 
