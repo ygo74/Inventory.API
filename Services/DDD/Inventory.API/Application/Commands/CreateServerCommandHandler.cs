@@ -2,10 +2,12 @@
 using Inventory.API.Infrastructure;
 using Inventory.Domain;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 
 namespace Inventory.API.Application.Commands
@@ -17,13 +19,18 @@ namespace Inventory.API.Application.Commands
         private readonly ILogger<CreateServerCommandHandler> _logger;
         private readonly IMediator _mediator;
         private readonly GraphQLService _graphQLService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CreateServerCommandHandler(InventoryService inventoryService, GraphQLService graphQLService, ILogger<CreateServerCommandHandler> logger, IMediator mediator)
+        public CreateServerCommandHandler(InventoryService inventoryService, GraphQLService graphQLService, 
+                                          ILogger<CreateServerCommandHandler> logger, IMediator mediator, 
+                                          IHttpContextAccessor httpContextAccessor)
         {
             _inventoryService = inventoryService ?? throw new ArgumentNullException(nameof(inventoryService));
             _graphQLService = graphQLService ?? throw new ArgumentNullException(nameof(graphQLService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            
 
         }
 

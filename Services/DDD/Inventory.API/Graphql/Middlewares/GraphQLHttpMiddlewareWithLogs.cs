@@ -7,7 +7,7 @@ using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace Inventory.API.Middlewares
+namespace Inventory.API.Graphql.Middlewares
 {
     public class GraphQLHttpMiddlewareWithLogs<TSchema> : GraphQLHttpMiddleware<TSchema>
         where TSchema : ISchema

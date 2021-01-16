@@ -7,6 +7,7 @@ using Inventory.Domain.Filters;
 using Inventory.Domain.Models;
 using Inventory.Domain.Repositories.Interfaces;
 using Inventory.Domain.Specifications;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
@@ -27,10 +28,13 @@ namespace Inventory.API.Infrastructure
 
         private readonly IMapper _mapper;
 
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+
 
         public GraphQLService(InventoryService inventoryService, IGroupRepository groupRepository, IAsyncRepository<Server> serverRepository,
                                 IAsyncRepository<Inventory.Domain.Models.Application> applicationRepository,
-                                IMemoryCache cache, IMapper mapper)
+                                IMemoryCache cache, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _inventoryService = inventoryService ?? throw new ArgumentNullException(nameof(inventoryService));
             _groupRepository = groupRepository ?? throw new ArgumentNullException(nameof(groupRepository));
@@ -38,6 +42,7 @@ namespace Inventory.API.Infrastructure
             _applicationRepository = applicationRepository ?? throw new ArgumentNullException(nameof(applicationRepository));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
 
         }
 
@@ -170,6 +175,10 @@ namespace Inventory.API.Infrastructure
 
         public async Task<InventoryDto> GetInventoryForGroupAsync(string groupName, string environment)
         {
+
+            var claims = _httpContextAccessor.HttpContext.User.Identities.FirstOrDefault().Claims.ToList();
+
+
             // Get AllGroups
             var allInventoryGroups = await this.GetAllGroupAsync();
 

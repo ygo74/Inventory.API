@@ -33,6 +33,11 @@ namespace Inventory.Infrastructure.Databases.EntityConfiguration
             // Disks
             builder.HasMany(s => s.ServerDisks);
 
+            // Location
+            builder.HasOne(s => s.Location)
+                .WithMany(l => l.Servers)
+                .HasForeignKey(s => s.LocationId);
+
             // Ignore server Properties
             //Variables
             //builder.Ignore(s => s.Variables);

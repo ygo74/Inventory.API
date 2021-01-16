@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using GraphQL.Server.Authorization.AspNetCore;
 using Inventory.API.Graphql.Types;
 using Inventory.API.Graphql.InputTypes;
 using Inventory.API.Application.Dto;
@@ -19,6 +20,7 @@ namespace Inventory.API.Graphql.Mutations
             Field<ServerType, ServerDto>()
                 .Name("createServer")
                 .Description("Create New Server")
+                .AuthorizeWith("admin")
                 .Argument<NonNullGraphType<ServerInputType>>("server", "server input")
                 .ResolveAsync(async ctx =>
                 {
