@@ -78,7 +78,7 @@ namespace Inventory.Domain.Models
         public ICollection<BaseDisk> ServerDisks => _serverDisks.AsReadOnly();
 
         //Location
-        public int LocationId { get; private set; }
+        public int? LocationId { get; private set; }
         public Location Location { get; private set; }
 
         #region Managed disks

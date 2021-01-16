@@ -1,5 +1,7 @@
 ﻿using GraphQL.DataLoader;
 using GraphQL.Types;
+using GraphQL.Server.Authorization.AspNetCore;
+
 using Inventory.Domain.Models;
 using Inventory.Domain.Repositories.Interfaces;
 using Inventory.API.Graphql.Types;
@@ -17,6 +19,7 @@ namespace Inventory.API.Graphql.Queries
 
             Field<InventoryType, InventoryDto>()
                 .Name("Inventory")
+                .AuthorizeWith("ansible")
                 .Argument<NonNullGraphType<StringGraphType>>("GroupName")
                 .Argument<NonNullGraphType<StringGraphType>>("Environment")
                 .ResolveAsync(ctx =>

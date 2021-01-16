@@ -29,6 +29,7 @@ using Inventory.API.Commands.Application.Behaviors;
 using Inventory.API.Commands;
 using FluentValidation;
 using Inventory.API.Graphql.Extensions;
+using Inventory.API.Graphql.Middlewares;
 
 namespace Inventory.API
 {
@@ -110,7 +111,11 @@ namespace Inventory.API
                   c.SwaggerEndpoint("/swagger/v1/swagger.json", "Inventory.API V1");
               });
 
-            //app.UseGraphQL<InventorySchema, GraphQLHttpMiddlewareWithLogs<InventorySchema>>("/graphql");
+            app.UseRouting();
+
+            //app.UseGraphQL<InventorySchema, DebugPipelineMiddleware<InventorySchema>>("/graphql");
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseGraphQL<InventorySchema>("/graphql");
 
             app.UseGraphQLPlayground(new GraphQLPlaygroundOptions
@@ -142,7 +147,6 @@ namespace Inventory.API
                 },
             });
 
-            app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
