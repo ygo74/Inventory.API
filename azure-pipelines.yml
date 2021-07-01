@@ -7,6 +7,12 @@ stages:
         name: setvarStep
       - bash: echo $(System.JobName)
 
+  - job: A2
+    steps:
+      - pwsh: echo "##vso[task.setvariable variable=RunStageC;isOutput=true]true"
+        name: setvarStep
+      - bash: echo $(System.JobName)
+
 - stage: StageB
   dependsOn: 
     - StageA
