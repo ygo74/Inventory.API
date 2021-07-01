@@ -1,34 +1,49 @@
-# ASP.NET Core (.NET Framework)
-# Build and test ASP.NET Core projects targeting the full .NET Framework.
-# Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
-
-trigger:
-- master
-
-pool:
-  vmImage: 'windows-latest'
-
-variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-
-steps:
-- task: NuGetToolInstaller@1
-
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+stages:
+- stage: StageA
+  jobs:
+  - deployment: A1
+    pool:
+      vmImage: 'ubuntu-16.04'
+    environment: env1
+    strategy:                  
+      runOnce:
+        deploy:
+          steps:
+          - bash: echo "##vso[task.setvariable variable=myOutputVar;isOutput=true]this is the deployment variable value"
+            name: setvarStep
+          - bash: echo $(System.JobName)
+  - deployment: A2
+    pool:
+      vmImage: 'ubuntu-16.04'
+    environment: 
+      name: env2
+      resourceType: virtualmachine
+    strategy:                  
+      runOnce:
+        deploy:
+          steps:
+          - script: echo "##vso[task.setvariable variable=myOutputVarTwo;isOutput=true]this is the second deployment variable value"
+            name: setvarStepTwo
+  
+  - job: B1
+    dependsOn: A1
+    pool:
+      vmImage: 'ubuntu-16.04'
+    variables:
+      myVarFromDeploymentJob: $[ dependencies.A1.outputs['A1.setvarStep.myOutputVar'] ]
+      
+    steps:
+    - script: "echo $(myVarFromDeploymentJob)"
+      name: echovar
+ 
+  - job: B2
+    dependsOn: A2
+    pool:
+      vmImage: 'ubuntu-16.04'
+    variables:
+      myVarFromDeploymentJob: $[ dependencies.A2.outputs['A2.setvarStepTwo.myOutputVar'] ]
+      myOutputVarTwo: $[ dependencies.A2.outputs['Deploy_vmsfortesting.setvarStepTwo.myOutputVarTwo'] ]
+    
+    steps:
+    - script: "echo $(myOutputVarTwo)"
+      name: echovartwo
