@@ -18,12 +18,12 @@ namespace Inventory.API.Graphql.Types
                     });
 
             //Servers
-            Field<ListGraphType<GroupType>, IEnumerable<Group>>()
-                    .Name("Groups")
-                    .Resolve(ctx =>
-                    {
-                        return ctx.Source.Groups;
-                    });
+            //Field<ListGraphType<GroupType>, IEnumerable<Group>>()
+            //        .Name("Groups")
+            //        .Resolve(ctx =>
+            //        {
+            //            return ctx.Source.Groups;
+            //        });
 
         }
 

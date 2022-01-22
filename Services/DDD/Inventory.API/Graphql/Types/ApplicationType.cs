@@ -1,6 +1,7 @@
 ﻿using GraphQL.DataLoader;
 using GraphQL.Types;
 using Inventory.API.Application.Dto;
+using Inventory.API.Application.Servers;
 using Inventory.API.Infrastructure;
 using Inventory.Domain.Models;
 using Inventory.Domain.Repositories.Interfaces;
@@ -13,7 +14,7 @@ namespace Inventory.API.Graphql.Types
 {
     public class ApplicationType : ObjectGraphType<Inventory.Domain.Models.Application>
     {
-        public ApplicationType(GraphQLService graphQLService, IDataLoaderContextAccessor accessor)
+        public ApplicationType(ServerService serverService, IDataLoaderContextAccessor accessor)
         {
             Field(e => e.Name);
             Field(e => e.Code);
@@ -23,8 +24,9 @@ namespace Inventory.API.Graphql.Types
                 .Name("Servers")
                 .ResolveAsync(ctx =>
                 {
-                    var itemsloader = accessor.Context.GetOrAddCollectionBatchLoader<int, ServerDto>("GetServersByApplicationId", graphQLService.GetServersByApplicationAsync);
-                    return itemsloader.LoadAsync(ctx.Source.ApplicationId);
+                    //var itemsloader = accessor.Context.GetOrAddCollectionBatchLoader<int, ServerDto>("GetServersByApplicationId", serverService.GetServersByApplicationAsync);
+                    //return itemsloader.LoadAsync(ctx.Source.ApplicationId);
+                    return null;
 
                 });
 

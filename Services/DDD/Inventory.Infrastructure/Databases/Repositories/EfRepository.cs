@@ -15,11 +15,11 @@ namespace Inventory.Infrastructure.Databases.Repositories
     /// https://blogs.msdn.microsoft.com/pfxteam/2012/04/13/should-i-expose-synchronous-wrappers-for-asynchronous-methods/
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class EfRepository<T> : IAsyncRepository<T> where T : class
+    public class EfRepository<T> : RepositoryBase<T> , IAsyncRepository<T> where T : class
     {
         protected readonly InventoryDbContext _dbContext;
 
-        public EfRepository(InventoryDbContext dbContext)
+        public EfRepository(InventoryDbContext dbContext) : base(dbContext)
         {
             _dbContext = dbContext;
         }
@@ -37,58 +37,6 @@ namespace Inventory.Infrastructure.Databases.Repositories
             }
         }
 
-        public virtual async Task<T> GetByIdAsync(int id)
-        {
-            return await _dbContext.Set<T>().FindAsync(id);
-        }
-
-        public async Task<IReadOnlyList<T>> ListAllAsync()
-        {
-            return await _dbContext.Set<T>().ToListAsync();
-        }
-
-        public async Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec)
-        {
-            var specificationResult = ApplySpecification(spec);
-            return await specificationResult.ToListAsync();
-        }
-
-        public async Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec, Expression<Func<T, object>> selector = null)
-        {
-            var specificationResult = ApplySpecification(spec);
-            if (selector != null)
-            {
-                specificationResult.Select(selector);
-            }
-            return await specificationResult.ToListAsync();
-        }
-
-        public async Task<int> CountAsync(ISpecification<T> spec)
-        {
-            var specificationResult = ApplySpecification(spec);
-            return await specificationResult.CountAsync();
-        }
-
-        public async Task<T> AddAsync(T entity)
-        {
-            await _dbContext.Set<T>().AddAsync(entity);
-            await _dbContext.SaveChangesAsync();
-
-            return entity;
-        }
-
-        public async Task UpdateAsync(T entity)
-        {
-            _dbContext.Entry(entity).State = EntityState.Modified;
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(T entity)
-        {
-            _dbContext.Set<T>().Remove(entity);
-            await _dbContext.SaveChangesAsync();
-        }
-
         public async Task<T> FirstAsync(ISpecification<T> spec)
         {
             var specificationResult = ApplySpecification(spec);
@@ -101,10 +49,5 @@ namespace Inventory.Infrastructure.Databases.Repositories
             return await specificationResult.FirstOrDefaultAsync();
         }
 
-        private IQueryable<T> ApplySpecification(ISpecification<T> spec)
-        {
-            var evaluator = new SpecificationEvaluator<T>();
-            return evaluator.GetQuery(_dbContext.Set<T>().AsQueryable(), spec);
-        }
     }
 }

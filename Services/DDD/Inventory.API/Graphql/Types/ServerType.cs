@@ -1,7 +1,6 @@
 ﻿using GraphQL.Types;
 using GraphQL.Utilities.Federation;
 using Inventory.API.Application.Dto;
-using Inventory.API.Graphql.Types.Disks;
 using System.Linq;
 
 namespace Inventory.API.Graphql.Types
@@ -43,14 +42,14 @@ namespace Inventory.API.Graphql.Types
                 .Name("os")
                 .Resolve(ctx =>
                 {
-                    return ctx.Source.OperatingSystem.Name;
+                    return ctx.Source.OperatingSystem.Model;
                 });
 
             Field<OsFamillyEnum>()
                 .Name("osFamilly")
                 .Resolve(ctx =>
                 {
-                    return ctx.Source.OperatingSystem.Familly;
+                    return ctx.Source.OperatingSystem.Family;
                 });
 
             Field<LocationType>()
@@ -60,12 +59,6 @@ namespace Inventory.API.Graphql.Types
                     return ctx.Source.Location;
                 });
 
-            Field<AnyScalarGraphType>()
-                .Name("group_names")
-                .Resolve(ctx =>
-                {
-                    return ctx.Source.Groups.Select(g => g.AnsibleGroupName).ToArray();
-                });
 
             Field<AnyScalarGraphType>()
                 .Name("environments")
@@ -74,13 +67,6 @@ namespace Inventory.API.Graphql.Types
                     return ctx.Source.Environments.Select(e => e.Name).ToArray();
                 });
 
-
-            Field<ListGraphType<DiskInterfaceGraphType>>()
-                .Name("disks")
-                .Resolve(ctx =>
-                {
-                    return ctx.Source.Disks;
-                });
 
             Field<AnyScalarGraphType>()
                 .Name("Variables")

@@ -1,6 +1,6 @@
 using Inventory.Domain;
-using Inventory.Domain.Extensions;
 using Inventory.Domain.Models;
+using Inventory.Domain.Models.ManagedEntities;
 using Inventory.Domain.Specifications;
 using Inventory.Infrastructure.Databases;
 using Inventory.Infrastructure.Databases.Repositories;
@@ -18,21 +18,21 @@ using System.Threading.Tasks;
 
 namespace Inventory.UnitTests
 {
-    public class EfRepositoryTests : BaseDbInventoryTests<EfRepository<Server>>
+    public class EfRepositoryTests : BaseDbInventoryTests
     {
 
-        [Test]
+        //[Test]
         public async Task GetAllEnvironmentsTest()
         {
 
-            var repo = new EfRepository<Inventory.Domain.Models.Environment>(this.DbContext);
-            var environments = await repo.ListAllAsync();
+            var repo = new EfRepository<Inventory.Domain.Models.Configuration.Environment>(this.DbContext);
+            var environments = await repo.ListAsync();
 
             Assert.IsTrue(environments.Any());
         }
 
 
-        [Test]
+        //[Test]
         public async Task GetServerByIdAsyncTest()
         {
 
@@ -44,44 +44,26 @@ namespace Inventory.UnitTests
             Assert.AreEqual(serverRef.ServerId, serverCheck.ServerId);
         }
 
-        [Test]
+        //[Test]
         public async Task GetAllServersTest()
         {
 
             var repo = new EfRepository<Server>(this.DbContext);
-            var servers = await repo.ListAllAsync();
+            var servers = await repo.ListAsync();
 
             Assert.IsTrue(servers.Any());
         }
 
-        [Test]
-        public async Task GetAllGroupsTest()
-        {
-            var repo = new EfRepository<Group>(this.DbContext);
-            var groups = await repo.ListAllAsync();
-
-            Assert.IsTrue(groups.Any());
-        }
-
-        [Test]
-        public void GetAllLinkedGroupsTest()
-        {
-            var repo = new GroupRepository(this.DbContext);
-            var groups = repo.GetAllLinkedGroups("windows");
-
-            Assert.IsTrue(groups.Any());
-        }
-
-        [Test]
+        //[Test]
         public async Task GetAllApplicationsTest()
         {
             var repo = new EfRepository<Application>(this.DbContext);
-            var applications = await repo.ListAllAsync();
+            var applications = await repo.ListAsync();
 
             Assert.IsTrue(applications.Any());
         }
 
-        [Test]
+        //[Test]
         public async Task GetApplicationsByNameTest()
         {
 
@@ -93,7 +75,7 @@ namespace Inventory.UnitTests
             Assert.IsTrue(applications.Any());
         }
 
-        [Test]
+        //[Test]
         public async Task GetApplicationsByNameAndCodeTest()
         {
 
@@ -105,44 +87,6 @@ namespace Inventory.UnitTests
 
             Assert.IsTrue(applications.Any());
         }
-
-
-        [Test]
-        public async Task GetServersByGroupsTest()
-        {
-            var groupName = "windows";
-
-            // Find all Allowed groups and child groups
-            var repo = new GroupRepository(this.DbContext);
-
-            var allGroups = await repo.ListAllAsync();
-
-            var x = allGroups.Single(g => g.Name == "windows");
-            var y = x.FlattenChildrends();
-
-            var childGroups = repo.GetChildrenGroups(groupName);
-            var allGroupNames = childGroups.Select(g => g.Name).ToArray();
-
-            // Find all servers for these groups
-            var repoSrv = new EfRepository<Server>(this.DbContext);
-            //var servers = await repoSrv.ListAsync(new ServerWithGroupsSpecification(allGroupNames));
-            var servers = await repoSrv.ListAsync(new ServerSpecification(allGroupNames,"poc"));
-
-            foreach(Server srv in servers)
-            {
-                foreach(ServerGroup sg in srv.ServerGroups)
-                {
-                    var parentGroups = sg.Group.TraverseParents();
-
-                }
-            }
-
-            Assert.IsTrue(childGroups.Any());
-
-        }
-
-
-
 
     }
 

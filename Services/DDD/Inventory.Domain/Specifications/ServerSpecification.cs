@@ -1,6 +1,7 @@
 ﻿using Ardalis.Specification;
 using Inventory.Domain.Filters;
 using Inventory.Domain.Models;
+using Inventory.Domain.Models.ManagedEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,6 @@ namespace Inventory.Domain.Specifications
         public ServerSpecification() 
         {
             Query.Include(s => s.OperatingSystem);
-            Query.Include(s => s.ServerDisks);
-            Query.Include(s => s.ServerEnvironments);
-            Query.Include(s => s.ServerGroups).ThenInclude(sg => sg.Group);
         }
 
         public ServerSpecification(string hostName):this()
@@ -28,12 +26,6 @@ namespace Inventory.Domain.Specifications
         {
             Query
                 .Where(s => s.ServerId == Id);
-        }
-
-        public ServerSpecification(string[] groupNames, string environment) : this()
-        {
-            Query.Where(s => s.ServerGroups.Any(sg => groupNames.Contains(sg.Group.Name)) 
-                        && s.ServerEnvironments.Any(se => se.Environment.Name == environment));
         }
 
         /// <summary>
@@ -50,9 +42,6 @@ namespace Inventory.Domain.Specifications
             if (filter.LoadChildren)
             {
                 Query.Include(s => s.OperatingSystem);
-                Query.Include(s => s.ServerDisks);
-                Query.Include(s => s.ServerEnvironments);
-                Query.Include(s => s.ServerGroups).ThenInclude(sg => sg.Group);
             }
 
             if (filter.IsPagingEnabled)
@@ -61,13 +50,6 @@ namespace Inventory.Domain.Specifications
                 Query.Take(filter.Take);
             }
 
-            if (filter.EnvironmentIds != null)
-            {
-                Query.Include(s => s.ServerEnvironments).ThenInclude(se => se.Environment);
-                Query.Where(s => s.ServerEnvironments.Any(se => filter.EnvironmentIds.Contains(se.EnvironmentId)));
-                
-            }
-            
         }
 
     }

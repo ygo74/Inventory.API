@@ -1,4 +1,5 @@
 ﻿using Inventory.Domain.Models;
+using Inventory.Domain.Models.ManagedEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -30,8 +31,6 @@ namespace Inventory.Infrastructure.Databases.EntityConfiguration
                    .WithMany(os => os.Servers)
                    .HasForeignKey(s => s.OperatingSystemId);
 
-            // Disks
-            builder.HasMany(s => s.ServerDisks);
 
             // Location
             builder.HasOne(s => s.Location)

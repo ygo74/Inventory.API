@@ -19,10 +19,8 @@ namespace Inventory.API.Graphql
 
             this.AddQuery<InventoryQuery>(resolver);
             this.AddQuery<ServerQuery>(resolver);
-            this.AddQuery<GroupQuery>(resolver);
 
             this.AddMutation<ServerMutation>(resolver);
-            this.AddMutation<GroupMutation>(resolver);
             this.AddMutation<GetAuthorizationTokenMutation>(resolver);
 
         }

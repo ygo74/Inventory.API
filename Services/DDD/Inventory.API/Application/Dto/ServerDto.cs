@@ -1,4 +1,5 @@
 ﻿using Inventory.Domain.Models;
+using Inventory.Domain.Models.Configuration;
 using System.Collections.Generic;
 
 namespace Inventory.API.Application.Dto
@@ -6,24 +7,16 @@ namespace Inventory.API.Application.Dto
     public class ServerDto
     {
         public string HostName { get; set; }
-        public int CPU { get; private set; }
-        public int RAM { get; private set; }
-        public System.Net.IPAddress Subnet { get; private set; }
+        public int CPU { get; set; }
+        public int RAM { get; set; }
+        public System.Net.IPAddress Subnet { get; set; }
 
-        private List<Environment> _environments = new List<Environment>();
-        public List<Environment> Environments => _environments;
+        public List<Environment> Environments { get; set; }
 
-        public ServerStatus Status { get; private set; }
-        public Domain.Models.OperatingSystem OperatingSystem { get; private set; }
+        public string Status { get; set; }
+        public Domain.Models.Configuration.OperatingSystem OperatingSystem { get; private set; }
 
         public Location Location { get; private set; }
-
-        private List<Group> _groups = new List<Group>();
-        public List<Group> Groups => _groups;
-
-
-        private List<BaseDisk> _disks = new List<BaseDisk>();
-        public List<BaseDisk> Disks => _disks;
 
         public Dictionary<string, object> Variables { get; set; }
     }

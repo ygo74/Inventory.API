@@ -2,6 +2,7 @@
 using GraphQL.DataLoader;
 using GraphQL.Types;
 using Inventory.API.Application.Dto;
+using Inventory.API.Application.Servers;
 using Inventory.API.Graphql.Filters;
 using Inventory.API.Graphql.Types;
 using Inventory.API.Infrastructure;
@@ -13,7 +14,7 @@ namespace Inventory.API.Graphql.Queries
     public class ServerQuery : ObjectGraphType
     {
 
-        public ServerQuery(IDataLoaderContextAccessor accessor, GraphQLService graphQLService)
+        public ServerQuery(IDataLoaderContextAccessor accessor, ServerService serverService)
         {
 
             Field<ListGraphType<ServerType>, IReadOnlyList<ServerDto>>()
@@ -23,7 +24,7 @@ namespace Inventory.API.Graphql.Queries
                     {
                         var filter = ctx.GetArgument<ServerFilter>("filter");
                         filter.IsPagingEnabled = true;
-                        return graphQLService.GetAllServersAsync(filter);
+                        return serverService.GetAllServersAsync(filter);
                     });
         }
     }

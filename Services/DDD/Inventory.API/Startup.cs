@@ -17,7 +17,7 @@ using Inventory.Domain.Repositories.Interfaces;
 using Inventory.Domain.Models;
 using Inventory.Infrastructure.Databases.Repositories;
 using GraphQL.Utilities.Federation;
-using OperatingSystem = Inventory.Domain.Models.OperatingSystem;
+using OperatingSystem = Inventory.Domain.Models.Configuration.OperatingSystem;
 using Inventory.Domain;
 using Inventory.API.Infrastructure;
 using Inventory.API.Graphql.Types;
@@ -30,6 +30,7 @@ using Inventory.API.Commands;
 using FluentValidation;
 using Inventory.API.Graphql.Extensions;
 using Inventory.API.Graphql.Middlewares;
+using Inventory.API.Http.Filters;
 
 namespace Inventory.API
 {
@@ -50,6 +51,9 @@ namespace Inventory.API
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddScoped<ValidationFilterIdAttribute>();
+
+
             services.AddAutoMapper(typeof(Startup));
             services.AddMemoryCache();
             services.AddMediatR(typeof(Startup));
@@ -66,20 +70,9 @@ namespace Inventory.API
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 
-            services.AddScoped<IAsyncRepository<Location>, EfRepository<Location>>()
-                    .AddScoped<IAsyncRepository<TrustLevel>, EfRepository<TrustLevel>>()
-                    .AddScoped<IAsyncRepository<OperatingSystem>, EfRepository<OperatingSystem>>()
-                    .AddScoped<IAsyncRepository<Domain.Models.Application>, EfRepository<Domain.Models.Application>>()
-                    .AddScoped<IAsyncRepository<Domain.Models.Environment>, EfRepository<Domain.Models.Environment>>();
+            services.AddScoped(typeof(IAsyncRepository<>), typeof(EfRepository<>));
 
-            services.AddScoped<IAsyncRepository<Server>, EfRepository<Server>>();
-            services.AddScoped<IAsyncRepository<Group>, EfRepository<Group>>();
-            services.AddScoped<IAsyncRepository<ServerGroup>, EfRepository<ServerGroup>>();
-            services.AddScoped<IGroupRepository, GroupRepository >();
-
-            services.AddScoped<InventoryService >();
             services.AddScoped<InventoryFilesContext>();
-            services.AddScoped<GraphQLService>();
 
             services.ResolveGraphDependencies(Environment);
 

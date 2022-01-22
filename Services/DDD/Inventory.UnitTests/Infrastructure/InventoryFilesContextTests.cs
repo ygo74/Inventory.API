@@ -24,7 +24,7 @@ namespace Inventory.UnitTests
 
 
 
-        [Test]
+        //[Test]
         public void GetVariablesTest()
         {
             var memoryCache = new MemoryCache(new MemoryCacheOptions());

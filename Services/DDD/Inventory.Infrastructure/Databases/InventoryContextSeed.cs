@@ -1,4 +1,7 @@
-﻿using Inventory.Domain.Models;
+﻿using Inventory.Domain.Enums;
+using Inventory.Domain.Models;
+using Inventory.Domain.Models.Configuration;
+using Inventory.Domain.Models.ManagedEntities;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
@@ -18,12 +21,11 @@ namespace Inventory.Infrastructure.Databases
 
             await policy.ExecuteAsync(async () =>
             {
-                if (!context.Groups.Any())
+                if (!context.Servers.Any())
                 {
                     var operatingSystems = GetOperatingSystems();
                     var environments = GetEnvironments();
                     var servers = GetFakeServers(operatingSystems, environments);
-                    var groups = GetDefaultGroups();
                     var locations = GetLocations();
                     var location = locations.FirstOrDefault();
                     var applications = GetFakeApplications();
@@ -31,9 +33,6 @@ namespace Inventory.Infrastructure.Databases
 
                     foreach (Server srv in servers)
                     {
-                        var group = groups.Single(grp => grp.Name == srv.OperatingSystem.Name);
-                        group.AddServer(srv);
-
                         location.AddServer(srv);
 
                         application.AddServer(srv);
@@ -45,7 +44,6 @@ namespace Inventory.Infrastructure.Databases
                     context.OperatingSystems.AddRange(operatingSystems);
                     context.TrustLevels.AddRange(GetTrustLevels());
 
-                    context.Groups.AddRange(groups);
                     context.Servers.AddRange(servers);
 
                     await context.SaveChangesAsync();
@@ -68,31 +66,33 @@ namespace Inventory.Infrastructure.Databases
         }
 
 
-        private List<Server> GetFakeServers(List<Domain.Models.OperatingSystem> operatingSystems, List<Domain.Models.Environment> environments)
+        private List<Server> GetFakeServers(List<Domain.Models.Configuration.OperatingSystem> operatingSystems, List<Domain.Models.Configuration.Environment> environments)
         {
 
-            var windows2019 = operatingSystems.Single(os => os.Name.Equals("Windows 2019", StringComparison.OrdinalIgnoreCase));
-            var windows2016 = operatingSystems.Single(os => os.Name.Equals("Windows 2016", StringComparison.OrdinalIgnoreCase));
-            var rhel7 = operatingSystems.Single(os => os.Name.Equals("RHEL 7", StringComparison.OrdinalIgnoreCase));
-            var rhel8 = operatingSystems.Single(os => os.Name.Equals("RHEL 8", StringComparison.OrdinalIgnoreCase));
+            //var windows2019 = operatingSystems.Single(os => os.Model.Equals("Windows 2019", StringComparison.OrdinalIgnoreCase));
+            //var windows2016 = operatingSystems.Single(os => os.Model.Equals("Windows 2016", StringComparison.OrdinalIgnoreCase));
+            //var rhel7 = operatingSystems.Single(os => os.Model.Equals("RHEL 7", StringComparison.OrdinalIgnoreCase));
+            //var rhel8 = operatingSystems.Single(os => os.Model.Equals("RHEL 8", StringComparison.OrdinalIgnoreCase));
 
-            var prd = environments.Single(env => env.Name == "prd");
-            var sit = environments.Single(env => env.Name == "sit");
-            var uat = environments.Single(env => env.Name == "uat");
-            var poc = environments.Single(env => env.Name == "poc");
+            //var prd = environments.Single(env => env.Name == "prd");
+            //var sit = environments.Single(env => env.Name == "sit");
+            //var uat = environments.Single(env => env.Name == "uat");
+            //var poc = environments.Single(env => env.Name == "poc");
 
 
-            return new List<Server>()
-            {
-                new Server("msTest1", windows2019, poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
-                new Server("msTest2", windows2019, uat, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
-                new Server("msTest3", windows2016, poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
-                new Server("msTest4", windows2016, sit, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
-                new Server("lxTest1", rhel7,       prd, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
-                new Server("lxTest2", rhel7,       poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
-                new Server("lxTest3", rhel8,       sit, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
-                new Server("lxTest4", rhel8,       poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
-            };
+            //return new List<Server>()
+            //{
+            //    new Server("msTest1", windows2019, poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
+            //    new Server("msTest2", windows2019, uat, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
+            //    new Server("msTest3", windows2016, poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
+            //    new Server("msTest4", windows2016, sit, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
+            //    new Server("lxTest1", rhel7,       prd, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
+            //    new Server("lxTest2", rhel7,       poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
+            //    new Server("lxTest3", rhel8,       sit, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
+            //    new Server("lxTest4", rhel8,       poc, 2, 4, System.Net.IPAddress.Parse("192.168.1.0")),
+            //};
+
+            return new List<Server>();
         }
 
 
@@ -105,59 +105,19 @@ namespace Inventory.Infrastructure.Databases
             };
         }
 
-        private List<Group> GetDefaultGroups()
+
+        private List<Domain.Models.Configuration.OperatingSystem> GetOperatingSystems()
         {
-
-            //OS Groups
-            var osGroups = new Group(name: "OperatingSystems", ansibleGroupName: "os");
-
-            var windowsGroups = new Group(name: "Windows");
-            var linuxGroups = new Group(name: "Linux");
-
-            osGroups.AddSubGroups(windowsGroups);
-            osGroups.AddSubGroups(linuxGroups);
-
-            windowsGroups.AddSubGroups(new Group("Windows 2019", "system_windows_2k19"));
-            windowsGroups.AddSubGroups(new Group("Windows 2016", "system_windows_2k16"));
-
-            linuxGroups.AddSubGroups(new Group("RHEL 7", "system_rhel_7"));
-            linuxGroups.AddSubGroups(new Group("RHEL 8", "system_rhel_8"));
-
-            var allgroups = new List<Group>()
+            return new List<Domain.Models.Configuration.OperatingSystem>()
             {
-                osGroups,
-                windowsGroups,
-                linuxGroups
-            };
-            allgroups.AddRange(windowsGroups.Children);
-            allgroups.AddRange(linuxGroups.Children);
-
-            return allgroups;
-
-        }
-
-        private List<Domain.Models.OperatingSystem> GetOperatingSystems()
-        {
-            return new List<Domain.Models.OperatingSystem>()
-            {
-                new Domain.Models.OperatingSystem("Windows 2019", OsFamilly.Windows),
-                new Domain.Models.OperatingSystem("Windows 2016", OsFamilly.Windows),
-                new Domain.Models.OperatingSystem("RHEL 7", OsFamilly.Linux),
-                new Domain.Models.OperatingSystem("RHEL 8", OsFamilly.Linux)
             };
         }
 
-        private List<Domain.Models.Environment> GetEnvironments()
+        private List<Domain.Models.Configuration.Environment> GetEnvironments()
         {
 
-            return new List<Domain.Models.Environment>()
+            return new List<Domain.Models.Configuration.Environment>()
             {
-                new Domain.Models.Environment("prd", EnvironmentFamilly.Production),
-                new Domain.Models.Environment("drp", EnvironmentFamilly.Production),
-                new Domain.Models.Environment("dev", EnvironmentFamilly.Developoment),
-                new Domain.Models.Environment("sit", EnvironmentFamilly.Tests),
-                new Domain.Models.Environment("uat", EnvironmentFamilly.Tests),
-                new Domain.Models.Environment("poc", EnvironmentFamilly.Developoment)
             };               
         }
 
@@ -166,8 +126,6 @@ namespace Inventory.Infrastructure.Databases
 
             return new List<Location>()
             {
-                new Location("Paris", "fr", "par"),
-                new Location("Geneva", "ch", "gva")
             };
         }
 
@@ -176,11 +134,6 @@ namespace Inventory.Infrastructure.Databases
 
             return new List<TrustLevel>()
             {
-                new TrustLevel("Confidential", "COM"),
-                new TrustLevel("Secure", "SEC"),
-                new TrustLevel("Administration", "ADM"),
-                new TrustLevel("Internet", "INT"),
-                new TrustLevel("Extranet", "EXT")
             };
         }
 

@@ -9,12 +9,13 @@ using System;
 using GraphQL;
 using Inventory.API.Infrastructure;
 using Inventory.API.Application.Dto;
+using Inventory.Domain.Models.ManagedEntities;
 
 namespace Inventory.API.Graphql.Queries
 {
     public class InventoryQuery : ObjectGraphType
     {
-        public InventoryQuery(IAsyncRepository<Server> serverRepository, IGroupRepository groupRepository, GraphQLService graphQLService)
+        public InventoryQuery(IAsyncRepository<Server> serverRepository)
         {
 
             Field<InventoryType, InventoryDto>()
@@ -28,7 +29,7 @@ namespace Inventory.API.Graphql.Queries
                     var env = ctx.GetArgument<String>("Environment");
                     ctx.UserContext.Add("environment", env);
 
-                    return graphQLService.GetInventoryForGroupAsync(groupName,env);
+                    return null;
 
                 });
 

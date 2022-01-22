@@ -1,5 +1,6 @@
 ﻿using Ardalis.Specification;
 using Inventory.Domain.Models;
+using Inventory.Domain.Models.Configuration;
 using System.Collections.Generic;
 using System.Text;
 
