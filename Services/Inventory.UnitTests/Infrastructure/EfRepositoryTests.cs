@@ -4,6 +4,7 @@ using Inventory.Domain.Models.ManagedEntities;
 using Inventory.Domain.Specifications;
 using Inventory.Infrastructure.Databases;
 using Inventory.Infrastructure.Databases.Repositories;
+using Environment = Inventory.Domain.Models.Configuration.Environment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
@@ -15,11 +16,33 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Inventory.Domain.Models.Credentials;
 
 namespace Inventory.UnitTests
 {
     public class EfRepositoryTests : BaseDbInventoryTests
     {
+
+        [Test]
+        public async Task Should_Query_All_Environments()
+        {
+
+            var repo = this.GetAsyncRepository<Environment>();
+            var environments = await repo.ListAsync();
+
+            Assert.IsTrue(environments.Any());
+        }
+
+        [Test]
+        public async Task Should_Query_All_Credentials()
+        {
+
+            var repo = this.GetAsyncRepository<Credential>();
+            var credentials = await repo.ListAsync();
+
+            Assert.IsTrue(credentials.Any());
+        }
+
 
         //[Test]
         public async Task GetAllEnvironmentsTest()

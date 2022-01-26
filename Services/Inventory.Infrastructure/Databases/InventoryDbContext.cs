@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using System.IO;
 using Inventory.Domain.Models.Configuration;
 using Inventory.Domain.Models.ManagedEntities;
+using Inventory.Domain.Models.Credentials;
 
 namespace Inventory.Infrastructure.Databases
 {
@@ -91,6 +92,8 @@ namespace Inventory.Infrastructure.Databases
         public DbSet<TrustLevel> TrustLevels { get; set; }
         public DbSet<DataCenter> DataCenters { get; set; }
 
+        // Credentiaux
+        public DbSet<Credential> Credentials { get; set; }
 
         // Inventory variables
         public DbSet<Application> Applications { get; set; }
@@ -110,6 +113,9 @@ namespace Inventory.Infrastructure.Databases
             modelBuilder.ApplyConfiguration(new EnvironmentTypeConfiguration());
             modelBuilder.ApplyConfiguration(new OperatingSystemTypeConfiguration());
             modelBuilder.ApplyConfiguration(new LocationTypeConfiguration());
+
+            // Credentials
+            modelBuilder.ApplyConfiguration(new CredentialTypeConfiguration());
 
             // Managed entities
             modelBuilder.ApplyConfiguration(new ServerEntityTypeConfiguration());
