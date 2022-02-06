@@ -26,7 +26,7 @@ namespace Inventory.UnitTests.Infrastructure
                 .Build();
 
             var subscriptionId = Guid.Parse(configuration["Azure:SubscriptionId"]);
-            var tenantId = Guid.Parse(configuration["Azure:TeantId"]);
+            var tenantId = Guid.Parse(configuration["Azure:TenantId"]);
             var clientId = Guid.Parse(configuration["Azure:ClientId"]);
             var password = configuration["Azure:ClientSecret"];
 

@@ -26,7 +26,6 @@ stages:
             azureSubscription: 'Visual Studio Enterprise (62177529-73f0-4e11-a584-5d3526dc6999)'
             keyVaultName:  'mesfVault'
             secretsFilter: 'Ansible-Automation'
-        
 
         - task: PowerShell@2
           displayName: 'Update AppSettings file before testing'
