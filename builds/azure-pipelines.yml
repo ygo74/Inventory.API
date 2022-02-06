@@ -53,6 +53,7 @@ stages:
             summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
 
     - job: DockerBuild
+      displayName: Build and publish docker images
       dependsOn:
         - DotnetBuild
         - DotnetTest
