@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Domain.Enums
 {
-    enum DataCenterType
+    public enum DataCenterType
     {
         Cloud,
         OnPremise

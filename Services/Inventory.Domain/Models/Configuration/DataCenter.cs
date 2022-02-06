@@ -17,8 +17,8 @@ namespace Inventory.Domain.Models.Configuration
         public DataCenterType DataCenterType { get; private set; }
 
 
-    // Server links
-    private List<Server> _servers = new List<Server>();
+        // Server links
+        private List<Server> _servers = new List<Server>();
         public ICollection<Server> Servers => _servers.AsReadOnly();
 
         public DataCenter(string code, string name, DataCenterType dataCenterType)
