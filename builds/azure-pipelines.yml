@@ -15,7 +15,7 @@ stages:
             command: 'build'
             projects: 'Services/Inventory.API.sln'
 
-    - job: DotnetBuild
+    - job: DotnetTest
       displayName: Test Service
       dependsOn: DotnetBuild
       steps:
