@@ -45,10 +45,30 @@ stages:
     - job: DockerBuild
       dependsOn:
         - DotnetBuild
-        - DotnetTest
+        # - DotnetTest
+      variables:
+        tag: $(Build.BuildId)
       steps:
 
-          - bash: echo "Hello"
+        - task: Docker@2
+          displayName: Build Inventory API Images
+          inputs:
+            containerRegistry: 'mesfcontainerregistry'
+            repository: 'DynamicInventory/InventoryAPI'
+            command: 'build'
+            Dockerfile: '**/Dockerfile'
+            buildContext: '$(Build.SourcesDirectory)/Services'
+            tags: |
+              $(tag)
+
+        - task: Docker@2
+          displayName: Deploy image to mesfcontainerregistry
+          inputs:
+            containerRegistry: 'mesfcontainerregistry'
+            repository: 'DynamicInventory/InventoryAPI'
+            command: 'push'
+            tags: '$(tag)'
+
 
 - stage: DeployApplication
   dependsOn:
