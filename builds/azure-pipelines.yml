@@ -22,12 +22,12 @@ stages:
       - bash: echo $(System.JobName)
 
 - stage: StageB
-  dependsOn: 
+  dependsOn:
     - StageA
- 
+
   # when referring to another stage, stage name is included in variable path
   condition: eq(dependencies.StageA.outputs['A1.setvarStep.RunStageB'], 'true')
-  
+
   # Variables reference syntax differs slightly from inter-stage condition syntax
   variables:
     myOutputVar: $[stageDependencies.StageA.A1.outputs['setvarStep.RunStageB']]
@@ -36,7 +36,7 @@ stages:
     pool:
       vmImage: 'ubuntu-16.04'
     environment: env1
-    strategy:                  
+    strategy:
       runOnce:
         deploy:
           steps:
