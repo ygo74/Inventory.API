@@ -1,56 +1,54 @@
 stages:
-- stage: StageA
+- stage: BuildApplication
+  displayName: Build Inventory Service
   jobs:
-  - job: A1
-    steps:
+    - job: DotnetBuild
+      displayName: Build Service
+      steps:
 
-      - task: gitversion/setup@0
-        inputs:
-          versionSpec: '5.x'
+        - task: DotNetCoreCLI@2
+          displayName: Build Inventory.API.sln
+          inputs:
+            command: 'build'
+            projects: 'Services/Inventory.API.sln'
 
-      - task: gitversion/execute@0
-        displayName: Determine Version
+    - job: DotnetBuild
+      displayName: Test Service
+      dependsOn: DotnetBuild
+      steps:
 
-      - pwsh: echo "##vso[task.setvariable variable=RunStageB;isOutput=true]true"
-        name: setvarStep
-      - bash: echo $(System.JobName)
+        - displayName: 'Update AppSettings file before testing'
+          powershell: |
+            $pathToJson = "Services/Inventory.UnitTests/appsettings.json"
+            $a = Get-Content $pathToJson | ConvertFrom-Json
+            $a.Azure.ClientSecret = ${{ parameters.clientSecret }}
+            $a.Azure.TeantId = ${{ parameters.TeantId }}
+            $a.Azure.ClientId = ${{ parameters.ClientId }}
+            $a | ConvertTo-Json | set-content $pathToJson
 
-  - job: A2
-    steps:
-      - pwsh: echo "##vso[task.setvariable variable=RunStageC;isOutput=true]true"
-        name: setvarStep
-      - bash: echo $(System.JobName)
+        - task: DotNetCoreCLI@2
+          displayName: Test Inventory.API.sln
+          inputs:
+            command: 'test'
+            projects: 'Services/Inventory.API.sln'
 
-      - task: DotNetCoreCLI@2
-        displayName: Build Inventory.API.sln
-        inputs:
-          command: 'build'
-          projects: 'Services/Inventory.API.sln'
+    - job: DockerBuild
+      dependsOn: DotnetBuild
+      steps:
 
-      - task: DotNetCoreCLI@2
-        displayName: Test Inventory.API.sln
-        inputs:
-          command: 'test'
-          projects: 'Services/Inventory.API.sln'
-          
+          - bash: echo "Hello"
 
-- stage: StageB
+- stage: DeployApplication
   dependsOn:
-    - StageA
+    - BuildApplication
 
-  # when referring to another stage, stage name is included in variable path
-  condition: eq(dependencies.StageA.outputs['A1.setvarStep.RunStageB'], 'true')
-
-  # Variables reference syntax differs slightly from inter-stage condition syntax
-  variables:
-    myOutputVar: $[stageDependencies.StageA.A1.outputs['setvarStep.RunStageB']]
   jobs:
-  - deployment: B1
-    pool:
-      vmImage: 'ubuntu-16.04'
-    environment: env1
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - bash: echo $(myOutputVar)
+    - deployment: B1
+      pool:
+        vmImage: 'ubuntu-16.04'
+      environment: env1
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - bash: echo $(myOutputVar)

@@ -18,6 +18,7 @@ namespace Inventory.UnitTests.Infrastructure
         [Test]
         public async Task Should_work()
         {
+            // Arrange
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(TestContext.CurrentContext.TestDirectory)
                 .AddJsonFile("appsettings.json", optional: true)
@@ -32,9 +33,15 @@ namespace Inventory.UnitTests.Infrastructure
             var credential = new AzureCredential("unittest", "account for unit tests");
             credential.SetAzurePassword(subscriptionId, tenantId, clientId, password);
 
+
+            // Act
             var provider = new NetworkService(this.GetLogger<NetworkService>(), this.GetMapper(), credential);
-            await provider.ListAllAsync();
-            Assert.Fail("Not yet implemented");
+            var results = await provider.ListAllAsync();
+            
+            // Assert
+            Assert.IsNotNull(results);
+            Assert.IsTrue(results.Count > 0);
+
         }
     }
 }
