@@ -30,22 +30,32 @@ stages:
               $a.Azure.ClientSecret = $env:VAR_CLIENT_SECRET
               $a.Azure.TenantId = $env:VAR_TENANT_ID
               $a.Azure.ClientId = $env:VAR_CLIENT_ID
+              $a.Azure.SubscriptionId = $env:VAR_SUBSCRIPTION_ID
               $a | ConvertTo-Json | set-content $pathToJson
           env:
             VAR_CLIENT_SECRET: $(ClientSecret)
             VAR_TENANT_ID: $(TenantId)
             VAR_CLIENT_ID: $(ClientId)
+            VAR_SUBSCRIPTION_ID: $(SubscriptionId)
 
         - task: DotNetCoreCLI@2
           displayName: Test Inventory.API.sln
           inputs:
             command: 'test'
             projects: 'Services/Inventory.API.sln'
+            arguments: '--collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura'
+            publishTestResults: true
+
+        - task: PublishCodeCoverageResults@1
+          displayName: 'Publish code coverage report'
+          inputs:
+            codeCoverageTool: 'Cobertura'
+            summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
 
     - job: DockerBuild
       dependsOn:
         - DotnetBuild
-        # - DotnetTest
+        - DotnetTest
       variables:
         tag: $(Build.BuildId)
       steps:
