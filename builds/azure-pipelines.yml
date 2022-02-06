@@ -21,6 +21,19 @@ stages:
         name: setvarStep
       - bash: echo $(System.JobName)
 
+      - task: DotNetCoreCLI@2
+        displayName: Build Inventory.API.sln
+        inputs:
+          command: 'build'
+          projects: 'Services/Inventory.API.sln'
+
+      - task: DotNetCoreCLI@2
+        displayName: Test Inventory.API.sln
+        inputs:
+          command: 'test'
+          projects: 'Services/Inventory.API.sln'
+          
+
 - stage: StageB
   dependsOn:
     - StageA
