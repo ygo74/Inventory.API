@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Inventory.Domain.Models.Configuration.DataCenter">
+    <Position X="3.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Configuration\DataCenter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Inventory.Domain.Models.Configuration.Environment">
+    <Position X="6.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAACgAAQAAAAAAAAAgBAAAAAAAAA=</HashCode>
+      <FileName>Models\Configuration\Environment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Inventory.Domain.BaseModels.ConfigurationEntity">
+    <Position X="8.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAACAAAAAAAAA=</HashCode>
+      <FileName>BaseModels\ConfigurationEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Inventory.Domain.Models.Configuration.Location">
+    <Position X="8.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAAAAEAAAAAAQAAAAAAAgAgBAAAAAAAAA=</HashCode>
+      <FileName>Models\Configuration\Location.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Inventory.Domain.Models.Configuration.OperatingSystem">
+    <Position X="10.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgBgAAAAABAA=</HashCode>
+      <FileName>Models\Configuration\OperatingSystem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Inventory.Domain.Models.Configuration.TrustLevel">
+    <Position X="12.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAgBAAAAAAgAA=</HashCode>
+      <FileName>Models\Configuration\TrustLevel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Inventory.Domain.BaseModels.Entity">
+    <Position X="8.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAgAAAAAAAAAgAAAAAAAAAAAAIEEQAABAAAOAiA=</HashCode>
+      <FileName>BaseModels\Entity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Inventory.Domain.BaseModels.AuditEntity" Collapsed="true">
+    <Position X="8.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAAAAAAAAACAAAAAAQAAAAAAAAAAAE=</HashCode>
+      <FileName>BaseModels\AuditEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -15,4 +15,3 @@ has_children: false
 </details>
 
 ## Goals
-

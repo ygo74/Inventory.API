@@ -17,6 +17,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Inventory.Domain.Models.Credentials;
+using Inventory.Domain.Models.Configuration;
+using OperatingSystem = Inventory.Domain.Models.Configuration.OperatingSystem;
 
 namespace Inventory.UnitTests
 {
@@ -28,9 +30,9 @@ namespace Inventory.UnitTests
         {
 
             var repo = this.GetAsyncRepository<Environment>();
-            var environments = await repo.ListAsync();
+            var results = await repo.ListAsync();
 
-            Assert.IsTrue(environments.Any());
+            Assert.IsTrue(results.Any());
         }
 
         [Test]
@@ -38,78 +40,53 @@ namespace Inventory.UnitTests
         {
 
             var repo = this.GetAsyncRepository<Credential>();
-            var credentials = await repo.ListAsync();
+            var results = await repo.ListAsync();
 
-            Assert.IsTrue(credentials.Any());
+            Assert.IsTrue(results.Any());
         }
 
 
-        //[Test]
-        public async Task GetAllEnvironmentsTest()
+        [Test]
+        public async Task Should_Query_All_Locations()
         {
 
-            var repo = new EfRepository<Inventory.Domain.Models.Configuration.Environment>(this.DbContext);
-            var environments = await repo.ListAsync();
+            var repo = this.GetAsyncRepository<Location>();
+            var results = await repo.ListAsync();
 
-            Assert.IsTrue(environments.Any());
+            Assert.IsTrue(results.Any());
         }
 
 
-        //[Test]
-        public async Task GetServerByIdAsyncTest()
+        [Test]
+        public async Task Should_Query_All_DataCenters()
         {
 
-            var repo = new EfRepository<Server>(this.DbContext);
-            var serverRef = this.DbContext.Servers.FirstOrDefault();
+            var repo = this.GetAsyncRepository<DataCenter>();
+            var results = await repo.ListAsync();
 
-            var serverCheck = await repo.GetByIdAsync(serverRef.ServerId);
-
-            Assert.AreEqual(serverRef.ServerId, serverCheck.ServerId);
+            Assert.IsTrue(results.Any());
         }
 
-        //[Test]
-        public async Task GetAllServersTest()
+        [Test]
+        public async Task Should_Query_All_OperatingSystems()
         {
 
-            var repo = new EfRepository<Server>(this.DbContext);
-            var servers = await repo.ListAsync();
+            var repo = this.GetAsyncRepository<OperatingSystem>();
+            var results = await repo.ListAsync();
 
-            Assert.IsTrue(servers.Any());
+            Assert.IsTrue(results.Any());
         }
 
-        //[Test]
-        public async Task GetAllApplicationsTest()
-        {
-            var repo = new EfRepository<Application>(this.DbContext);
-            var applications = await repo.ListAsync();
-
-            Assert.IsTrue(applications.Any());
-        }
-
-        //[Test]
-        public async Task GetApplicationsByNameTest()
+        [Test]
+        public async Task Should_Query_All_TrustLevels()
         {
 
-            var appSpec = new ApplicationSpecification();
-            appSpec.Name = "MyApp1";
-            var repo = new EfRepository<Application>(this.DbContext);
-            var applications = await repo.ListAsync(appSpec);
+            var repo = this.GetAsyncRepository<TrustLevel>();
+            var results = await repo.ListAsync();
 
-            Assert.IsTrue(applications.Any());
+            Assert.IsTrue(results.Any());
         }
 
-        //[Test]
-        public async Task GetApplicationsByNameAndCodeTest()
-        {
-
-            var appSpec = new ApplicationSpecification();
-            appSpec.Name = "MyApp1";
-            appSpec.Code = "ap1";
-            var repo = new EfRepository<Application>(this.DbContext);
-            var applications = await repo.ListAsync(appSpec);
-
-            Assert.IsTrue(applications.Any());
-        }
 
     }
 
