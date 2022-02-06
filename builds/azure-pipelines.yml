@@ -19,7 +19,7 @@ stages:
       displayName: Test Service
       dependsOn: DotnetBuild
       steps:
-        
+
         - task: PowerShell@2
           displayName: 'Update AppSettings file before testing'
           inputs:
@@ -27,10 +27,14 @@ stages:
             script: |
               $pathToJson = "Services/Inventory.UnitTests/appsettings.json"
               $a = Get-Content $pathToJson | ConvertFrom-Json
-              $a.Azure.ClientSecret = $(ClientSecret)
-              $a.Azure.TenantId = $(TenantId)
-              $a.Azure.ClientId = $(ClientId)
+              $a.Azure.ClientSecret = $env:VAR_CLIENT_SECRET
+              $a.Azure.TenantId = $env:VAR_TENANT_ID
+              $a.Azure.ClientId = $env:VAR_CLIENT_ID
               $a | ConvertTo-Json | set-content $pathToJson
+          env:
+            VAR_CLIENT_SECRET: $(ClientSecret)
+            VAR_TENANT_ID: $(TenantId)
+            VAR_CLIENT_ID: $(ClientId)
 
         - task: DotNetCoreCLI@2
           displayName: Test Inventory.API.sln
@@ -39,7 +43,7 @@ stages:
             projects: 'Services/Inventory.API.sln'
 
     - job: DockerBuild
-      dependsOn: 
+      dependsOn:
         - DotnetBuild
         - DotnetTest
       steps:
