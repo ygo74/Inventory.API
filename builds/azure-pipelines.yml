@@ -1,3 +1,6 @@
+variables:
+  - group: Azure_Credential
+
 stages:
 - stage: BuildApplication
   displayName: Build Inventory Service
@@ -17,14 +20,25 @@ stages:
       dependsOn: DotnetBuild
       steps:
 
-        - displayName: 'Update AppSettings file before testing'
-          powershell: |
-            $pathToJson = "Services/Inventory.UnitTests/appsettings.json"
-            $a = Get-Content $pathToJson | ConvertFrom-Json
-            $a.Azure.ClientSecret = ${{ parameters.clientSecret }}
-            $a.Azure.TeantId = ${{ parameters.TeantId }}
-            $a.Azure.ClientId = ${{ parameters.ClientId }}
-            $a | ConvertTo-Json | set-content $pathToJson
+        - task: AzureKeyVault@1
+          displayName: 'Load client secret from Azure Key vault'
+          inputs:
+            azureSubscription: 'Visual Studio Enterprise (62177529-73f0-4e11-a584-5d3526dc6999)'
+            keyVaultName:  'mesfVault'
+            secretsFilter: 'Ansible-Automation'
+        
+
+        - task: PowerShell@2
+          displayName: 'Update AppSettings file before testing'
+          inputs:
+            targetType: 'inline'
+            script: |
+              $pathToJson = "Services/Inventory.UnitTests/appsettings.json"
+              $a = Get-Content $pathToJson | ConvertFrom-Json
+              $a.Azure.ClientSecret = $(Ansible-Automation)
+              $a.Azure.TenantId = $(TenantId)
+              $a.Azure.ClientId = $(ClientId)
+              $a | ConvertTo-Json | set-content $pathToJson
 
         - task: DotNetCoreCLI@2
           displayName: Test Inventory.API.sln
