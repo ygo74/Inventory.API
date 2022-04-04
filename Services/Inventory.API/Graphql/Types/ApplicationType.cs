@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.API.Graphql.Types
 {
-    public class ApplicationType : ObjectGraphType<Inventory.Domain.Models.Application>
+    public class ApplicationType : ObjectGraphType<Inventory.Domain.Models.Configuration.Application>
     {
         public ApplicationType(ServerService serverService, IDataLoaderContextAccessor accessor)
         {

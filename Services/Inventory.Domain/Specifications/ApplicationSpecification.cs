@@ -1,5 +1,5 @@
 ﻿using Ardalis.Specification;
-using Inventory.Domain.Models;
+using Inventory.Domain.Models.Configuration;
 using System.Linq;
 
 namespace Inventory.Domain.Specifications

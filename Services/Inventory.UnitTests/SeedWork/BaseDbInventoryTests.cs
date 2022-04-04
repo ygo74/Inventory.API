@@ -166,6 +166,7 @@ namespace Inventory.UnitTests
             dbContext.Locations.AddRange(LocationSeed.Get());
             dbContext.Environments.AddRange(EnvironmentSeed.Get());
             dbContext.OperatingSystems.AddRange(OperatingSystemSeed.Get());
+            DbContext.Applications.AddRange(ApplicationSeed.Get());
 
             // Credentials
             DbContext.Credentials.AddRange(CredentialSeed.Get());

@@ -47,8 +47,8 @@ namespace Inventory.Domain.Models.ManagedEntities
         public OperatingSystem OperatingSystem { get; private set; }
 
         // Many to Many Applications
-        private List<Application> _applications = new List<Application>();
-        public ICollection<Application> Applications => _applications.AsReadOnly();
+        private List<ApplicationInstance> _applications = new List<ApplicationInstance>();
+        public ICollection<ApplicationInstance> Applications => _applications.AsReadOnly();
 
         // Location
         public int? LocationId { get; private set; }
@@ -62,6 +62,11 @@ namespace Inventory.Domain.Models.ManagedEntities
         }
 
         #region Managed environments
+
+        public void AddApplicationInstance(ApplicationInstance application)
+        {
+            _applications.Add(application);
+        }
 
         //public void LinkToEnvironment(Environment environment)
         //{

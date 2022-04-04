@@ -8,7 +8,6 @@ namespace Inventory.Domain.Models.Configuration
 {
     public class TrustLevel : ConfigurationEntity
     {
-        public int TrustLevelId { get; private set; }
         public string Name { get; private set; }
         public string Code { get; private set; }
 

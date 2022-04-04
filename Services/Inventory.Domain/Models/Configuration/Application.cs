@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inventory.Domain.Models
+namespace Inventory.Domain.Models.Configuration
 {
     public class Application
     {

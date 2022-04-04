@@ -48,4 +48,8 @@
     <ProjectReference Include="..\Inventory.Infrastructure\Inventory.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Domain\Configuration\" />
+  </ItemGroup>
+
 </Project>
