@@ -5,11 +5,34 @@ networks:
     driver: bridge 
 
 services:
+  #inventory.api:
+  #  image: ${DOCKER_REGISTRY-}inventoryapi
+  #  build:
+  #    context: .
+  #    dockerfile: Inventory.API/Dockerfile
+  #  depends_on:
+  #    - "postgres_image"
+  #  networks:
+  #    - dockerapi-dev
+  #  volumes:
+  #    - D:/devel/github/ansible_inventory/tests/inventories/:/inventories
+
+  inventory.servers.api:
+    image: ${DOCKER_REGISTRY-}inventoryserversapi
+    build:
+      context: .
+      dockerfile: servers/Inventory.Servers.Api/Dockerfile
+    depends_on:
+      - "postgres_image"
+    networks:
+      - dockerapi-dev
+
+
   inventory.api:
     image: ${DOCKER_REGISTRY-}inventoryapi
     build:
       context: .
-      dockerfile: Inventory.API/Dockerfile
+      dockerfile: Inventory.Graphql/Dockerfile
     depends_on:
       - "postgres_image"
     networks:
@@ -28,7 +51,7 @@ services:
     environment:
       POSTGRES_USER: "bloguser"
       POSTGRES_PASSWORD: "bloguser"
-      POSTGRES_DB: "blogdb"
+      POSTGRES_DB: "serversDB"
     networks:
       - dockerapi-dev
 

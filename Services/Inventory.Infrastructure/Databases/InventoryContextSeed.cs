@@ -21,8 +21,9 @@ namespace Inventory.Infrastructure.Databases
 
             await policy.ExecuteAsync(async () =>
             {
-                if (!context.Servers.Any())
+                if (!context.DataCenters.Any())
                 {
+                    var datacenters = GetDataCenters();
                     var operatingSystems = GetOperatingSystems();
                     var environments = GetEnvironments();
                     var servers = GetFakeServers(operatingSystems, environments);
@@ -38,6 +39,7 @@ namespace Inventory.Infrastructure.Databases
                         application.AddServer(srv);
                     }
 
+                    context.DataCenters.AddRange(datacenters);
                     context.Applications.AddRange(applications);
                     context.Locations.AddRange(locations);
                     context.Environments.AddRange(environments);
@@ -137,5 +139,14 @@ namespace Inventory.Infrastructure.Databases
             };
         }
 
+        private List<DataCenter> GetDataCenters()
+        {
+            return new List<DataCenter>()
+            {
+                new DataCenter("Azure1", "Azure", DataCenterType.Cloud)
+            };
+        }
     }
+
+
 }

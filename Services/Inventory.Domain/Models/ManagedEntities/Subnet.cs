@@ -1,4 +1,5 @@
-﻿using Inventory.Domain.Models.Configuration;
+﻿using Inventory.Domain.BaseModels;
+using Inventory.Domain.Models.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Domain.Models.ManagedEntities
 {
-    public class Subnet
+    public class Subnet : ManagedEntity
     {
         public string CIDR { get; private set; }
 

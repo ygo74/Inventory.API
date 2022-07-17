@@ -1,6 +1,15 @@
 version: '3.4'
 
 services:
+  inventory.servers.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ConnectionStrings__InventoryDatabase=host=postgres_image;port=5432;database=serversDB;username=bloguser;password=bloguser
+      - InventoryPath=/inventories/{0}/group_vars
+    ports:
+      - "32773:80"
+      - "32772:443"
   inventory.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

@@ -23,6 +23,7 @@ namespace Inventory.UnitTests.Infrastructure
                 .SetBasePath(TestContext.CurrentContext.TestDirectory)
                 .AddJsonFile("appsettings.json", optional: true)
                 .AddUserSecrets(typeof(Inventory.UnitTests.Infrastructure.AzureProviderTest).Assembly)
+                .AddEnvironmentVariables()
                 .Build();
 
             var subscriptionId = Guid.Parse(configuration["Azure:SubscriptionId"]);
