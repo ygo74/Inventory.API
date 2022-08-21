@@ -1,0 +1,428 @@
+---
+# https://www.elastic.co/guide/en/apm/guide/master/apm-quick-start.html
+# https://github.com/elastic/apm-server/blob/main/docker-compose.yml
+
+version: '3'
+services:
+  setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    volumes:
+      - type: bind
+        source: ./certificates
+        target: /usr/share/elasticsearch/config/certs
+    networks:
+      - elastic
+    user: "0"
+    command: >
+      bash -c '
+        if [ x${ELASTIC_PASSWORD} == x ]; then
+          echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
+          exit 1;
+        elif [ x${KIBANA_PASSWORD} == x ]; then
+          echo "Set the KIBANA_PASSWORD environment variable in the .env file";
+          exit 1;
+        fi;
+        echo "Waiting for Elasticsearch availability";
+        until curl -v -s --cacert config/certs/ca/ca.crt -u elastic:${ELASTIC_PASSWORD} https://es01:9200 | grep -q "cluster_name"; do sleep 30; done;
+        echo "Setting kibana_system password";
+        until curl -s -X POST --cacert config/certs/ca/ca.crt -u elastic:${ELASTIC_PASSWORD} -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+        echo "All done!";
+        until echo "keep alive" | grep -q "finished"; do sleep 3600; done;
+      '
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
+      interval: 1s
+      timeout: 5s
+      retries: 120
+
+  # apm-server:
+  #   image: docker.elastic.co/apm/apm-server:${STACK_VERSION}
+  #   hostname: apm-server
+  #   depends_on:
+  #     es01:
+  #       condition: service_healthy
+  #     kibana:
+  #       condition: service_healthy
+  #   cap_add: ["CHOWN", "DAC_OVERRIDE", "SETGID", "SETUID"]
+  #   cap_drop: ["ALL"]
+  #   ports:
+  #   - 8200:8200
+  #   networks:
+  #   - elastic
+  #   command: >
+  #      apm-server -e -d "*"
+  #        -E apm-server.rum.enabled=true
+  #        -E setup.kibana.host=kibana:5601
+  #        -E setup.template.settings.index.number_of_replicas=0
+  #        -E output.elasticsearch.hosts=["es01:9200"]
+  #        -E output.elasticsearch.username=elastic
+  #        -E output.elasticsearch.password=${ELASTIC_PASSWORD}
+  #        -E apm-server.kibana.enabled=true
+  #        -E apm-server.kibana.host=kibana:5601
+  #        -E apm-server.kibana.username=kibana_system
+  #        -E apm-server.kibana.password=${KIBANA_PASSWORD}
+  #   healthcheck:
+  #     interval: 10s
+  #     retries: 80
+  #     test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/
+  #   volumes:
+  #     - type: bind
+  #       source: ./certificates
+  #       target: /usr/share/elasticsearch/config/certs
+
+  # https://www.elastic.co/guide/en/fleet/8.3/fleet-troubleshooting.html
+  # https://discuss.elastic.co/t/how-to-run-fleet-server-in-insecure-mode/296610
+  # fleet-server:
+  #   image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION}
+  #   ports:
+  #     - 8220:8220
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -s -k https://localhost:8220/api/status | grep -q 'HEALTHY'"]
+  #     retries: 300
+  #     interval: 1s
+  #   environment:
+  #     FLEET_SERVER_ENABLE: "1"
+  #     FLEET_SERVER_POLICY_ID: "fleet-server-apm"
+  #     FLEET_SERVER_ELASTICSEARCH_HOST: https://es01:9200
+  #     FLEET_SERVER_ELASTICSEARCH_USERNAME: "${ES_SUPERUSER_USER:-elastic}"
+  #     FLEET_SERVER_ELASTICSEARCH_PASSWORD: "${ELASTIC_PASSWORD:-changeme}"
+  #     FLEET_SERVER_SERVICE_TOKEN: AAEAAWVsYXN0aWMvZmxlZXQtc2VydmVyL3Rva2VuLTE2NTk4MDM1MTcyODU6RkVMSkF3UHFTUHlXNXl5dFc3X0xHQQ
+  #     FLEET_SERVER_CERT: /usr/share/elastic-agent/config/certs/fleet-server/fleet-server.crt
+  #     FLEET_SERVER_CERT_KEY: /usr/share/elastic-agent/config/certs/fleet-server/fleet-server.key
+  #     CERTIFICATE_AUTHORITIES:  /usr/share/elastic-agent/config/certs/ca/ca.crt
+  #     FLEET_SERVER_ES_CA:  /usr/share/elastic-agent/config/certs/ca/ca.crt
+  #     FLEET_URL: https://fleet-server:8220
+  #     FLEET_SERVER_ELASTICSEARCH_INSECURE: true
+  #     KIBANA_FLEET_SETUP: "true"
+  #     KIBANA_FLEET_HOST: "http://kibana:${KIBANA_PORT}"
+  #     KIBANA_FLEET_USERNAME: "${ES_SUPERUSER_USER:-elastic}"
+  #     KIBANA_FLEET_PASSWORD: "${ELASTIC_PASSWORD:-changeme}"
+  #   depends_on:
+  #     es01: { condition: service_healthy }
+  #     kibana: { condition: service_healthy }
+  #   volumes:
+  #     - type: bind
+  #       source: ./certificates
+  #       target: /usr/share/elastic-agent/config/certs
+  #   networks:
+  #     - elastic
+
+  opentelemetry-collector:
+    container_name: opentelemetry-collector
+    hostname: opentelemetry-collector
+    image: otel/opentelemetry-collector:0.56.0
+    command: [ "--config=/etc/otel-collector-config.yml" ]
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
+    ports:
+      - "14250:14250"
+      - "55680:55680"
+      - "55690:55690"
+      - "1777:1777"
+    networks:
+      - elastic
+    # depends_on:
+      # es01:
+        # condition: service_healthy
+      # apm-server:
+        # condition: service_healthy
+    # dns_search: .
+    # environment:
+      # - NO_PROXY=apm-server
+
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    hostname: es01
+    restart: on-failure
+    # container_name: es01
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      # - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "network.host=0.0.0.0"
+      - "transport.host=127.0.0.1"
+      - "http.host=0.0.0.0"
+      - "cluster.routing.allocation.disk.threshold_enabled=false"
+      - discovery.type=single-node
+      # - node.name=es01
+      # - cluster.name=${CLUSTER_NAME}
+      #- discovery.seed_hosts=es02
+      #- cluster.initial_master_nodes=es01,es02
+      - bootstrap.memory_lock=true
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - xpack.security.enabled=true
+      - xpack.security.authc.token.enabled=true
+      - xpack.security.authc.api_key.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/es01/es01.key
+      - xpack.security.http.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.http.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es01/es01.key
+      - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.license.self_generated.type=${LICENSE}
+      - xpack.security.authc.anonymous.roles=remote_monitoring_collector
+      - xpack.security.authc.realms.file.file1.order=0
+      - xpack.security.authc.realms.native.native1.order=1
+      - logger.org.elasticsearch=${ES_LOG_LEVEL:-error}
+      - action.destructive_requires_name=false
+    mem_limit: ${MEM_LIMIT}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - type: bind
+        source: ./certificates
+        target: /usr/share/elasticsearch/config/certs
+      - esdata01:/usr/share/elasticsearch/data
+    ports:
+      - ${ES_PORT}:9200
+    networks:
+      - elastic
+    healthcheck:
+      # test:
+      #   [
+      #     "CMD-SHELL",
+      #     "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+      #   ]
+      test: ["CMD-SHELL", "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=500ms"]
+      interval: 30s
+      timeout: 10s
+      retries: 50
+    depends_on:
+      setup:
+        condition: service_healthy
+
+  # https://www.elastic.co/guide/en/kibana/current/docker.html
+  # https://www.elastic.co/guide/en/kibana/current/settings.html
+  # https://www.elastic.co/guide/en/fleet/master/create-a-policy-no-ui.html
+  # https://www.elastic.co/guide/en/kibana/master/fleet-settings-kb.html
+  # https://www.elastic.co/guide/en/kibana/master/logging-configuration.html#logging-appenders
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    hostname: kibana
+    depends_on:
+      es01:
+        condition: service_healthy
+      # es02:
+        # condition: service_healthy
+    environment:
+      - ELASTICSEARCH_URL=https://es01:9200
+      - ELASTICSEARCH_HOSTS=https://es01:9200
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+      - MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED=true
+      - LOGGING_ROOT_LEVEL=all
+      - xpack.security.enabled=true
+      - xpack.security.encryptionKey=fhjskloppd678ehkdfdlliverpoolfcr
+      - xpack.encryptedSavedObjects.encryptionKey=fhjskloppd678ehkdfdlliverpoolfcr
+      - XPACK_FLEET_AGENTS_FLEET_SERVER_HOSTS=["https://fleet-server:8220"]
+      - XPACK_FLEET_AGENTS_ELASTICSEARCH_HOSTS=["https://es01:9200"]
+      # - XPACK_FLEET_AGENTS_ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=/usr/share/elastic-agent/config/certs/ca/ca.crt
+
+    mem_limit: ${MEM_LIMIT}
+    ports:
+    - ${KIBANA_PORT}:5601
+    volumes:
+      - type: bind
+        source: ./certificates
+        target: /usr/share/kibana/config/certs
+      - kibanadata:/usr/share/kibana/data
+      - "./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml"
+      - "./logs/kibana:/var/log/kibana"
+    networks:
+    - elastic
+    healthcheck:
+      interval: 10s
+      retries: 300
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -u elastic:${ELASTIC_PASSWORD} http://localhost:5601/api/status | grep -q 'All services are available'"
+        ]
+
+  # logstash:
+  #   image: docker.elastic.co/logstash/logstash:${STACK_VERSION}
+  #   hostname: logstash
+  #   volumes:
+  #     # - type: bind
+  #     #   source: ./logstash/logstash.yml
+  #     #   target: /usr/share/logstash/config/logstash.yml
+  #     #   read_only: true
+  #     - type: bind
+  #       source: ./logstash
+  #       target: /usr/share/logstash/pipeline
+  #       read_only: true
+  #     - type: bind
+  #       source: ./logstash.yml
+  #       target: /usr/share/logstash/config/logstash.yml
+  #       read_only: true
+  #     - type: bind
+  #       source: ./certificates
+  #       target: /etc/logstash/config/certs
+  #   ports:
+  #     - "5500:5500/tcp"
+  #     - "5500:5500/udp"
+  #     - 5501:5501
+  #   environment:
+  #     - "LS_JAVA_OPTS=-Xms512m -Xmx512m"
+  #     - ELASTICSEARCH_URL=https://es01:9200
+  #     - ELASTICSEARCH_HOSTS='["https://es01:9200"]'
+  #     - ELASTICSEARCH_USERNAME=elastic
+  #     - ELASTICSEARCH_PASSWORD=test.xx.1
+  #     - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+  #     - xpack.security.enabled=true
+  #     - MONITORING_ELASTICSEARCH_HOSTS='["https://es01:9200"]'
+
+  #   networks:
+  #     - elastic
+  #   depends_on:
+  #     es01:
+  #       condition: service_healthy
+    # user: "0"
+    # command: >
+      # bash -c '
+        # ls -altr /etc/logstash/config/certs/ca
+      # '
+
+  # https://www.elastic.co/guide/en/fleet/current/agent-environment-variables.html
+  fleet-server:
+    image: docker.elastic.co/beats/elastic-agent:8.3.3
+    hostname: fleet-server
+    ports:
+      - 8220:8220
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -k https://localhost:8220/api/status | grep -q 'HEALTHY'"]
+      retries: 300
+      interval: 1s
+    environment:
+      ELASTICSEARCH_HOST: https://es01:9200
+      ELASTICSEARCH_USERNAME: "${ES_SUPERUSER_USER:-elastic}"
+      ELASTICSEARCH_PASSWORD: "${ELASTIC_PASSWORD:-changeme}"
+      ELASTICSEARCH_CA:  /usr/share/elastic-agent/config/certs/ca/ca.crt
+
+      KIBANA_HOST: "http://kibana:${KIBANA_PORT}"
+      KIBANA_USERNAME: "${ES_SUPERUSER_USER:-elastic}"
+      KIBANA_PASSWORD: "${ELASTIC_PASSWORD:-changeme}"
+
+      # Prepare Kibana for Fleet
+      KIBANA_FLEET_SETUP: "1"
+      KIBANA_FLEET_HOST: "http://kibana:${KIBANA_PORT}"
+      # KIBANA_FLEET_USERNAME: "${ES_SUPERUSER_USER:-elastic}"
+      # KIBANA_FLEET_PASSWORD: "${ELASTIC_PASSWORD:-changeme}"
+
+      # Bootstrap Fleet server
+      FLEET_SERVER_ENABLE: "1"
+      # FLEET_SERVER_ELASTICSEARCH_HOST: https://es01:9200
+      # FLEET_SERVER_ELASTICSEARCH_CA:  /usr/share/elastic-agent/config/certs/ca/ca.crt
+      # FLEET_SERVER_SERVICE_TOKEN: b0RUUmw0SUI1X1FkdnNlM2FMWGs6SmlKYk4xZzJUWjZFM3EzX19NM0NzUQ==
+      # FLEET_SERVER_POLICY_ID: "fleet-server-policy"
+      FLEET_SERVER_POLICY_ID: "fleet-server-apm"
+      FLEET_SERVER_ELASTICSEARCH_USERNAME: "${ES_SUPERUSER_USER:-elastic}"
+      FLEET_SERVER_ELASTICSEARCH_PASSWORD: "${ELASTIC_PASSWORD:-changeme}"
+      FLEET_SERVER_CERT: /usr/share/elastic-agent/config/certs/fleet-server/fleet-server.crt
+      FLEET_SERVER_CERT_KEY: /usr/share/elastic-agent/config/certs/fleet-server/fleet-server.key
+      CERTIFICATE_AUTHORITIES:  /usr/share/elastic-agent/config/certs/ca/ca.crt
+      FLEET_URL: https://fleet-server:8220
+      FLEET_SERVER_ELASTICSEARCH_INSECURE: true
+      FLEET_SERVER_INSECURE_HTTP: true
+      FLEET_INSECURE: true
+    depends_on:
+      es01: { condition: service_healthy }
+      kibana: { condition: service_healthy }
+    volumes:
+      - type: bind
+        source: ./certificates
+        target: /usr/share/elastic-agent/config/certs
+      - type: bind
+        source: ./logs/fleet-logging
+        target: /usr/share/elastic-agent/state/data/logs
+      - "/usr/local/bin/docker:/usr/bin/docker"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - elastic
+    user: root
+
+
+
+  # metricbeat:
+  #   image: docker.elastic.co/beats/metricbeat:${STACK_VERSION}
+  #   environment:
+  #     ELASTICSEARCH_HOSTS: '["https://es01:9200"]'
+  #     ELASTICSEARCH_USERNAME: "elastic"
+  #     ELASTICSEARCH_PASSWORD: "${ELASTIC_PASSWORD}"
+  #     CERTIFICATE_AUTHORITIES:  /usr/share/elastic-agent/config/certs/ca/ca.crt
+  #     CERTIFICATE:  /usr/share/elastic-agent/config/certs/ca/ca.crt
+  #     FLEET_ENROLL: "1"
+  #     FLEET_SERVER_ES_CA:  /usr/share/elastic-agent/config/certs/ca/ca.crt
+  #     FLEET_URL: https://fleet-server:8220
+  #     FLEET_SERVER_ELASTICSEARCH_INSECURE: true
+  #     FLEET_SERVER_INSECURE_HTTP: true
+  #     FLEET_INSECURE: true
+  #   depends_on:
+  #     es01: { condition: service_healthy }
+  #     fleet-server: { condition: service_healthy }
+  #   volumes:
+  #     - "./metricbeat/elasticsearch-xpack.yml://usr/share/metricbeat/modules.d/elasticsearch-xpack.yml"
+  #     - "./metricbeat/apm-server.yml://usr/share/metricbeat/modules.d/apm-server.yml"
+  #     - type: bind
+  #       source: ./certificates
+  #       target: /usr/share/elastic-agent/config/certs
+  #   profiles:
+  #     - monitoring
+  #   networks:
+  #     - elastic
+
+  # https://www.elastic.co/guide/en/fleet/current/agent-environment-variables.html
+  elastic-agent:
+    image: docker.elastic.co/beats/elastic-agent:8.3.3
+    hostname: elastic-agent
+    environment:
+      FLEET_ENROLL: "1"
+      CERTIFICATE_AUTHORITIES:  /usr/share/elastic-agent/config/certs/ca/ca.crt
+      FLEET_URL: https://fleet-server:8220
+      FLEET_ENROLLMENT_TOKEN: eDJZcHY0SUJRRTRwblJmWEFwTWc6RVgzcHpLaE1US2lHT2NvRkxmU1lWQQ==
+      FLEET_INSECURE: true
+      ELASTICSEARCH_HOSTS: https://es01:9200
+      ELASTICSEARCH_USERNAME: elastic
+      ELASTICSEARCH_PASSWORD: "${ELASTIC_PASSWORD}"
+      ELASTICSEARCH_CA: /usr/share/elastic-agent/config/certs/ca/ca.crt
+    restart: always
+    user: root
+    ports:
+      - "8200:8200"
+    depends_on:
+      es01: { condition: service_healthy }
+      fleet-server: { condition: service_healthy }
+    volumes:
+      - "./metricbeat/elasticsearch-xpack.yml://usr/share/metricbeat/modules.d/elasticsearch-xpack.yml"
+      - "./metricbeat/apm-server.yml://usr/share/metricbeat/modules.d/apm-server.yml"
+      - type: bind
+        source: ./certificates
+        target: /usr/share/elastic-agent/config/certs
+      - type: bind
+        source: ./logs/elastic-agent
+        target: /usr/share/elastic-agent/state/data/logs
+      - "/usr/local/bin/docker:/usr/bin/docker"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./elastic-agent/elastic-agent.yml:/usr/share/elastic-agent/elastic-agent.yml"
+
+    profiles:
+      - monitoring
+    networks:
+      - elastic
+
+volumes:
+  certs:
+  esdata01:
+  esdata02:
+  kibanadata:
+
+networks:
+  elastic:
+    driver: bridge

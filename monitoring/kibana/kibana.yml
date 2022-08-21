@@ -1,0 +1,67 @@
+server.host: 0.0.0.0
+status.allowAnonymous: false
+monitoring.ui.container.elasticsearch.enabled: true
+telemetry.enabled: false
+
+xpack.fleet.packages:
+  # - name: system
+  #   version: latest
+  # - name: elastic_agent
+  #   version: latest
+  - name: fleet_server
+    version: latest
+  - name: apm
+    version: latest
+xpack.fleet.agentPolicies:
+  - name: Fleet Server (APM)
+    id: fleet-server-apm
+    is_default_fleet_server: true
+    is_managed: false
+    namespace: default
+    package_policies:
+      - name: fleet_server-apm
+        id: default-fleet-server
+        package:
+          name: fleet_server
+  - name: APM Server from elastic agent
+    id: apm-1-server
+    is_default: true
+    unenroll_timeout: 900
+    package_policies:
+      - name: apm-1-server
+        id: apm-1-server
+        package:
+          name: apm
+        inputs:
+        - type: apm
+          enabled: true
+          vars:
+          - name: host
+            value: elastic-agent:8200
+          - name: url
+            value: http://elastic-agent:8200
+xpack.fleet.outputs:
+  - id: fleet-default-output
+    name: default
+    is_default: true
+    is_default_monitoring: true
+    type: elasticsearch
+    hosts: ['https://es01:9200']
+    config:
+      ssl.certificate_authorities: ["/usr/share/elastic-agent/config/certs/ca/ca.crt"]
+
+logging:
+  appenders:
+    rolling-file:
+      type: rolling-file
+      fileName: /var/logs/kibana.log
+      policy:
+        type: time-interval
+        interval: 10s
+        modulate: true
+      strategy:
+        type: numeric
+        pattern: '-%i'
+        max: 2
+      layout:
+        type: pattern
