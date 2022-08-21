@@ -4,7 +4,7 @@
 
 version: '3'
 services:
-  setup:
+  setup-certificates:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
       - type: bind
@@ -48,9 +48,27 @@ services:
           "      - localhost\n"\
           "    ip:\n"\
           "      - 127.0.0.1\n"\
+          "  - name: kibana\n"\
+          "    dns:\n"\
+          "      - kibana\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
           "  - name: fleet-server\n"\
           "    dns:\n"\
           "      - fleet-server\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: apm-server\n"\
+          "    dns:\n"\
+          "      - apm-server\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: opentelemetry-collector\n"\
+          "    dns:\n"\
+          "      - opentelemetry-collector\n"\
           "      - localhost\n"\
           "    ip:\n"\
           "      - 127.0.0.1\n"\

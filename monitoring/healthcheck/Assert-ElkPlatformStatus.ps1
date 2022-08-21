@@ -6,7 +6,7 @@ param(
 
     [Parameter(Position=0,mandatory=$false)]
     [string]
-    $KibanaUri="http://localhost:5601/",
+    $KibanaUri="https://localhost:5601/",
 
     [Parameter(Position=0,mandatory=$false)]
     [string]

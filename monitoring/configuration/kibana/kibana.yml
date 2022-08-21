@@ -3,6 +3,14 @@ status.allowAnonymous: false
 monitoring.ui.container.elasticsearch.enabled: true
 telemetry.enabled: false
 
+# HTTPS
+# https://www.elastic.co/guide/en/kibana/master/Security-production-considerations.html
+server.securityResponseHeaders.strictTransportSecurity: "max-age=31536000"
+server.securityResponseHeaders.disableEmbedding: true
+csp.strict: true
+
+
+# https://www.elastic.co/guide/en/fleet/master/create-a-policy-no-ui.html
 xpack.fleet.packages:
   # - name: system
   #   version: latest
@@ -12,6 +20,7 @@ xpack.fleet.packages:
     version: latest
   - name: apm
     version: latest
+
 xpack.fleet.agentPolicies:
   - name: Fleet Server (APM)
     id: fleet-server-apm
@@ -37,9 +46,10 @@ xpack.fleet.agentPolicies:
           enabled: true
           vars:
           - name: host
-            value: elastic-agent:8200
+            value: apm-server:8200
           - name: url
-            value: http://elastic-agent:8200
+            value: http://apm-server:8200
+
 xpack.fleet.outputs:
   - id: fleet-default-output
     name: default
@@ -50,6 +60,7 @@ xpack.fleet.outputs:
     config:
       ssl.certificate_authorities: ["/usr/share/elastic-agent/config/certs/ca/ca.crt"]
 
+# https://www.elastic.co/guide/en/kibana/master/logging-configuration.html#logging-appenders
 logging:
   appenders:
     rolling-file:

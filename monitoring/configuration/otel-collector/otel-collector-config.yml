@@ -16,13 +16,13 @@ exporters:
   logging:
     loglevel: debug
   otlp/elastic:
-    endpoint: elastic-agent:8200
+    endpoint: apm-server:8200
     headers:
       Authorization: "ApiKey QmYybHVvSUJBTG5ORlJEeHlvNXo6ZjJYMTNleVNUaVdZUl9tWm1EZ1pxZw=="
     tls:
       insecure: true
   otlphttp/elastic:
-    endpoint: http://elastic-agent:8200
+    endpoint: http://apm-server:8200
     headers:
       Authorization: "ApiKey QmYybHVvSUJBTG5ORlJEeHlvNXo6ZjJYMTNleVNUaVdZUl9tWm1EZ1pxZw=="
     tls:
