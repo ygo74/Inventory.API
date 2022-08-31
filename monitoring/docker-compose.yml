@@ -99,6 +99,18 @@ services:
       setup:
         condition: service_healthy
 
+  registry:
+    image: docker.elastic.co/package-registry/distribution:${STACK_VERSION}
+    ports:
+      - 8080:8080
+    networks:
+      - elastic
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://registry:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 50
+
   # https://www.elastic.co/guide/en/kibana/current/docker.html
   # https://www.elastic.co/guide/en/kibana/8.3/docker.html#environment-variable-config
   # https://www.elastic.co/guide/en/kibana/current/settings.html
@@ -110,6 +122,8 @@ services:
     hostname: kibana
     depends_on:
       es01:
+        condition: service_healthy
+      registry:
         condition: service_healthy
       # es02:
         # condition: service_healthy
@@ -142,6 +156,9 @@ services:
       - XPACK_FLEET_AGENTS_ELASTICSEARCH_HOSTS=["https://es01:9200"]
       # - XPACK_FLEET_AGENTS_ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=/usr/share/elastic-agent/config/certs/ca/ca.crt
 
+      # Local registry
+      - xpack.fleet.registryUrl="http://registry:8080"
+
     mem_limit: ${MEM_LIMIT}
     ports:
     - ${KIBANA_PORT}:5601
@@ -163,7 +180,7 @@ services:
 
   # https://www.elastic.co/guide/en/fleet/current/agent-environment-variables.html
   fleet-server:
-    image: docker.elastic.co/beats/elastic-agent:8.3.3
+    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION}
     hostname: fleet-server
     ports:
       - 8220:8220
@@ -203,11 +220,12 @@ services:
       FLEET_SERVER_ELASTICSEARCH_INSECURE: true
       FLEET_SERVER_INSECURE_HTTP: true
       FLEET_INSECURE: true
+
     depends_on:
       es01: { condition: service_healthy }
       kibana: { condition: service_healthy }
     volumes:
-      - "./logs/fleet-server:/usr/share/elastic-agent/state/data/logs"
+      - "/mnt/d/devel/github/ansible_inventory/monitoring/logs/fleet-server:/usr/share/elastic-agent/state/data/logs:rw"
       - "./certificates:/usr/share/elastic-agent/config/certs"
       - "/usr/local/bin/docker:/usr/bin/docker"
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -217,7 +235,7 @@ services:
 
   # https://www.elastic.co/guide/en/fleet/current/agent-environment-variables.html
   apm-server:
-    image: docker.elastic.co/beats/elastic-agent:8.3.3
+    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION}
     hostname: apm-server
     environment:
       ELASTICSEARCH_HOSTS: https://es01:9200
