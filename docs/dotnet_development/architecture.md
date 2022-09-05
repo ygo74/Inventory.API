@@ -9,3 +9,7 @@ has_children: false
 ## High level design
 
 ![Application Architecture](./../assets/images/application-architecture.png)
+
+## Microservices architecture
+
+![Microservices Architecture](./../assets/images/microservices-architecture.png)
