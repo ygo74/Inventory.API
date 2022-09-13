@@ -12,10 +12,10 @@ csp.strict: true
 
 # https://www.elastic.co/guide/en/fleet/master/create-a-policy-no-ui.html
 xpack.fleet.packages:
-  # - name: system
-  #   version: latest
-  # - name: elastic_agent
-  #   version: latest
+  - name: system
+    version: latest
+  - name: elastic_agent
+    version: latest
   - name: fleet_server
     version: latest
   - name: apm

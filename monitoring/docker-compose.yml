@@ -246,7 +246,7 @@ services:
       FLEET_ENROLL: "1"
       CERTIFICATE_AUTHORITIES:  /usr/share/elastic-agent/config/certs/ca/ca.crt
       FLEET_URL: https://fleet-server:8220
-      FLEET_ENROLLMENT_TOKEN: cEU2RnY0SUJUT05hTzhvdTN5SE06YjlOMkJNTXBTR09xXzlGaEY1Um5Mdw==
+      FLEET_ENROLLMENT_TOKEN: eS1mMDBJSUJXbGxfSzZ3VHNlSm46eEFTOHVaSE1RSGE5N3FtbzRXNjFUQQ==
       FLEET_INSECURE: true
     restart: always
     user: root
@@ -259,7 +259,8 @@ services:
       - "./metricbeat/elasticsearch-xpack.yml://usr/share/metricbeat/modules.d/elasticsearch-xpack.yml"
       - "./metricbeat/apm-server.yml://usr/share/metricbeat/modules.d/apm-server.yml"
       - "./certificates:/usr/share/elastic-agent/config/certs"
-      - "./logs/apm-server:/usr/share/elastic-agent/state/data/logs"
+      - "/mnt/d/devel/github/ansible_inventory/monitoring/logs/apm-server:/usr/share/elastic-agent/state/data/logs:rw"
+      # - "./logs/apm-server:/usr/share/elastic-agent/state/data/logs"
       - "/usr/local/bin/docker:/usr/bin/docker"
       - "/var/run/docker.sock:/var/run/docker.sock"
 
