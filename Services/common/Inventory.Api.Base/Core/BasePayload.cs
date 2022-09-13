@@ -15,9 +15,9 @@ namespace Inventory.Api.Base.Core
 
     }
 
-    public abstract class Payload<U, T> : IPayload where U : Payload<U, T>, new()
+    public abstract class BasePayload<U, T> : IPayload where U : BasePayload<U, T>, new()
     {
-        protected Payload()
+        protected BasePayload()
         {
             this.errors = new List<T>();
         }

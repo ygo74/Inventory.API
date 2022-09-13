@@ -2,6 +2,7 @@
 using Inventory.Infrastructure.Base.Database;
 using Inventory.Servers.Domain.Models;
 using Inventory.Servers.Infrastructure.EntityConfiguration;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

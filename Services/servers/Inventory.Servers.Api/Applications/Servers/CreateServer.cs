@@ -24,7 +24,7 @@ namespace Inventory.Servers.Api.Applications.Servers
             public string Hostname { get; set; }
         }
 
-        public class CreateServerPayload : Payload<CreateServerPayload, ValidationError>
+        public class CreateServerPayload : BasePayload<CreateServerPayload, ValidationError>
         {
             public ServerDto Server { get; set; }
         }

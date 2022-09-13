@@ -3,8 +3,29 @@ version: '3.4'
 networks:
   dockerapi-dev:
     driver: bridge 
+  elastic:
+    external:
+      name: monitoring_elastic
 
 services:
+
+  seq:
+    image: datalust/seq:latest
+    networks:
+      - dockerapi-dev
+
+  caching:
+    image: redis:alpine
+    networks:
+      - dockerapi-dev
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    networks:
+      - dockerapi-dev
+
+
+
   #inventory.api:
   #  image: ${DOCKER_REGISTRY-}inventoryapi
   #  build:
@@ -24,21 +45,23 @@ services:
       dockerfile: servers/Inventory.Servers.Api/Dockerfile
     depends_on:
       - "postgres_image"
+      - "inventory.configuration.api"
     networks:
       - dockerapi-dev
+      - elastic
 
 
-  inventory.api:
-    image: ${DOCKER_REGISTRY-}inventoryapi
+
+  inventory.configuration.api:
+    image: ${DOCKER_REGISTRY-}inventory.configuration.api
     build:
       context: .
-      dockerfile: Inventory.Graphql/Dockerfile
+      dockerfile: configuration/Inventory.Configuration.Api/Dockerfile
     depends_on:
       - "postgres_image"
     networks:
       - dockerapi-dev
-    volumes:
-      - D:/devel/github/ansible_inventory/tests/inventories/:/inventories
+      - elastic
 
   postgres_image:
     image: postgres:latest

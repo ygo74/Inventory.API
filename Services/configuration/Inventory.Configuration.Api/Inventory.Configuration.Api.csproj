@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>a0485e78-f98f-48b4-9baf-a74b86b108fd</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HotChocolate.AspNetCore" Version="12.12.0" />
+    <PackageReference Include="HotChocolate.Data" Version="12.12.0" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="12.12.0" />
+    <PackageReference Include="HotChocolate.Diagnostics" Version="12.12.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+    
+    <PackageReference Include="FluentValidation" Version="9.3.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="9.3.0" />
+    <PackageReference Include="MediatR" Version="9.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\common\Inventory.Api.Base\Inventory.Api.Base.csproj" />
+    <ProjectReference Include="..\Inventory.Configuration.Domain\Inventory.Configuration.Domain.csproj" />
+    <ProjectReference Include="..\Inventory.Configuration.Infrastructure\Inventory.Configuration.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

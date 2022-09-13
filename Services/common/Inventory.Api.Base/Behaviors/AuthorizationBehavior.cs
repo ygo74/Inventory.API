@@ -164,7 +164,7 @@ namespace Inventory.Api.Base.Behaviors
 
             // In case it is Mutation Response Payload = handled as payload error union
             if (Inventory.Api.Base.Common.IsSubclassOfRawGeneric(
-                typeof(Payload<,>),
+                typeof(BasePayload<,>),
                 typeof(TResponse))
             )
             {

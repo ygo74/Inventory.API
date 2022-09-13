@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,6 +33,35 @@ namespace Inventory.Infrastructure.Base.Telemetry
             source_name = new ActivitySource("test").Name;
 
             serviceCollection.AddSingleton<ITelemetry, Telemetry>();
+
+            serviceCollection.AddOpenTelemetryTracing(tracerProviderBuilder =>
+            {
+                tracerProviderBuilder
+                    .AddSource("test")
+                    .SetResourceBuilder(
+                        ResourceBuilder.CreateDefault()
+                        .AddService(serviceName: "otel-test-xx", serviceVersion: "1.0.0"))
+                    .AddHttpClientInstrumentation(opts => opts.RecordException = true)
+                    .AddAspNetCoreInstrumentation()
+                    .AddEntityFrameworkCoreInstrumentation(e => e.SetDbStatementForText = true)
+                    .AddHotChocolateInstrumentation()
+                    .AddOtlpExporter(options =>
+                    {
+                        options.Endpoint = new Uri("http://opentelemetry-collector:55680");
+                        options.TimeoutMilliseconds = 10000;
+                        //Export dirrectly to APM
+                        //options.Endpoint = new Uri("http://apm-server:8200");
+                        //options.Headers = "ApiKey test";
+                        //options.BatchExportProcessorOptions = new OpenTelemetry.BatchExportProcessorOptions<Activity>()
+                        //{
+
+                        //};
+                        //options.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+                        //options.ExportProcessorType = OpenTelemetry.ExportProcessorType.Simple;
+                    });
+
+
+            });
 
             return serviceCollection;
         }

@@ -3,8 +3,11 @@ using FluentValidation;
 using Inventory.Api.Base.Behaviors;
 using Inventory.Api.Base.Users;
 using Inventory.Domain.Base.Repository;
+using Inventory.Infrastructure.Base.Events;
+using Inventory.Infrastructure.Base.Events.RabbitMQ;
 using Inventory.Infrastructure.Base.Telemetry;
 using Inventory.Servers.Api.Configuration;
+using Inventory.Servers.Api.IntegrationEvents;
 using Inventory.Servers.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -55,6 +58,10 @@ namespace Inventory.Servers.Api
             // Add Graphql
             services.AddGraphqlServices(Environment);
 
+            // Add RabbitMQ
+            services.AddRabbitMQService(Configuration);
+            services.AddTransient<DatacenterIntegrationEventHandler>();
+
 
             services.AddScoped<ICurrentUser, CurrentUser>();
             string sourceName = null;
@@ -88,6 +95,16 @@ namespace Inventory.Servers.Api
                 endpoints.MapControllers();
                 endpoints.MapGraphQLEndpoint();
             });
+
+            ConfigureEventBus(app);
         }
+
+        private void ConfigureEventBus(IApplicationBuilder app)
+        {
+            var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
+
+            eventBus.Subscribe<DatacenterIntegrationEvent, DatacenterIntegrationEventHandler>("dctest");
+        }
+
     }
 }

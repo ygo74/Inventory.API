@@ -1,3 +1,4 @@
+using Inventory.Infrastructure.Base.Logging;
 using Inventory.Servers.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -17,17 +18,15 @@ namespace Inventory.Servers.Api
 {
     public class Program
     {
+        public static readonly string Namespace = typeof(Program).Namespace;
+        public static readonly string AppName = Namespace.Substring(Namespace.LastIndexOf('.', Namespace.LastIndexOf('.') - 1) + 1);
+
         public static int Main(string[] args)
         {
             var configuration = GetConfiguration();
 
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .CreateLogger();
-
+            var loggerConfiguration = LoggingConfiguration.CreateSerilogLoggerConfiguration(configuration, AppName, "xxx");
+            Log.Logger = loggerConfiguration.CreateLogger();
 
             try
             {
@@ -98,6 +97,7 @@ namespace Inventory.Servers.Api
 
             return builder.Build();
         }
+
 
     }
 }

@@ -15,7 +15,7 @@ namespace Inventory.Servers.Api.Configuration
         public static IServiceCollection AddCustomDbContext(this IServiceCollection services, IConfiguration configuration)
         {
 
-            services.AddEntityFrameworkNpgsql().AddPooledDbContextFactory<ServerDbContext>(options =>
+            services.AddEntityFrameworkNpgsql().AddPooledDbContextFactory<ServerDbContext>((serviceProvider, options) =>
             //services.AddEntityFrameworkNpgsql().AddDbContext<ServerDbContext>(options =>
             {
                 options.UseNpgsql(configuration.GetConnectionString("InventoryDatabase"),
@@ -25,6 +25,8 @@ namespace Inventory.Servers.Api.Configuration
                                       //Configuring Connection Resiliency: https://docs.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency 
                                       sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), null);
                                   });
+
+                options.UseInternalServiceProvider(serviceProvider);
 
             });
 
