@@ -38,11 +38,11 @@ services:
   #  volumes:
   #    - D:/devel/github/ansible_inventory/tests/inventories/:/inventories
 
-  inventory.servers.api:
+  Inventory.Devices.api:
     image: ${DOCKER_REGISTRY-}inventoryserversapi
     build:
       context: .
-      dockerfile: servers/Inventory.Servers.Api/Dockerfile
+      dockerfile: devices/Inventory.Devices.Api/Dockerfile
     depends_on:
       - "postgres_image"
       - "inventory.configuration.api"

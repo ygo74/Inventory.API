@@ -20,10 +20,15 @@ namespace Inventory.Infrastructure.Base.Database
 
         protected ApplicationDbContext() : base() { }
 
-        protected ApplicationDbContext(DbContextOptions options) : base(options) 
+        protected ApplicationDbContext(DbContextOptions options) : base(options)
         {
             _mediator = this.GetService<IMediator>();
         }
+
+        //protected ApplicationDbContext(DbContextOptions options, IMediator mediator) : base(options) 
+        //{
+        //    _mediator = mediator;
+        //}
 
         #region Transactions
         private IDbContextTransaction _currentTransaction;

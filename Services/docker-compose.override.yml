@@ -18,7 +18,7 @@ services:
       - "15672:15672"
       - "5672:5672"
 
-  inventory.servers.api:
+  Inventory.Devices.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80

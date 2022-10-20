@@ -41,22 +41,39 @@ services:
     restart: on-failure
     # container_name: es01
     environment:
+      # Memory configuration
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       # - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - bootstrap.memory_lock=true
+
+      # Listeners
       - "network.host=0.0.0.0"
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
+
+      # Cluster configuration
       - "cluster.routing.allocation.disk.threshold_enabled=false"
       - discovery.type=single-node
       # - node.name=es01
       # - cluster.name=${CLUSTER_NAME}
       #- discovery.seed_hosts=es02
       #- cluster.initial_master_nodes=es01,es02
-      - bootstrap.memory_lock=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - logger.org.elasticsearch=${ES_LOG_LEVEL:-error}
+      - action.destructive_requires_name=false
+
+      # Enable xpack security
       - xpack.security.enabled=true
+      - xpack.license.self_generated.type=${LICENSE}
+
+      # Enable xpack security authentication
       - xpack.security.authc.token.enabled=true
       - xpack.security.authc.api_key.enabled=true
+      - xpack.security.authc.anonymous.roles=remote_monitoring_collector
+      - xpack.security.authc.realms.file.file1.order=0
+      - xpack.security.authc.realms.native.native1.order=1
+
+      # Enable xpack security SSL
       - xpack.security.http.ssl.enabled=true
       - xpack.security.http.ssl.key=certs/es01/es01.key
       - xpack.security.http.ssl.certificate=certs/es01/es01.crt
@@ -67,12 +84,7 @@ services:
       - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
-      - xpack.license.self_generated.type=${LICENSE}
-      - xpack.security.authc.anonymous.roles=remote_monitoring_collector
-      - xpack.security.authc.realms.file.file1.order=0
-      - xpack.security.authc.realms.native.native1.order=1
-      - logger.org.elasticsearch=${ES_LOG_LEVEL:-error}
-      - action.destructive_requires_name=false
+
     mem_limit: ${MEM_LIMIT}
     ulimits:
       memlock:
@@ -189,20 +201,16 @@ services:
       retries: 300
       interval: 1s
     environment:
+      # Elastic search connection
       ELASTICSEARCH_HOST: https://es01:9200
       ELASTICSEARCH_USERNAME: "${ES_SUPERUSER_USER:-elastic}"
       ELASTICSEARCH_PASSWORD: "${ELASTIC_PASSWORD:-changeme}"
       ELASTICSEARCH_CA:  /usr/share/elastic-agent/config/certs/ca/ca.crt
 
+      # Kibana connection
       KIBANA_HOST: "https://kibana:${KIBANA_PORT}"
       KIBANA_USERNAME: "${ES_SUPERUSER_USER:-elastic}"
       KIBANA_PASSWORD: "${ELASTIC_PASSWORD:-changeme}"
-
-      # Prepare Kibana for Fleet
-      KIBANA_FLEET_SETUP: "1"
-      KIBANA_FLEET_HOST: "https://kibana:${KIBANA_PORT}"
-      # KIBANA_FLEET_USERNAME: "${ES_SUPERUSER_USER:-elastic}"
-      # KIBANA_FLEET_PASSWORD: "${ELASTIC_PASSWORD:-changeme}"
 
       # Bootstrap Fleet server
       FLEET_SERVER_ENABLE: "1"
@@ -213,13 +221,21 @@ services:
       FLEET_SERVER_POLICY_ID: "fleet-server-apm"
       FLEET_SERVER_ELASTICSEARCH_USERNAME: "${ES_SUPERUSER_USER:-elastic}"
       FLEET_SERVER_ELASTICSEARCH_PASSWORD: "${ELASTIC_PASSWORD:-changeme}"
-      FLEET_SERVER_CERT: /usr/share/elastic-agent/config/certs/fleet-server/fleet-server.crt
-      FLEET_SERVER_CERT_KEY: /usr/share/elastic-agent/config/certs/fleet-server/fleet-server.key
-      CERTIFICATE_AUTHORITIES:  /usr/share/elastic-agent/config/certs/ca/ca.crt
       FLEET_URL: https://fleet-server:8220
       FLEET_SERVER_ELASTICSEARCH_INSECURE: true
       FLEET_SERVER_INSECURE_HTTP: true
       FLEET_INSECURE: true
+
+      # Prepare Kibana for Fleet
+      KIBANA_FLEET_SETUP: "1"
+      KIBANA_FLEET_HOST: "https://kibana:${KIBANA_PORT}"
+      # KIBANA_FLEET_USERNAME: "${ES_SUPERUSER_USER:-elastic}"
+      # KIBANA_FLEET_PASSWORD: "${ELASTIC_PASSWORD:-changeme}"
+
+      #  Enable fleet server SSL
+      FLEET_SERVER_CERT: /usr/share/elastic-agent/config/certs/fleet-server/fleet-server.crt
+      FLEET_SERVER_CERT_KEY: /usr/share/elastic-agent/config/certs/fleet-server/fleet-server.key
+      CERTIFICATE_AUTHORITIES:  /usr/share/elastic-agent/config/certs/ca/ca.crt
 
     depends_on:
       es01: { condition: service_healthy }
@@ -232,6 +248,15 @@ services:
     networks:
       - elastic
     user: root
+
+  # Ensure fleet server is ready when the first docker-compose load containers
+  # Then It is possible to retrieve the enrollmenebt token to pass to apm-server
+  # https://github.com/elastic/elastic-package/blob/main/internal/profile/_static/docker-compose-stack.yml
+  fleet-server_is_ready:
+    image: tianon/true
+    depends_on:
+      fleet-server:
+        condition: service_healthy
 
   # https://www.elastic.co/guide/en/fleet/current/agent-environment-variables.html
   apm-server:
@@ -246,7 +271,7 @@ services:
       FLEET_ENROLL: "1"
       CERTIFICATE_AUTHORITIES:  /usr/share/elastic-agent/config/certs/ca/ca.crt
       FLEET_URL: https://fleet-server:8220
-      FLEET_ENROLLMENT_TOKEN: eS1mMDBJSUJXbGxfSzZ3VHNlSm46eEFTOHVaSE1RSGE5N3FtbzRXNjFUQQ==
+      FLEET_ENROLLMENT_TOKEN: "${APM_ENROLLMENT_TOKEN}"
       FLEET_INSECURE: true
     restart: always
     user: root
@@ -256,10 +281,10 @@ services:
       es01: { condition: service_healthy }
       fleet-server: { condition: service_healthy }
     volumes:
-      - "./metricbeat/elasticsearch-xpack.yml://usr/share/metricbeat/modules.d/elasticsearch-xpack.yml"
-      - "./metricbeat/apm-server.yml://usr/share/metricbeat/modules.d/apm-server.yml"
+      # - "./metricbeat/elasticsearch-xpack.yml://usr/share/metricbeat/modules.d/elasticsearch-xpack.yml"
+      # - "./metricbeat/apm-server.yml://usr/share/metricbeat/modules.d/apm-server.yml"
       - "./certificates:/usr/share/elastic-agent/config/certs"
-      - "/mnt/d/devel/github/ansible_inventory/monitoring/logs/apm-server:/usr/share/elastic-agent/state/data/logs:rw"
+      # - "/mnt/d/devel/github/ansible_inventory/monitoring/logs/apm-server:/usr/share/elastic-agent/state/data/logs:rw"
       # - "./logs/apm-server:/usr/share/elastic-agent/state/data/logs"
       - "/usr/local/bin/docker:/usr/bin/docker"
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -302,6 +327,25 @@ services:
     # dns_search: .
     # environment:
       # - NO_PROXY=apm-server
+
+  heartbeat-platform:
+    container_name: heartbeat-platform
+    hostname: heartbeat-platform
+    image: docker.elastic.co/beats/heartbeat:${STACK_VERSION}
+    command: [ "--config=/etc/otel-collector-config.yml" ]
+    volumes:
+      - ./configuration/heartbeat/heartbeat.yml:/usr/share/heartbeat/heartbeat.yml:ro
+      - "./certificates:/usr/share/elastic-agent/config/certs"
+    networks:
+      - elastic
+    profiles:
+      - monitoring
+    depends_on:
+      es01:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
+
 
 volumes:
   certs:

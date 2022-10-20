@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Infrastructure.Base.Database
 {
-    public class EfAsyncRepository<DB,T> : RepositoryBase<T>, IAsyncRepository<T>, IAsyncDisposable where DB : DbContext,IUnitOfWork where T : class
+    public class EfAsyncRepository<DB,T> : RepositoryBase<T>, IAsyncRepository<T>, IAsyncDisposable, IDisposable where DB : DbContext,IUnitOfWork where T : class
     {
         protected readonly DB _dbContext;
         protected readonly IDbContextFactory<DB> _dbContextFactory;
@@ -39,15 +39,36 @@ namespace Inventory.Infrastructure.Base.Database
             }
         }
 
-        public ValueTask DisposeAsync()
+        public void Dispose()
         {
-            if (_dbContextFactory != null)
-            {
-                return _dbContext.DisposeAsync();
-            }
-            return new ValueTask(Task.CompletedTask);
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _dbContext?.Dispose();
+            }
+        }
+        public async ValueTask DisposeAsync()
+        {
+            await DisposeAsyncCore().ConfigureAwait(false);
+
+            Dispose(disposing: false);
+#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
+            GC.SuppressFinalize(this);
+#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
+        }
+
+        protected virtual async ValueTask DisposeAsyncCore()
+        {
+            if (_dbContext is not null)
+            {
+                await _dbContext.DisposeAsync().ConfigureAwait(false);
+            }
+        }
         public async Task<T> FirstAsync(ISpecification<T> spec)
         {
             var specificationResult = ApplySpecification(spec);
