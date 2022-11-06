@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Api.Base.Exceptions
 {
-    public class ValidationError : ApiError
+    public class ValidationError : GenericApiError
     {
         public ValidationError()
         {

@@ -10,6 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Inventory.Configuration.Api.Application.Datacenter;
 
 namespace Inventory.Configuration.Api.Graphql.Queries
 {
@@ -17,19 +20,21 @@ namespace Inventory.Configuration.Api.Graphql.Queries
     public class DatacenterQueries
     {
         [UseFiltering]
-        public Task<List<Datacenter>> GetDatacenters([Service] IAsyncRepository<Datacenter> _repository, IResolverContext ctx)
+        public Task<List<DatacenterDto>> GetDatacenters([Service] IAsyncRepository<Datacenter> _repository, [Service] IMapper mapper, IResolverContext ctx)
         {
-            return _repository.ListAsync();
+            return Task.FromResult(mapper.Map<List<DatacenterDto>>(_repository.ListAsync()));
         }
 
         [UsePaging]
         [UseProjection]
         [UseSorting]
         [UseFiltering]
-        public IQueryable<Datacenter> GetDatacenters2([Service] IDbContextFactory<ConfigurationDbContext> dbContextFactory, IResolverContext ctx)
+        public IQueryable<DatacenterDto> GetDatacenters2([Service] IDbContextFactory<ConfigurationDbContext> dbContextFactory, 
+                                                       [Service] IMapper mapper,
+                                                      IResolverContext ctx)
         {
             var dbContext = dbContextFactory.CreateDbContext();
-            return dbContext.Datacenters;
+            return mapper.ProjectTo<DatacenterDto>(dbContext.Datacenters, null);
         }
 
     }

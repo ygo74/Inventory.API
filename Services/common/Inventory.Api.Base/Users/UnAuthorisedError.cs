@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Api.Base.Users
 {
-    public class UnAuthorisedError : ApiError
+    public class UnAuthorisedError : GenericApiError
     {
         public UnAuthorisedError()
         {

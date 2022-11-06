@@ -15,9 +15,9 @@ namespace Inventory.Configuration.Domain.Models
 
         public DatacenterType DataCenterType { get; private set; }
 
-        protected Datacenter() : base(null,null) { }
+        protected Datacenter() { }
 
-        public Datacenter(string code, string name, DatacenterType dataCenterType, DateTime? validFrom=null, DateTime? validTo=null):base(validFrom, validTo)
+        public Datacenter(string code, string name, DatacenterType dataCenterType, DateTime? validFrom=null, DateTime? validTo=null)
         {
             Code = !String.IsNullOrEmpty(code) ? code : throw new ArgumentNullException(nameof(code));
             Name = !String.IsNullOrEmpty(name) ? name : throw new ArgumentNullException(nameof(name));

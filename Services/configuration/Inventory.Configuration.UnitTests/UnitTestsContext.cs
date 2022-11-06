@@ -1,7 +1,6 @@
 ﻿using Inventory.Configuration.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,57 +18,50 @@ using Inventory.UnitTests.Base;
 using Inventory.Infrastructure.Base.Telemetry;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Inventory.Infrastructure.Base.Events.RabbitMQ;
+using Inventory.Infrastructure.Base.Events;
+using Inventory.UnitTests.Base.Events;
 
 namespace Inventory.Configuration.UnitTests
 {
-    public class UnitTestsContext
+    public class UnitTestsContext : TestExecutionContext<Inventory.Configuration.Api.Startup>
     {
 
         private static readonly UnitTestsContext _context = new UnitTestsContext();
-        private readonly ServiceProvider _serviceProvider;
-        private readonly IConfiguration _configuration;
-
-        private UnitTestsContext()
+        protected UnitTestsContext()
         {
-            _configuration = GetConfiguration();
 
-            var serviceCollection = new ServiceCollection();
+        }
 
-            serviceCollection.AddMemoryCache();
-            serviceCollection.AddLogging();
 
-            serviceCollection.AddScoped(typeof(IAsyncRepository<>), typeof(ConfigurationRepository<>));
+        public override void Configure(ServiceCollection services, IWebHostEnvironment Environment)
+        {
+            base.Configure(services, Environment);
 
-            // MediatR
-            serviceCollection.AddMediatR(typeof(Inventory.Configuration.Api.Startup));
-            serviceCollection.AddScoped<IMediator, Mediator>();
-            serviceCollection.AddScoped<ServiceFactory>(p => p.GetService);
-            serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-
-            // FluentValidation
-            serviceCollection.AddValidatorsFromAssembly(typeof(Inventory.Configuration.Api.Startup).Assembly);
-
-            // AutoMapper
-            serviceCollection.AddAutoMapper(typeof(Inventory.Configuration.Api.Startup));
+            // RabbitMQ
+            services.AddSingleton<IEventBus, WithoutEventBus>();
 
             // Telemetry
             string sourceName = null;
-            serviceCollection.AddTelemetryService(_configuration, out sourceName);
+            services.AddTelemetryService(Configuration, out sourceName);
 
-
-            // Unit tests specific configuration
-            serviceCollection.AddScoped<ICurrentUser, CurrentTestUserService>();
-            serviceCollection.AddEntityFrameworkInMemoryDatabase().AddDbContext<ConfigurationDbContext>((sp, options) =>
+            // Database
+            services.AddScoped(typeof(IAsyncRepository<>), typeof(ConfigurationRepository<>));
+            services.AddEntityFrameworkInMemoryDatabase().AddDbContext<ConfigurationDbContext>((sp, options) =>
             {
                 options.UseInMemoryDatabase("in-memory").UseInternalServiceProvider(sp);
             });
 
-            serviceCollection.AddScoped<Microsoft.AspNetCore.Http.IHttpContextAccessor>(factory =>
+
+            // Unit tests specific configuration
+            services.AddScoped<ICurrentUser, CurrentTestUserService>();
+
+            services.AddScoped<Microsoft.AspNetCore.Http.IHttpContextAccessor>(factory =>
             {
                 return new Microsoft.AspNetCore.Http.HttpContextAccessor();
             });
-
-            _serviceProvider = serviceCollection.BuildServiceProvider();
 
         }
 
@@ -81,27 +73,9 @@ namespace Inventory.Configuration.UnitTests
             }
         }
 
-        public ConfigurationDbContext DbContext => _serviceProvider.GetService<ConfigurationDbContext>();
-
-        public T GetService<T>() => _serviceProvider.GetService<T>();
-
-        public ILogger<T> GetLogger<T>() => _serviceProvider.GetService<ILogger<T>>();
-
-        public IMapper GetMapper() => _serviceProvider.GetService<IMapper>();
-
-        public IMediator GetMediator() => _serviceProvider.GetService<IMediator>();
-
-        public IAsyncRepository<T> GetAsyncRepository<T>() where T : class => _serviceProvider.GetService<IAsyncRepository<T>>();
-
-        private IConfiguration GetConfiguration()
-        {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables();
-
-            return builder.Build();
-        }
+        public IMediator GetMediator() => GetService<IMediator>();
+        public ConfigurationDbContext DbContext => GetService<ConfigurationDbContext>();
+        public IAsyncRepository<T> GetAsyncRepository<T>() where T : class => GetService<IAsyncRepository<T>>();
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Inventory.Domain.Base.Extensions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -24,22 +25,29 @@ namespace Inventory.Infrastructure.Base.Events.RabbitMQ
         private readonly IRabbitMQPersistentConnection _persistentConnection;
         private readonly ILogger<EventBusRabbitMQ> _logger;
         private readonly IEventBusSubscriptionsManager _subsManager;
-        //private readonly ILifetimeScope _autofac;
-        private readonly IServiceProvider _autofac;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IConfiguration _configuration;
         private readonly int _retryCount;
 
         private IModel _consumerChannel;
         private string _queueName;
 
         public EventBusRabbitMQ(IRabbitMQPersistentConnection persistentConnection, ILogger<EventBusRabbitMQ> logger,
-            IServiceProvider autofac, IEventBusSubscriptionsManager subsManager, string queueName = null, int retryCount = 5)
+            IServiceProvider serviceProvider, IEventBusSubscriptionsManager subsManager, IConfiguration configuration,
+            string queueName = null, int retryCount = 5
+            )
         {
             _persistentConnection = persistentConnection ?? throw new ArgumentNullException(nameof(persistentConnection));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _subsManager = subsManager ?? new InMemoryEventBusSubscriptionsManager();
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+
+            if (!configuration.GetValue<bool>("PublishIntegrationEvent"))
+                return;
+
             _queueName = queueName;
             _consumerChannel = CreateConsumerChannel();
-            _autofac = autofac;
+            _serviceProvider = serviceProvider;
             _retryCount = retryCount;
             _subsManager.OnEventRemoved += SubsManager_OnEventRemoved;
         }
@@ -67,6 +75,9 @@ namespace Inventory.Infrastructure.Base.Events.RabbitMQ
 
         public void Publish<T>(T @event, string eventName=null) where T : IntegrationEvent
         {
+            if (!_configuration.GetValue<bool>("PublishIntegrationEvent"))
+                return;
+
             if (!_persistentConnection.IsConnected)
             {
                 _persistentConnection.TryConnect();
@@ -274,7 +285,7 @@ namespace Inventory.Infrastructure.Base.Events.RabbitMQ
                     if (subscription.IsDynamic)
                     {
                         //var handler = scope.ResolveOptional(subscription.HandlerType) as IDynamicIntegrationEventHandler;
-                        var handler = _autofac.GetService(subscription.HandlerType) as IDynamicIntegrationEventHandler;
+                        var handler = _serviceProvider.GetService(subscription.HandlerType) as IDynamicIntegrationEventHandler;
                         if (handler == null) continue;
                         //dynamic eventData = JObject.Parse(message);
                         dynamic eventData = JsonSerializer.Deserialize<dynamic>(message);
@@ -285,7 +296,7 @@ namespace Inventory.Infrastructure.Base.Events.RabbitMQ
                     else
                     {
                         //var handler = scope.ResolveOptional(subscription.HandlerType);
-                        var handler = _autofac.GetService(subscription.HandlerType);
+                        var handler = _serviceProvider.GetService(subscription.HandlerType);
                         if (handler == null) continue;
                         var eventType = _subsManager.GetEventTypeByName(eventName);
                         //var integrationEvent = JsonConvert.DeserializeObject(message, eventType);

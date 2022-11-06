@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HotChocolate;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,6 +32,7 @@ namespace Inventory.Api.Base.Core
         /// <summary>
         /// Add errors collection and return itself
         /// </summary>
+        [GraphQLIgnore()]
         public U PushError(params T[] errors)
         {
             this.errors.AddRange(errors);
@@ -41,6 +43,7 @@ namespace Inventory.Api.Base.Core
         /// <summary>
         /// Check if any error exist
         /// </summary>
+        [GraphQLIgnore()]
         public bool HasError()
         {
 
@@ -56,6 +59,7 @@ namespace Inventory.Api.Base.Core
         /// Return new instance with errors
         /// </summary>
         /// <param name="errors"></param>
+        [GraphQLIgnore()]
         public static U Error(params T[] errors)
         {
             U u = new U();
@@ -66,11 +70,13 @@ namespace Inventory.Api.Base.Core
         /// <summary>
         /// Returns new instance
         /// </summary>
+        [GraphQLIgnore()]
         public static U Success()
         {
             return new U();
         }
 
+        [GraphQLIgnore()]
         public void AddError(object o)
         {
 

@@ -12,38 +12,49 @@ namespace Inventory.Api.Base.Graphql.Types
 {
     public class ErrorTypes
     {
-        public class BaseErrorType : ObjectType<ApiError>
-        {
-            protected override void Configure(IObjectTypeDescriptor<ApiError> descriptor)
-            {
+        //public class BaseErrorType : ObjectType<ApiError>
+        //{
+        //    protected override void Configure(IObjectTypeDescriptor<ApiError> descriptor)
+        //    {
 
-                descriptor.Implements<BaseErrorInterfaceType>();
-            }
-        }
+        //        descriptor.Implements<BaseErrorInterfaceType>();
+        //    }
+        //}
 
         public class BaseErrorInterfaceType : InterfaceType<IApiError>
         {
             protected override void Configure(IInterfaceTypeDescriptor<IApiError> descriptor)
             {
+                descriptor.Name("ApiError");
                 descriptor.Field(e => e.message).Type<StringType>();
             }
         }
 
-        public class ValidationErrorType : ObjectType<ValidationError>
-        {
-            protected override void Configure(IObjectTypeDescriptor<ValidationError> descriptor)
-            {
-                descriptor.Implements<BaseErrorInterfaceType>();
-            }
-        }
+        //public class ValidationErrorType : ObjectType<ValidationError>
+        //{
+        //    protected override void Configure(IObjectTypeDescriptor<ValidationError> descriptor)
+        //    {
+        //        descriptor.Implements<BaseErrorInterfaceType>();
+        //    }
+        //}
 
-        public class UnAuthorisedErrorType : ObjectType<UnAuthorisedError>
-        {
-            protected override void Configure(IObjectTypeDescriptor<UnAuthorisedError> descriptor)
-            {
-                descriptor.Implements<BaseErrorInterfaceType>();
-            }
-        }
+        //public class UnAuthorisedErrorType : ObjectType<UnAuthorisedError>
+        //{
+        //    protected override void Configure(IObjectTypeDescriptor<UnAuthorisedError> descriptor)
+        //    {
+        //        descriptor.Implements<BaseErrorInterfaceType>();
+        //    }
+        //}
+
+        //public class CreateWebHookErrorUnion : UnionType
+        //{
+        //    protected override void Configure(IUnionTypeDescriptor descriptor)
+        //    {
+        //        descriptor.Type<ValidationErrorType>();
+        //        descriptor.Type<UnAuthorisedErrorType>();
+        //        //descriptor.Type<InternalServerErrorType>();
+        //    }
+        //}
 
     }
 }

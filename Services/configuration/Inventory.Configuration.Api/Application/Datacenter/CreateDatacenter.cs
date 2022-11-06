@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using HotChocolate;
 using Inventory.Api.Base.Core;
 using Inventory.Api.Base.Exceptions;
 using Inventory.Configuration.Domain.Events;
@@ -16,6 +17,7 @@ namespace Inventory.Configuration.Api.Application.Datacenter
 {
     public class CreateDatacenter
     {
+        [GraphQLName("CreateDatacenterInput")]
         public class Command : CreateConfigurationEntity<Payload>
         {
             public string Name { get; set; }
@@ -33,9 +35,8 @@ namespace Inventory.Configuration.Api.Application.Datacenter
             {
 
                 RuleFor(e => e.Name).Cascade(CascadeMode.Stop)
-                    .NotNull()
-                    .NotEmpty()
-                    .WithMessage("{PropertyName} is mandatory");
+                    .NotNull().WithMessage("{PropertyName} is mandatory")
+                    .NotEmpty().WithMessage("{PropertyName} is mandatory");
 
                 RuleFor(e => e.Code).Cascade(CascadeMode.Stop)
                     .NotNull()

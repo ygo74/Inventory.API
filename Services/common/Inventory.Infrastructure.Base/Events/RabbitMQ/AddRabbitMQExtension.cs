@@ -66,7 +66,7 @@ namespace Inventory.Infrastructure.Base.Events.RabbitMQ
                     subscriptionClientName = configuration["SubscriptionClientName"];
                 }
 
-                return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager, subscriptionClientName, retryCount);
+                return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager, configuration, subscriptionClientName, retryCount);
             }); 
             
 

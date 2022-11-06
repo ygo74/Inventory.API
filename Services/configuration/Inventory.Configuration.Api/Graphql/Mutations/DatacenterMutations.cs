@@ -12,12 +12,12 @@ namespace Inventory.Configuration.Api.Graphql.Mutations
     [ExtendObjectType(OperationTypeNames.Mutation)]
     public class DatacenterMutations
     {
-        public async Task<CreateDatacenter.Payload> CreateServer(
-            CreateDatacenter.Command command,
+        public async Task<CreateDatacenter.Payload> CreateDatacenter(
+            CreateDatacenter.Command input,
             [Service] IMediator _mediator
             )
         {
-            return await _mediator.Send(command);
+            return await _mediator.Send(input);
         }
 
     }

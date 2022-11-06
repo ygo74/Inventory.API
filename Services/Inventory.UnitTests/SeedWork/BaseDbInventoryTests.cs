@@ -24,8 +24,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Inventory.Infrastructure.Azure.Services;
-using Inventory.Infrastructure.Azure;
 
 namespace Inventory.UnitTests
 {
@@ -92,7 +90,7 @@ namespace Inventory.UnitTests
             serviceCollection.AddAutoMapper(typeof(Inventory.API.Startup));
 
             // Azure infrastructure
-            ServicesExtension.RegisterService(serviceCollection);
+            //ServicesExtension.RegisterService(serviceCollection);
             //serviceCollection.UseInfrastructureAzureService();
 
             _serviceProvider = serviceCollection.BuildServiceProvider();

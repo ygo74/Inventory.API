@@ -2,8 +2,13 @@
 using HotChocolate.AspNetCore.Extensions;
 using HotChocolate.Data;
 using HotChocolate.Types;
+using Inventory.Api.Base.Core;
+using Inventory.Api.Base.Exceptions;
+using Inventory.Api.Base.Users;
+using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Api.Graphql.Mutations;
 using Inventory.Configuration.Api.Graphql.Queries;
+using Inventory.Configuration.Api.Graphql.Types;
 using Inventory.Configuration.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using static Inventory.Api.Base.Graphql.Types.ErrorTypes;
+using static Inventory.Configuration.Api.Graphql.Mutations.PluginMutations;
 
 namespace Inventory.Configuration.Api.Configuration
 {
@@ -71,15 +77,32 @@ namespace Inventory.Configuration.Api.Configuration
                     .AddTypeExtension<DatacenterQueries>()
                 .AddMutationType(d => d.Name("Mutation"))
                     .AddTypeExtension<DatacenterMutations>()
+                    .AddTypeExtension<PluginMutations>()
+                .AddType<DatacenterType>()
+                .AddType<CreateDatacenterInputType>()
+                .AddType<CreateDatacenterPayloadType>()
+                .AddType<PluginType>()
+                .AddType<CreatePluginInputType>()
+                .AddType<CreatePluginPayloadType>()
 
+                //.AddMutationConventions(
+                //    new MutationConventionOptions
+                //    {
+                //        InputArgumentName = "input",
+                //        InputTypeNamePattern = "{MutationName}Input",
+                //        PayloadTypeNamePattern = "{MutationName}Payload",
+                //        PayloadErrorTypeNamePattern = "{MutationName}Error",
+                //        PayloadErrorsFieldName = "errors",
+                //        ApplyToAllMutations = true
+                //    })
                 .BindRuntimeType<DateTime, DateTimeType>()
                 .BindRuntimeType<int, IntType>()
                 .BindRuntimeType<long, LongType>()
-                .AddType<BaseErrorType>()
-                .AddType<BaseErrorInterfaceType>()
-                .AddType<ValidationErrorType>()
-                .AddType<UnAuthorisedErrorType>()
                 //.AddType<CreateWebHookErrorUnion>()
+                .AddType<GenericApiError>()
+                .AddType<ValidationError>()
+                .AddType<UnAuthorisedError>()
+                .AddType<BaseErrorInterfaceType>()
                 ;
 
             return serviceCollection;

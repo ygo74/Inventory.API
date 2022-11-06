@@ -14,10 +14,9 @@ namespace Inventory.Configuration.Api.Application.Datacenter
             CreateMap<CreateDatacenter.Command, Domain.Models.Datacenter>();
             CreateMap<Domain.Models.Datacenter, DatacenterDto>()
                  //.IncludeBase<ConfigurationEntity, ConfigurationEntityDto>();
-                 .ForMember(d => d.ValidFrom, options =>
+                 .ForMember(d => d.StartDate, options =>
                  {
-                     options.PreCondition(src => src.ValidFrom.HasValue);
-                     options.MapFrom(src => src.ValidFrom);
+                     options.MapFrom(src => src.StartDate);
                  });
 
             CreateMap<Domain.Models.Datacenter, DatacenterIntegrationEvent>()

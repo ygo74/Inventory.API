@@ -27,7 +27,7 @@ namespace Inventory.Configuration.Api
 
             try
             {
-                var host = CreateHostBuilder(configuration, args).Build();
+                var host = CreateHostBuilder(args).Build();
 
                 using (var scope = host.Services.CreateScope())
                 {
@@ -63,8 +63,11 @@ namespace Inventory.Configuration.Api
             }
         }
 
-        public static IHostBuilder CreateHostBuilder(IConfiguration configuration, string[] args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
         {
+
+            var configuration = GetConfiguration();
+
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

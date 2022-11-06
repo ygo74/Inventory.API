@@ -12,9 +12,9 @@ namespace Inventory.Devices.Api.Graphql.Types
 {
     public class ErrorTypes
     {
-        public class BaseErrorType : ObjectType<ApiError>
+        public class BaseErrorType : ObjectType<GenericApiError>
         {
-            protected override void Configure(IObjectTypeDescriptor<ApiError> descriptor)
+            protected override void Configure(IObjectTypeDescriptor<GenericApiError> descriptor)
             {
 
                 descriptor.Implements<BaseErrorInterfaceType>();

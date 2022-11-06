@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inventory.Api.Base.Dto;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

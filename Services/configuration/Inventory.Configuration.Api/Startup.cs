@@ -25,6 +25,8 @@ using System.Threading.Tasks;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Resources;
 using System.Diagnostics;
+using Inventory.Configuration.Api.Application.Plugin;
+using Inventory.Api.Base.Plugins;
 
 namespace Inventory.Configuration.Api
 {
@@ -65,9 +67,13 @@ namespace Inventory.Configuration.Api
             services.AddRabbitMQService(Configuration);
 
             services.AddScoped<ICurrentUser, CurrentUser>();
+
             string sourceName = null;
             services.AddTelemetryService(Configuration, out sourceName);
 
+            // Application
+            services.AddSingleton<PluginResolver>();
+            services.AddScoped<PluginService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

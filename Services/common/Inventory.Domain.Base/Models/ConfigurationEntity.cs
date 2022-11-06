@@ -14,6 +14,8 @@ namespace Inventory.Domain.Base.Models
         public DateTime StartDate { get; protected set; }
         public DateTime? EndDate { get; protected set; }
 
+        public string InventoryCode { get; protected set; }
+
         public void SetAvailabilityDate(DateTime? startDate=null, DateTime? endDate=null)
         {
 
