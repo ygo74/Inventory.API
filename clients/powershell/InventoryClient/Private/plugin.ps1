@@ -31,3 +31,36 @@ fragment pluginDto on PluginDto
   }
 }
 "@
+
+$script:PluginQuery=@"
+query plugin(`$first: Int `$order: [PluginDtoSortInput!]) {
+  plugins(first: `$first order: `$order) {
+    pageInfo { ... pageInfo }
+    edges {
+      cursor
+      node {... pluginDto }
+    }
+    nodes { ... pluginDto }
+  }
+}
+"@
+
+$script:pluginDtoFragment=@"
+fragment pluginDto on PluginDto
+{
+  name
+  code
+  version
+  deprecated
+  startDate
+  endDate
+  created
+  createdBy
+  lastModified
+  lastModifiedBy
+  capacities {
+    key
+    value
+  }
+}
+"@

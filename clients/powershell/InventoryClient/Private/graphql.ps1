@@ -1,3 +1,15 @@
+
+$script:PaginationInfo=@"
+fragment pageInfo on PageInfo
+{
+  hasNextPage
+  hasPreviousPage
+  startCursor
+  endCursor
+}
+"@
+
+
 function Invoke-InternalGraphql
 {
     [CmdletBinding()]
@@ -14,10 +26,13 @@ function Invoke-InternalGraphql
 
     Begin
     {
-
+        $startFunction = Get-Date
+        Trace-StartFunction -CommandName $MyInvocation.MyCommand.Name
     }
     End
     {
+        $endFunction = Get-Date
+        Trace-EndFunction -CommandName $MyInvocation.MyCommand.Name -Duration ($endFunction -$startFunction)
 
     }
     Process
@@ -30,7 +45,9 @@ function Invoke-InternalGraphql
                 variables = $Variables
             }
 
-            $jsonBody = $body | ConvertTo-Json
+            $jsonBody = $body | ConvertTo-Json -Depth 5
+
+            Trace-Message -Message "Body: $jsonBody" -CommandName $MyInvocation.MyCommand.Name
 
             $result = Invoke-RestMethod -Uri $Uri -Method Post -Body $jsonBody -ContentType "application/json" -ErrorAction stop
             $result.data
