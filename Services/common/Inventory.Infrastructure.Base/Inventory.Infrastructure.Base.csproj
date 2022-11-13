@@ -36,4 +36,8 @@
     <ProjectReference Include="..\Inventory.Domain.Base\Inventory.Domain.Base.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
 </Project>

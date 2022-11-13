@@ -1,4 +1,4 @@
-﻿using Inventory.Configuration.Infrastructure;
+﻿using Inventory.Networks.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,14 +12,14 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Inventory.Configuration.Api.Configuration
+namespace Inventory.Networks.Api.Configuration
 {
     public static class AddDbContextExtension
     {
         public static IServiceCollection AddCustomDbContext(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment env)
         {
 
-            services.AddEntityFrameworkNpgsql().AddPooledDbContextFactory<ConfigurationDbContext>((serviceProvider, options) =>
+            services.AddEntityFrameworkNpgsql().AddPooledDbContextFactory<NetworksDbContext>((serviceProvider, options) =>
             //services.AddEntityFrameworkNpgsql().AddDbContext<ServerDbContext>(options =>
             {
                 options.UseNpgsql(configuration.GetConnectionString("InventoryDatabase"),

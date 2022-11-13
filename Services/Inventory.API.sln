@@ -59,13 +59,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Plugins.Interfaces", "plugins\Interfaces\Inventory.Plugins.Interfaces\Inventory.Plugins.Interfaces.csproj", "{4E55C3E6-809C-482B-9604-A7D54424E2F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Networks.Domain", "networks\Inventory.Networks.Domain\Inventory.Networks.Domain.csproj", "{AAFF8DBC-DD22-425D-9B32-A56824E7CDB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Networks.Domain", "networks\Inventory.Networks.Domain\Inventory.Networks.Domain.csproj", "{AAFF8DBC-DD22-425D-9B32-A56824E7CDB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Plugins.Azure.UnitTests", "plugins\Azure\Inventory.Plugins.Azure.UnitTests\Inventory.Plugins.Azure.UnitTests.csproj", "{3364484F-D7D2-4DCB-8D84-696A77DDAF02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Plugins.Azure.UnitTests", "plugins\Azure\Inventory.Plugins.Azure.UnitTests\Inventory.Plugins.Azure.UnitTests.csproj", "{3364484F-D7D2-4DCB-8D84-696A77DDAF02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Networks.Api", "networks\Inventory.Networks.Api\Inventory.Networks.Api.csproj", "{0E11FA28-646F-4B68-A56D-6ECABB6A68DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Networks.Api", "networks\Inventory.Networks.Api\Inventory.Networks.Api.csproj", "{0E11FA28-646F-4B68-A56D-6ECABB6A68DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Plugins.Base", "common\Inventory.Plugins.Base\Inventory.Plugins.Base.csproj", "{B0A749D9-9927-407A-A3D4-EAB5CBDB3B66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Plugins.Base", "common\Inventory.Plugins.Base\Inventory.Plugins.Base.csproj", "{B0A749D9-9927-407A-A3D4-EAB5CBDB3B66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Networks.Infrastructure", "networks\Inventory.Networks.Infrastructure\Inventory.Networks.Infrastructure.csproj", "{6FED5362-195D-4B97-A265-BB6D9E713772}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -169,6 +171,10 @@ Global
 		{B0A749D9-9927-407A-A3D4-EAB5CBDB3B66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0A749D9-9927-407A-A3D4-EAB5CBDB3B66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0A749D9-9927-407A-A3D4-EAB5CBDB3B66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FED5362-195D-4B97-A265-BB6D9E713772}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FED5362-195D-4B97-A265-BB6D9E713772}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FED5362-195D-4B97-A265-BB6D9E713772}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FED5362-195D-4B97-A265-BB6D9E713772}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -195,6 +201,7 @@ Global
 		{3364484F-D7D2-4DCB-8D84-696A77DDAF02} = {0064C18E-37CF-4902-B5C7-B5BD15D65ADE}
 		{0E11FA28-646F-4B68-A56D-6ECABB6A68DE} = {F206288D-F20B-4A9B-92BE-1703BE80B61F}
 		{B0A749D9-9927-407A-A3D4-EAB5CBDB3B66} = {CB4E6948-2FD6-44B0-9249-E6F0584370EE}
+		{6FED5362-195D-4B97-A265-BB6D9E713772} = {F206288D-F20B-4A9B-92BE-1703BE80B61F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB29300A-8C08-46DC-BB08-CF404BF53598}

@@ -6,6 +6,7 @@ using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Inventory.Configuration.Api.Graphql.Mutations
@@ -16,10 +17,11 @@ namespace Inventory.Configuration.Api.Graphql.Mutations
 
         public async Task<CreatePlugin.Payload> CreatePlugin(
             CreatePlugin.Command input,
-            [Service] IMediator _mediator
+            [Service] IMediator _mediator,
+            CancellationToken cancellationToken
             )
         {
-            return await _mediator.Send(input);
+            return await _mediator.Send(input,cancellationToken);
         }
 
         //public async Task<CreatePlugin.Payload> CreatePlugin(

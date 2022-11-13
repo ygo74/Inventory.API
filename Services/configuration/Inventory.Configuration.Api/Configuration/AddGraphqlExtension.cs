@@ -75,6 +75,7 @@ namespace Inventory.Configuration.Api.Configuration
                 .AddProjections()
                 .AddQueryType(d => d.Name("Query"))
                     .AddTypeExtension<DatacenterQueries>()
+                    .AddTypeExtension<PluginQueries>()
                 .AddMutationType(d => d.Name("Mutation"))
                     .AddTypeExtension<DatacenterMutations>()
                     .AddTypeExtension<PluginMutations>()

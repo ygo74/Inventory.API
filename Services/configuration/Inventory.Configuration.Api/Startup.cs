@@ -54,7 +54,7 @@ namespace Inventory.Configuration.Api
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
             // Add database
-            services.AddCustomDbContext(Configuration);
+            services.AddCustomDbContext(Configuration, Environment);
             services.AddScoped(typeof(IAsyncRepository<>), typeof(ConfigurationRepository<>));
 
             // Add Graphql

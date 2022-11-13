@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace Inventory.Infrastructure.Base.Database
         {
             _mediator = this.GetService<IMediator>();
         }
+
 
         //protected ApplicationDbContext(DbContextOptions options, IMediator mediator) : base(options) 
         //{

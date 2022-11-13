@@ -1,4 +1,5 @@
 using Inventory.Api.Base.Plugins;
+using Inventory.Networks.Api.Configuration;
 using Inventory.Plugins.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,12 +19,14 @@ namespace Inventory.Networks.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration,IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -40,10 +43,12 @@ namespace Inventory.Networks.Api
             services.AddLogging();
 
 
-            var pluginResolver = new PluginResolver();
-            var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net5.0\Inventory.Plugins.Azure.dll");
+            services.AddCustomDbContext(Configuration, Environment);
 
-            pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(services, Configuration, assembly);
+            //var pluginResolver = new PluginResolver();
+            //var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net5.0\Inventory.Plugins.Azure.dll");
+
+            //pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(services, Configuration, assembly);
 
 
         }
