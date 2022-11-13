@@ -1,0 +1,118 @@
+---
+layout: default
+title: Entity Framework
+parent: Dotnet development
+nav_order: 1
+has_children: false
+---
+
+<details open markdown="block">
+  <summary>
+    Table of contents
+  </summary>
+  {: .text-delta }
+1. TOC
+{:toc}
+</details>
+
+
+## Migrations
+{: .text-blue-300 }
+
+### Prerequisites
+{: .text-blue-200 }
+
+1. Required packages
+    {: .text-blue-100 }
+
+    Into startup projects :
+
+    * Microsoft.EntityFrameworkCore.Design
+
+        ```xml
+        <ItemGroup>
+            <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.13">
+                <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+                <PrivateAssets>all</PrivateAssets>
+            </PackageReference>
+            ...
+        </ItemGroup>
+
+        ```
+
+2. Class implementing IDesignTimeDbContextFactory
+    {: .text-blue-100 }
+
+    As our DBContext requires to access to Mediator, we need to link DbContext with a class implementing IMediator during the migration process.
+
+    To Achieve this link, we need return the DBContect from **Dependency injection** services containers and specify the migration to use a custom initialization by declaring a class which implements IDesignTimeDbContextFactory.
+
+    {: .warning}
+    > This procedure is required only because we use Dependency Injection inside our DbContext class
+
+    **Sample for NetworksDbContext**
+
+    ```csharp
+    public class NetworksDbContextDesignFactory : IDesignTimeDbContextFactory<NetworksDbContext>
+    {
+        public NetworksDbContext CreateDbContext(string[] args)
+        {
+            // Get environment
+            string environment = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+
+            // Build configuration from the API
+            // Allow to retrieve the connectionstring configuration
+            IConfiguration config = new ConfigurationBuilder()
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../Inventory.Networks.API"))
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment}.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
+
+
+            // Build service collections with DbContext and its dependecies
+            IServiceCollection services = new ServiceCollection();
+
+            services.AddDbContext<NetworksDbContext>((serviceProvider, options) =>
+            {
+                var connectionString = config.GetConnectionString("InventoryDatabase");
+                options.UseNpgsql(connectionString);
+            });
+
+            services.AddScoped<IMediator, NoMediator>();
+            var serviceProvider = services.BuildServiceProvider();
+
+            // Return the DbContext from Container
+            return serviceProvider.GetService<NetworksDbContext>();
+
+        }
+    }
+
+    ```
+
+### Create Migrations
+{: .text-blue-200 }
+
+```powershell
+# Set environment configuration use for the migration
+$env:ASPNETCORE_ENVIRONMENT="Development"
+```
+
+1. For Networks Infrastructure
+
+```powershell
+# Create a migration
+dotnet ef migrations add Initial -s .\networks\Inventory.Networks.Api\ -p .\networks\Inventory.Networks.Infrastructure\ -v
+
+```
+
+### Apply migrations to Database
+{: .text-blue-200 }
+
+1. For Networks Infrastructure
+
+```powershell
+# Apply migration
+dotnet ef database update -s .\networks\Inventory.Networks.Api\ -p .\networks\Inventory.Networks.Infrastructure\ -v
+```
