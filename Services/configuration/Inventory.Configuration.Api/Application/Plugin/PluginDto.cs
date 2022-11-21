@@ -16,7 +16,12 @@ namespace Inventory.Configuration.Api.Application.Plugin
         }
 
         public string Name { get; set; }
+
+        /// <summary>
+        /// Test code description
+        /// </summary>
         public string Code { get; set; }
+
         public string Version { get; set; }
 
         public Dictionary<string, bool> Capacities { 

@@ -20,8 +20,9 @@ function Invoke-InternalGraphql
         [string]
         $Query,
 
+        [AllowNull()]
         [PsObject]
-        $Variables
+        $Variables = $null
     )
 
     Begin
@@ -42,7 +43,11 @@ function Invoke-InternalGraphql
         {
             $body = @{
                 query = $Query
-                variables = $Variables
+            }
+
+            if ($null -ne $Variables)
+            {
+                $body["variables"] = $Variables
             }
 
             $jsonBody = $body | ConvertTo-Json -Depth 5
@@ -50,7 +55,7 @@ function Invoke-InternalGraphql
             Trace-Message -Message "Body: $jsonBody" -CommandName $MyInvocation.MyCommand.Name
 
             $result = Invoke-RestMethod -Uri $Uri -Method Post -Body $jsonBody -ContentType "application/json" -ErrorAction stop
-            $result.data
+            $result
 
         }
         catch

@@ -19,18 +19,38 @@ namespace Inventory.Configuration.Api.Graphql.Queries
     [ExtendObjectType(OperationTypeNames.Query)]
     public class PluginQueries
     {
-
+        /// <summary>
+        /// Test documentation on query
+        /// </summary>
+        /// <param name="dbContextFactory"></param>
+        /// <param name="mapper"></param>
+        /// <param name="pluginService"></param>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         [UsePaging]
         [UseProjection]
         [UseSorting]
         [UseFiltering]
         public IQueryable<PluginDto> GetPlugins([Service] IDbContextFactory<ConfigurationDbContext> dbContextFactory,
                                                        [Service] IMapper mapper,
+                                                       [Service] PluginService pluginService,
                                                       IResolverContext ctx)
         {
             var dbContext = dbContextFactory.CreateDbContext();
-            return mapper.ProjectTo<PluginDto>(dbContext.Plugins, null);
+            //return mapper.ProjectTo<PluginDto>(dbContext.Plugins, null);
+            //return dbContext.Plugins.Select(e => pluginService.GetPluginDto(e));
+            return dbContext.Plugins.Convert(pluginService);
+
         }
 
+
+    }
+
+    public static class PluginConverters
+    {
+        public static IQueryable<PluginDto> Convert(this IQueryable<Plugin> plugins, PluginService pluginService)
+        {
+            return plugins.Select(e => pluginService.GetPluginDto(e));
+        }
     }
 }

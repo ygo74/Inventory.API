@@ -45,6 +45,15 @@ query plugin(`$first: Int `$order: [PluginDtoSortInput!]) {
 }
 "@
 
+# $script:PluginQuery=@"
+# query plugin {
+#   plugins {
+#     ... pluginDto
+#   }
+# }
+# "@
+
+
 $script:pluginDtoFragment=@"
 fragment pluginDto on PluginDto
 {

@@ -95,10 +95,12 @@ function Find-InventoryPlugin
             )
         }
 
+        # $Variables = $null
         $Query = $script:PluginQuery + $script:PaginationInfo +$script:pluginDtoFragment
+        # $Query = $script:PluginQuery + $script:pluginDtoFragment
         $result = Invoke-InternalGraphql -Query $Query -Variables $Variables -uri $global:ConfigurationUri
 
-        $result.plugins
+        $result
 
     }
 }

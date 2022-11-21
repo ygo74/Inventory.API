@@ -5,6 +5,8 @@
     <UserSecretsId>a0485e78-f98f-48b4-9baf-a74b86b108fd</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,4 +41,9 @@
     <ProjectReference Include="..\..\plugins\Interfaces\Inventory.Plugins.Interfaces\Inventory.Plugins.Interfaces.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="$(MSBuildProjectDirectory)\__resources__\*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
