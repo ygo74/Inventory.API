@@ -35,5 +35,15 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
             Assert.IsNotNull(result);
         }
 
+        [TestCaseSource(typeof(PluginTestCases),nameof(PluginTestCases.GetPluginsByCode))]
+        public async Task Should_successfull_get_plugin_by_code(GetPluginRequest request)
+        {
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(request.Code, result.Result[0].Code);
+        }
     }
 }

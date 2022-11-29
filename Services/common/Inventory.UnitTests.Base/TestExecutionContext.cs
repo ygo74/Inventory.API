@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using Inventory.Api.Base.Behaviors;
+using Inventory.Infrastructure.Base.Logging;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -83,6 +85,10 @@ namespace Inventory.UnitTests.Base
 
         public TestExecutionContext()
         {
+            var loggerConfiguration = LoggingConfiguration.CreateSerilogLoggerConfiguration(Configuration, "UnitTest", "xxx");
+            Log.Logger = loggerConfiguration.CreateLogger();
+
+
             _serviceCollection = new ServiceCollection();
 
             // Configuration

@@ -71,6 +71,9 @@ namespace Inventory.Configuration.Api
             string sourceName = null;
             services.AddTelemetryService(Configuration, out sourceName);
 
+            //pagination
+            services.AddPagination();
+
             // Application
             services.AddSingleton<PluginResolver>();
             services.AddScoped<PluginService>();

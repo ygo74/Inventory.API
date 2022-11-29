@@ -20,13 +20,15 @@ namespace Inventory.Domain.Base.Models
         {
 
             // Default start date is the date of creation
-            StartDate = startDate.HasValue ? startDate.Value : DateTime.Today;
+            StartDate = startDate.HasValue ? startDate.Value : DateTime.Today.ToUniversalTime();
 
             if (endDate.HasValue && endDate.Value.CompareTo(StartDate) < 0)
             {
                 throw new InvalidDataException("End date {0} can't be before start date {1}", endDate.Value, startDate);
             }
-            EndDate = endDate;
+
+            EndDate = endDate.HasValue ? endDate.Value.ToUniversalTime() : endDate;
+
 
         }
 

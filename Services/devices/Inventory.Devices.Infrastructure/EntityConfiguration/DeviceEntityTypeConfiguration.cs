@@ -24,8 +24,8 @@ namespace Inventory.Devices.Infrastructure.EntityConfiguration
 
             builder.Property(e => e.PropertyBag)
                 .HasConversion(
-                    value => System.Text.Json.JsonSerializer.Serialize(value, typeof(Dictionary<string,object>),null),
-                    value => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(value, null)
+                    value => System.Text.Json.JsonSerializer.Serialize(value, typeof(Dictionary<string,object>),new System.Text.Json.JsonSerializerOptions()),
+                    value => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(value, new System.Text.Json.JsonSerializerOptions())
                 );
 
             builder.Ignore(e => e.DomainEvents);

@@ -29,7 +29,7 @@ namespace Inventory.Configuration.Api.Graphql.Queries
         [UseProjection]
         [UseSorting]
         [UseFiltering]
-        public IQueryable<DatacenterDto> GetDatacenters2([Service] IDbContextFactory<ConfigurationDbContext> dbContextFactory, 
+        public IQueryable<DatacenterDto> SearchDatacenters([Service] IDbContextFactory<ConfigurationDbContext> dbContextFactory, 
                                                        [Service] IMapper mapper,
                                                       IResolverContext ctx)
         {

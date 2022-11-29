@@ -30,11 +30,11 @@ namespace Inventory.Configuration.Api.Application.Plugin
 
             var plugin = _mapper.Map<PluginDto>(pluginEntity);
 
-            if (!string.IsNullOrWhiteSpace(pluginEntity.Path))
+            if (!string.IsNullOrWhiteSpace(pluginEntity.Path) && System.IO.File.Exists(pluginEntity.Path))
             {
                 var assembly = _pluginResolver.LoadPlugin(pluginEntity.Path);
 
-                var hasSubnet = assembly.GetTypes().Any(t => t.IsAssignableFrom(typeof(ISubnetProvider)));
+                var hasSubnet = assembly.GetTypes().Any(t => t.IsInstanceOfType(typeof(ISubnetProvider)));
                 plugin.SetCapacity("SubnetProvider", hasSubnet);
 
             }

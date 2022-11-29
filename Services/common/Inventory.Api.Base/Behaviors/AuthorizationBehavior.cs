@@ -233,5 +233,6 @@ namespace Inventory.Api.Base.Behaviors
                         request.GetType().FullName),
                         ActivityKind.Server);
         }
+
     }
 }

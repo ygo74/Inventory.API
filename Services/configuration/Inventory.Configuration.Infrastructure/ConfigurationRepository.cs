@@ -10,10 +10,10 @@ namespace Inventory.Configuration.Infrastructure
 {
     public class ConfigurationRepository<T> : EfAsyncRepository<ConfigurationDbContext, T> where T : class
     {
-        public ConfigurationRepository(ConfigurationDbContext dbContext) :base(dbContext)
-        {
+        //public ConfigurationRepository(ConfigurationDbContext dbContext) :base(dbContext)
+        //{
 
-        }
+        //}
 
         public ConfigurationRepository(IDbContextFactory<ConfigurationDbContext> dbContextFactory) : base(dbContextFactory)
         {

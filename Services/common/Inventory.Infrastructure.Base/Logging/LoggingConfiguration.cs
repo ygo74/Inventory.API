@@ -21,7 +21,7 @@ namespace Inventory.Infrastructure.Base.Logging
             return new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", Serilog.Events.LogEventLevel.Information)
-                    .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Verbose)
+                    //.WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Verbose)
                 .Enrich.WithProperty("ApplicationContext", appName)
                 .Enrich.FromLogContext()
                 .Enrich.WithEnvironmentName()

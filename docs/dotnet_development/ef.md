@@ -15,6 +15,11 @@ has_children: false
 {:toc}
 </details>
 
+## dotnet ef tools
+
+```powershell
+dotnet tool update --global dotnet-ef --version 6.0.11
+```
 
 ## Migrations
 {: .text-blue-300 }

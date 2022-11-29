@@ -23,6 +23,9 @@ using Microsoft.EntityFrameworkCore;
 using Inventory.Infrastructure.Base.Events.RabbitMQ;
 using Inventory.Infrastructure.Base.Events;
 using Inventory.UnitTests.Base.Events;
+using Inventory.Api.Base.Plugins;
+using Inventory.Configuration.Api.Application.Plugin;
+using Inventory.Infrastructure.Base.Logging;
 
 namespace Inventory.Configuration.UnitTests
 {
@@ -30,7 +33,7 @@ namespace Inventory.Configuration.UnitTests
     {
 
         private static readonly UnitTestsContext _context = new UnitTestsContext();
-        protected UnitTestsContext()
+        protected UnitTestsContext() : base()
         {
 
         }
@@ -53,6 +56,19 @@ namespace Inventory.Configuration.UnitTests
             {
                 options.UseInMemoryDatabase("in-memory").UseInternalServiceProvider(sp);
             });
+            services.AddEntityFrameworkInMemoryDatabase().AddPooledDbContextFactory<ConfigurationDbContext>((sp, options) =>
+            {
+                options.UseInMemoryDatabase("in-memory").UseInternalServiceProvider(sp);
+                options.EnableDetailedErrors(true);
+                options.EnableSensitiveDataLogging(true);
+
+            });
+
+
+
+// Applications
+services.AddSingleton<PluginResolver>();
+            services.AddScoped<PluginService>();
 
 
             // Unit tests specific configuration

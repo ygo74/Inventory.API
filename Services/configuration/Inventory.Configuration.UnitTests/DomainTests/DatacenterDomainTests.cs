@@ -36,7 +36,8 @@ namespace Inventory.Configuration.UnitTests.DomainTests
 
             // Arrange
             var datacenters = DataCenterSeed.Get();
-            var criteria = ExpressionFilterFactory.Create<Datacenter>().WithCode("EMEA-FR-PARIS").Valid();
+            var criteria = ExpressionFilterFactory.Create<Datacenter>();
+            criteria = criteria.WithCode("EMEA-FR-PARIS").Valid();
             var searchDatacenter = new DatacenterSearchSpecification(criteria);
 
             // Act

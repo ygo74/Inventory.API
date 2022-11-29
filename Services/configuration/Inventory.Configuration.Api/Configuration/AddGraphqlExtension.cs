@@ -2,6 +2,7 @@
 using HotChocolate.AspNetCore.Extensions;
 using HotChocolate.Data;
 using HotChocolate.Types;
+using HotChocolate.Types.Pagination;
 using Inventory.Api.Base.Core;
 using Inventory.Api.Base.Exceptions;
 using Inventory.Api.Base.Users;
@@ -33,18 +34,18 @@ namespace Inventory.Configuration.Api.Configuration
 
             serviceCollection.AddGraphQLServer()
                 .RegisterDbContext<ConfigurationDbContext>(DbContextKind.Pooled)
-                //.SetPagingOptions(
-                //    new PagingOptions
-                //    {
-                //        IncludeTotalCount = true,
-                //        MaxPageSize = 200
-                //    }
-                //)
-                //.ModifyRequestOptions(requestExecutorOptions =>
-                //{
-                //    requestExecutorOptions.IncludeExceptionDetails = !env.IsProduction();
-                //})
-                //.AllowIntrospection(env.IsDevelopment())
+                .SetPagingOptions(
+                    new PagingOptions
+                    {
+                        IncludeTotalCount = true,
+                        MaxPageSize = 200
+                    }
+                )
+                .ModifyRequestOptions(requestExecutorOptions =>
+                {
+                    requestExecutorOptions.IncludeExceptionDetails = !env.IsProduction();
+                })
+                .AllowIntrospection(env.IsDevelopment())
                 //.AddExportDirectiveType()
 
                 //.ModifyOptions(options =>
@@ -73,6 +74,7 @@ namespace Inventory.Configuration.Api.Configuration
                 .AddFiltering()
                 .AddSorting()
                 .AddProjections()
+                .AddTypeExtension<PluginsExtension>()
                 .AddQueryType(d => d.Name("Query"))
                     .AddTypeExtension<DatacenterQueries>()
                     .AddTypeExtension<PluginQueries>()
