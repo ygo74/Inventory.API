@@ -1,4 +1,6 @@
-﻿using Inventory.Api.Base.Dto;
+﻿using HotChocolate;
+using HotChocolate.Types;
+using Inventory.Api.Base.Dto;
 using Inventory.Api.Base.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -9,7 +11,7 @@ namespace Inventory.Configuration.Api.Application.Plugin
 {
     public class PluginDto : ConfigurationEntityDto
     {
-        private readonly Dictionary<string, bool> _capacities = new Dictionary<string, bool>();
+        private readonly Dictionary<string, object> _capacities = new Dictionary<string, object>();
         public PluginDto()
         {
             _capacities.Add("SubnetProvider", false);
@@ -25,7 +27,8 @@ namespace Inventory.Configuration.Api.Application.Plugin
 
         public string Version { get; set; }
 
-        public Dictionary<string, bool> Capacities { 
+        [GraphQLType(typeof(AnyType))]
+        public IReadOnlyDictionary<string, object> Capacities { 
             get { return _capacities; }
         }
 

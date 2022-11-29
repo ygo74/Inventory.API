@@ -34,7 +34,7 @@ namespace Inventory.Configuration.Api.Application.Plugin
             {
                 var assembly = _pluginResolver.LoadPlugin(pluginEntity.Path);
 
-                var hasSubnet = assembly.GetTypes().Any(t => t.IsInstanceOfType(typeof(ISubnetProvider)));
+                var hasSubnet = assembly.GetTypes().Any(t => typeof(ISubnetProvider).IsAssignableFrom(t));
                 plugin.SetCapacity("SubnetProvider", hasSubnet);
 
             }
