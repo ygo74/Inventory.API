@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using FluentValidation;
-using Inventory.Api.Base.Core;
-using Inventory.Api.Base.Exceptions;
-using Inventory.Domain.Base.Repository;
+using Inventory.Common.Application.Core;
+using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Domain.Repository;
 using Inventory.Devices.Api.Graphql.Mutations;
 using Inventory.Devices.Domain.Models;
 using Inventory.Devices.Domain.Specifications;

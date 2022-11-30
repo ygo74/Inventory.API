@@ -1,4 +1,4 @@
-﻿using Inventory.UnitTests.Base;
+﻿using Inventory.Common.UnitTests;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,6 +1,6 @@
 ﻿using FluentValidation.TestHelper;
 using HotChocolate.Execution;
-using Inventory.Api.Base.Exceptions;
+using Inventory.Common.Application.Exceptions;
 using Inventory.Devices.Api.Applications.OperatingSystem;
 using Inventory.Devices.Api.Configuration;
 using Inventory.Devices.UnitTests.TestCases;

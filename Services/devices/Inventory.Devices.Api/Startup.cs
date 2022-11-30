@@ -1,11 +1,11 @@
 using AutoMapper;
 using FluentValidation;
-using Inventory.Api.Base.Behaviors;
-using Inventory.Api.Base.Users;
-using Inventory.Domain.Base.Repository;
-using Inventory.Infrastructure.Base.Events;
-using Inventory.Infrastructure.Base.Events.RabbitMQ;
-using Inventory.Infrastructure.Base.Telemetry;
+using Inventory.Common.Application.Behaviors;
+using Inventory.Common.Application.Users;
+using Inventory.Common.Domain.Repository;
+using Inventory.Common.Infrastructure.Events;
+using Inventory.Common.Infrastructure.Events.RabbitMQ;
+using Inventory.Common.Infrastructure.Telemetry;
 using Inventory.Devices.Api.Configuration;
 using Inventory.Devices.Api.IntegrationEvents;
 using Inventory.Devices.Infrastructure;

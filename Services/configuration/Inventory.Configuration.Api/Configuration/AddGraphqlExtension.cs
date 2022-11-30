@@ -3,9 +3,9 @@ using HotChocolate.AspNetCore.Extensions;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
-using Inventory.Api.Base.Core;
-using Inventory.Api.Base.Exceptions;
-using Inventory.Api.Base.Users;
+using Inventory.Common.Application.Core;
+using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Application.Users;
 using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Api.Graphql.Mutations;
 using Inventory.Configuration.Api.Graphql.Queries;
@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Inventory.Api.Base.Graphql.Types.ErrorTypes;
+using static Inventory.Common.Application.Graphql.Types.ErrorTypes;
 using static Inventory.Configuration.Api.Graphql.Mutations.PluginMutations;
 
 namespace Inventory.Configuration.Api.Configuration
@@ -101,6 +101,7 @@ namespace Inventory.Configuration.Api.Configuration
                 .BindRuntimeType<DateTime, DateTimeType>()
                 .BindRuntimeType<int, IntType>()
                 .BindRuntimeType<long, LongType>()
+                .BindRuntimeType<Dictionary<string, bool>, AnyType>()
                 //.AddType<CreateWebHookErrorUnion>()
                 .AddType<GenericApiError>()
                 .AddType<ValidationError>()

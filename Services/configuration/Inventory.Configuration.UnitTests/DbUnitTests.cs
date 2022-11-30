@@ -1,6 +1,6 @@
 ﻿using Inventory.Configuration.Infrastructure;
 using Inventory.Configuration.UnitTests.SeedWork;
-using Inventory.Domain.Base.Repository;
+using Inventory.Common.Domain.Repository;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;

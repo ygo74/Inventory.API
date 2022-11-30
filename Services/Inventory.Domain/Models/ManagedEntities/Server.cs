@@ -1,4 +1,4 @@
-﻿using Inventory.Domain.BaseModels;
+﻿using Inventory.Common.DomainModels;
 using Inventory.Domain.Enums;
 using Inventory.Domain.Events;
 using Inventory.Domain.Models.Configuration;

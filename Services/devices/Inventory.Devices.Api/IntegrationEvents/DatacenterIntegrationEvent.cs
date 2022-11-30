@@ -1,4 +1,4 @@
-﻿using Inventory.Infrastructure.Base.Events;
+﻿using Inventory.Common.Infrastructure.Events;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

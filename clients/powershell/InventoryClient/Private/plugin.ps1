@@ -33,14 +33,14 @@ fragment pluginDto on PluginDto
 "@
 
 $script:PluginQuery=@"
-query plugin(`$first: Int `$order: [PluginDtoSortInput!]) {
-  plugins(first: `$first order: `$order) {
+query plugins(`$first: Int `$after: String) {
+  plugins(first: `$first  after: `$after includeDeprecated: false includeAllEntitites: false) {
     pageInfo { ... pageInfo }
+    totalCount
     edges {
       cursor
       node {... pluginDto }
     }
-    nodes { ... pluginDto }
   }
 }
 "@
@@ -67,9 +67,6 @@ fragment pluginDto on PluginDto
   createdBy
   lastModified
   lastModifiedBy
-  capacities {
-    key
-    value
-  }
+  capacities
 }
 "@

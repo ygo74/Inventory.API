@@ -25,8 +25,6 @@
     <PackageReference Include="HotChocolate.Types.CursorPagination" Version="12.15.2" />
     <PackageReference Include="HotChocolate.Diagnostics" Version="12.15.2" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
-    <PackageReference Include="MR.AspNetCore.Pagination" Version="2.0.0" />
-    <PackageReference Include="MR.EntityFrameworkCore.KeysetPagination" Version="1.2.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     
@@ -38,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Inventory.Api.Base\Inventory.Api.Base.csproj" />
+    <ProjectReference Include="..\..\common\Inventory.Common.Application\Inventory.Common.Application.csproj" />
     <ProjectReference Include="..\Inventory.Configuration.Domain\Inventory.Configuration.Domain.csproj" />
     <ProjectReference Include="..\Inventory.Configuration.Infrastructure\Inventory.Configuration.Infrastructure.csproj" />
     <ProjectReference Include="..\..\plugins\Interfaces\Inventory.Plugins.Interfaces\Inventory.Plugins.Interfaces.csproj" />

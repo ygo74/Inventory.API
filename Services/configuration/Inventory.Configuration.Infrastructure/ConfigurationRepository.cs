@@ -1,4 +1,4 @@
-﻿using Inventory.Infrastructure.Base.Database;
+﻿using Inventory.Common.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

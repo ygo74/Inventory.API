@@ -1,7 +1,7 @@
 ﻿using HotChocolate.Types;
-using Inventory.Api.Base.Core;
-using Inventory.Api.Base.Exceptions;
-using Inventory.Api.Base.Users;
+using Inventory.Common.Application.Core;
+using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Application.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;

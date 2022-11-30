@@ -1,4 +1,4 @@
-﻿using Inventory.Domain.BaseModels;
+﻿using Inventory.Common.DomainModels;
 using Inventory.Domain.Models.ManagedEntities;
 using System;
 using System.Collections.Generic;

@@ -1,7 +1,7 @@
 ﻿using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
-using Inventory.Domain.Base.Repository;
-using Inventory.Infrastructure.Base.Database;
+using Inventory.Common.Domain.Repository;
+using Inventory.Common.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

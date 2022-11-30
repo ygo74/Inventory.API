@@ -2,7 +2,7 @@
 using HotChocolate.Data;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using Inventory.Domain.Base.Repository;
+using Inventory.Common.Domain.Repository;
 using Inventory.Devices.Domain.Models;
 using Inventory.Devices.Infrastructure;
 using Microsoft.EntityFrameworkCore;

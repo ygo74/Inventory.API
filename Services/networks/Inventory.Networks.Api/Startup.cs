@@ -1,4 +1,4 @@
-using Inventory.Api.Base.Plugins;
+using Inventory.Common.Application.Plugins;
 using Inventory.Networks.Api.Configuration;
 using Inventory.Plugins.Interfaces;
 using Microsoft.AspNetCore.Builder;

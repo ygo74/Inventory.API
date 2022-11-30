@@ -4,7 +4,7 @@ using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
-using Inventory.Domain.Base.Repository;
+using Inventory.Common.Domain.Repository;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

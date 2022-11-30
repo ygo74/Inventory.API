@@ -6,26 +6,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Inventory.Domain.Base.Repository;
-using Inventory.Infrastructure.Base.Database;
-using Inventory.Api.Base.Behaviors;
+using Inventory.Common.Domain.Repository;
+using Inventory.Common.Infrastructure.Database;
+using Inventory.Common.Application.Behaviors;
 using FluentValidation;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Inventory.Configuration.Domain.Models;
-using Inventory.Api.Base.Users;
-using Inventory.UnitTests.Base;
-using Inventory.Infrastructure.Base.Telemetry;
+using Inventory.Common.Application.Users;
+using Inventory.Common.UnitTests;
+using Inventory.Common.Infrastructure.Telemetry;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Inventory.Infrastructure.Base.Events.RabbitMQ;
-using Inventory.Infrastructure.Base.Events;
-using Inventory.UnitTests.Base.Events;
-using Inventory.Api.Base.Plugins;
+using Inventory.Common.Infrastructure.Events.RabbitMQ;
+using Inventory.Common.Infrastructure.Events;
+using Inventory.Common.UnitTests.Events;
+using Inventory.Common.Application.Plugins;
 using Inventory.Configuration.Api.Application.Plugin;
-using Inventory.Infrastructure.Base.Logging;
+using Inventory.Common.Infrastructure.Logging;
 
 namespace Inventory.Configuration.UnitTests
 {

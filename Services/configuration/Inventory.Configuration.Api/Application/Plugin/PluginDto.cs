@@ -1,7 +1,7 @@
 ﻿using HotChocolate;
 using HotChocolate.Types;
-using Inventory.Api.Base.Dto;
-using Inventory.Api.Base.Exceptions;
+using Inventory.Common.Application.Dto;
+using Inventory.Common.Application.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

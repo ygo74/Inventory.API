@@ -90,9 +90,6 @@ function Find-InventoryPlugin
 
         $Variables = @{
             first = $First
-            order = @(
-                @{name="ASC"}
-            )
         }
 
         # $Variables = $null

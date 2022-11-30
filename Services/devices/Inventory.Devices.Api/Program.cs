@@ -1,4 +1,4 @@
-using Inventory.Infrastructure.Base.Logging;
+using Inventory.Common.Infrastructure.Logging;
 using Inventory.Devices.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;

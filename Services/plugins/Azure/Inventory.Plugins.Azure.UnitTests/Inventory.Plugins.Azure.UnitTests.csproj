@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\common\Inventory.UnitTests.Base\Inventory.UnitTests.Base.csproj" />
+    <ProjectReference Include="..\..\..\common\Inventory.Common.UnitTests\Inventory.Common.UnitTests.csproj" />
     <ProjectReference Include="..\Inventory.Plugins.Azure\Inventory.Plugins.Azure.csproj" />
   </ItemGroup>
 

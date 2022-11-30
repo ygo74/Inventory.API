@@ -1,17 +1,15 @@
 ﻿using Ardalis.GuardClauses;
 using AutoMapper;
-using Inventory.Api.Base.Core;
-using Inventory.Api.Base.Dto;
+using Inventory.Common.Application.Core;
+using Inventory.Common.Application.Dto;
 using Inventory.Configuration.Domain.Filters;
-using Inventory.Configuration.Domain.Specifications.PluginSpecifications;
 using Inventory.Configuration.Infrastructure;
-using Inventory.Domain.Base.Filters;
-using Inventory.Domain.Base.Repository;
+using Inventory.Common.Domain.Filters;
+using Inventory.Common.Domain.Repository;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MR.AspNetCore.Pagination;
-using MR.EntityFrameworkCore.KeysetPagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,16 +19,32 @@ using System.Threading.Tasks;
 namespace Inventory.Configuration.Api.Application.Plugin
 {
 #nullable enable
-    public class GetPluginRequest : ConfigurationEntityRequest<QueryCursorPaginatedPayload<PluginDto>>
+    public class GetPluginRequest : QueryConfigurationCursorPaginationRequest<Domain.Models.Plugin, PluginDto>
     {
-        public int? Id { get; set; }
         public string? Name { get; set; }
         public string? Code { get; set; }
         public string? Version { get; set; }
     }
+
+    //public class GetPluginRequest2 : QueryConfigurationOffsetPaginationRequest<OffsetPaginationPayload<PluginDto>>
+    //{
+    //    public string? Name { get; set; }
+    //    public string? Code { get; set; }
+    //    public string? Version { get; set; }
+    //}
+
+    public class GetPluginRequest2 : QueryConfigurationOffsetPaginationRequest<Domain.Models.Plugin, PluginDto>
+    {
+        public string? Name { get; set; }
+        public string? Code { get; set; }
+        public string? Version { get; set; }
+    }
+
+
 #nullable disable
 
-    public class GetPluginHandler : IRequestHandler<GetPluginRequest, QueryCursorPaginatedPayload<PluginDto>>
+    public class GetPluginHandler : IRequestHandler<GetPluginRequest, CursorPaginationdPayload<PluginDto>>, 
+                                    IRequestHandler<GetPluginRequest2, OffsetPaginationPayload<PluginDto>>
     {
         private readonly IAsyncRepository<Domain.Models.Plugin> _repository;
         private readonly ILogger<GetPluginHandler> _logger;
@@ -126,7 +140,7 @@ namespace Inventory.Configuration.Api.Application.Plugin
         //}
 
 
-        public async Task<QueryCursorPaginatedPayload<PluginDto>> Handle(GetPluginRequest request, CancellationToken cancellationToken)
+        public async Task<CursorPaginationdPayload<PluginDto>> Handle(GetPluginRequest request, CancellationToken cancellationToken)
         {
 
             await using var dbContext = _factory.CreateDbContext();
@@ -134,7 +148,7 @@ namespace Inventory.Configuration.Api.Application.Plugin
             var query = dbContext.Plugins.AsQueryable();
 
             // Filtering data
-            var filter = ExpressionFilterFactory.Create<Domain.Models.Plugin>();
+            var filter = request.GetConfigurationEntityFilter();
             if (!string.IsNullOrWhiteSpace(request.Name)) { filter = filter.WithName(request.Name); }
             if (!string.IsNullOrWhiteSpace(request.Code)) { filter = filter.WithCode(request.Code); }
 
@@ -149,20 +163,60 @@ namespace Inventory.Configuration.Api.Application.Plugin
                 map: q => q.Select(e => _pluginService.GetPluginDto(e)),
                 queryModel: new KeysetQueryModel
                 {
-                    After = request.After,
-                    Before = request.Before,
-                    Size = request.First
+                    After = request.Pagination.After,
+                    Before = request.Pagination.Before,
+                    Size = request.Pagination.Size
                 }
                 );
 
-            return new QueryCursorPaginatedPayload<PluginDto>
+            return new CursorPaginationdPayload<PluginDto>
             {
-                Count = result.TotalCount,
-                Result = result.Data,
+                TotalCount = result.TotalCount,
+                Data = result.Data,
                 HasNext = result.HasNext,
-                HasPrevious = result.HasPrevious
+                HasPrevious = result.HasPrevious,
+                StartCursor = result.Data.Count > 0 ? result.Data[0].Id.ToString() : string.Empty,
+                EndCursor = result.Data.Count > 0 ? result.Data[result.Data.Count -1].Id.ToString() : string.Empty,                
             };
 
         }
+
+        public async Task<OffsetPaginationPayload<PluginDto>> Handle(GetPluginRequest2 request, CancellationToken cancellationToken)
+        {
+
+            await using var dbContext = _factory.CreateDbContext();
+
+            var query = dbContext.Plugins.AsQueryable();
+
+            // Filtering data
+            var filter = request.GetConfigurationEntityFilter();    
+            if (!string.IsNullOrWhiteSpace(request.Name)) { filter = filter.WithName(request.Name); }
+            if (!string.IsNullOrWhiteSpace(request.Code)) { filter = filter.WithCode(request.Code); }
+
+            if (null != filter.Predicate)
+                query = query.Where(filter.Predicate);
+
+
+            var result = await _paginationService.OffsetPaginateAsync(
+                source: query,
+                map: q => q.Select(e => _pluginService.GetPluginDto(e)),
+                queryModel: new OffsetQueryModel
+                {
+                    Page = request.Pagination.Page,
+                    Size = request.Pagination.Size
+                }
+                );
+
+            return new OffsetPaginationPayload<PluginDto>
+            {
+                TotalCount = result.TotalCount,
+                Data = result.Data,
+                PageCount = result.PageCount,
+                Page = result.Page,
+                PageSize = result.PageSize                
+            };
+
+        }
+
     }
 }

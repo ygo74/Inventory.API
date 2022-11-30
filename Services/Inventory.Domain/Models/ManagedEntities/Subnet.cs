@@ -1,4 +1,4 @@
-﻿using Inventory.Domain.BaseModels;
+﻿using Inventory.Common.DomainModels;
 using Inventory.Domain.Models.Configuration;
 using System;
 using System.Collections.Generic;

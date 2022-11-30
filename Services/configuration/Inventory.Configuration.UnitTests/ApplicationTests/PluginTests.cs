@@ -24,7 +24,7 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
         public async Task Should_successfull_create_application_with_valid_values(CreatePlugin.Command newEntity)
         {
             // Arrange
-            //var result = Assert.Throws<Inventory.Api.Base.Exceptions.ValidationException>(async () => 
+            //var result = Assert.Throws<Inventory.Common.Application.Exceptions.ValidationException>(async () => 
             //{
             //    await _mediator.Send(newEntity);
             //});
@@ -43,7 +43,7 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(request.Code, result.Result[0].Code);
+            Assert.AreEqual(request.Code, result.Data[0].Code);
         }
     }
 }

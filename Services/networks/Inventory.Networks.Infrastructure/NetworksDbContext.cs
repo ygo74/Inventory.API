@@ -1,5 +1,5 @@
-﻿using Inventory.Domain.Base.Repository;
-using Inventory.Infrastructure.Base.Database;
+﻿using Inventory.Common.Domain.Repository;
+using Inventory.Common.Infrastructure.Database;
 using Inventory.Networks.Domain.Models;
 using Inventory.Networks.Infrastructure.EntityConfiguration;
 using Microsoft.EntityFrameworkCore;

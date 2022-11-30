@@ -6,12 +6,12 @@ using HotChocolate.Language;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
-using Inventory.Api.Base.Graphql.Extensions;
+using Inventory.Common.Application.Graphql.Extensions;
 using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Domain.Filters;
 using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
-using Inventory.Domain.Base.Repository;
+using Inventory.Common.Domain.Repository;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -61,55 +61,59 @@ namespace Inventory.Configuration.Api.Graphql.Queries
         }
 
 
-        [UsePaging()]
+        [UsePaging(DefaultPageSize = 10)]
         public async Task<Connection<PluginDto>> GetPlugins([Service] IMediator mediator,
-            CancellationToken cancellationToken, IResolverContext ctx, string? code, bool includeDeprecated=false, bool includeAllEntitites = false)
+            CancellationToken cancellationToken, IResolverContext ctx, 
+            string? code, string? name, string? version, DateTime? validFrom, DateTime? validTo, bool? includeDeprecated=false, bool? includeAllEntitites = false)
         {
 
-            var paginationArguments = ctx.GetPaggingArguments();
             var request = new GetPluginRequest
             {
-                After = paginationArguments.After,
-                Before = paginationArguments.Before,
-                First = paginationArguments.First,
-                Last = paginationArguments.Last,
-                AllEntities = includeAllEntitites,
-                IncludeDeprecated = includeDeprecated,
-                Code = code,                
+                Pagination = ctx.GetCursorPaggingRequest(),
+                AllEntities = includeAllEntitites.Value,
+                IncludeDeprecated = includeDeprecated.Value,
+                Code = code,
+                Name = name,
+                Version = version,
+                ValidFrom = validFrom, 
+                ValidTo = validTo
             };
 
-            var plugins = await mediator.Send(request, cancellationToken);
-            var edges = plugins.Result.Select(e => new Edge<PluginDto>(e, e.Id.ToString())).ToList();
+            var result = await mediator.Send(request, cancellationToken);
+            var edges = result.Data.Select(e => new Edge<PluginDto>(e, e.Id.ToString())).ToList();
 
-            var firstCursor = plugins.Result.Count > 0 ? plugins.Result[0].Id.ToString() : "";
-            var lastCursor = plugins.Result.Count > 0 ? plugins.Result[plugins.Result.Count -1].Id.ToString() : "";
+            var pageInfo = new ConnectionPageInfo(result.HasNext, result.HasPrevious, result.StartCursor , result.EndCursor);
 
-            var pageInfo = new ConnectionPageInfo(plugins.HasNext, plugins.HasPrevious, firstCursor , lastCursor);
-
-            var connection = new Connection<PluginDto>(edges, pageInfo, plugins.Count);
+            var connection = new Connection<PluginDto>(edges, pageInfo, result.TotalCount);
             return connection;
         }
 
 
-        [UsePaging(typeof(PluginDto), IncludeTotalCount = true, DefaultPageSize = 10)]
-        public IQueryable<PluginDto> GetValidPlugins(ConfigurationDbContext dbContext,
-                                                       [Service] IMapper mapper,
-                                                       [Service] PluginService pluginService,
-                                                      IResolverContext ctx)
+        [UseOffsetPaging]
+        public async Task<CollectionSegment<PluginDto>> GetPlugins2([Service] IMediator mediator,
+            CancellationToken cancellationToken, IResolverContext ctx,
+            string? code, string? name, string? version, bool? includeDeprecated = false, bool? includeAllEntitites = false)
         {
-            //return mapper.ProjectTo<PluginDto>(dbContext.Plugins, null);
-            //return dbContext.Plugins.Select(e => pluginService.GetPluginDto(e));
-            var validPlugin = new ValidPluginFilter();
-            return dbContext.Plugins
-                        .AsNoTracking()
-                        .Where(validPlugin.Predicate)
-                        .OrderBy(e => e.Code)
-                        .Select(e => new PluginDto
-                        {
-                            Code = e.Code
-                        });
-            
 
+            var request = new GetPluginRequest2
+            {
+                Pagination = ctx.GetOffsetPagingRequest(),
+                AllEntities = includeAllEntitites.Value,
+                IncludeDeprecated = includeDeprecated.Value,
+                Code = code,
+            };
+
+            var plugins = await mediator.Send(request, cancellationToken);
+
+            var pageInfo = new CollectionSegmentInfo(false, false);
+
+            var collectionSegment = new CollectionSegment<PluginDto>(
+                plugins.Data,
+                pageInfo,
+                plugins.TotalCount);
+                
+
+            return collectionSegment;
         }
 
         

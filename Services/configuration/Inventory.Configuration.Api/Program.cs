@@ -1,6 +1,6 @@
 using Elastic.Apm.DiagnosticSource;
 using Inventory.Configuration.Infrastructure;
-using Inventory.Infrastructure.Base.Logging;
+using Inventory.Common.Infrastructure.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

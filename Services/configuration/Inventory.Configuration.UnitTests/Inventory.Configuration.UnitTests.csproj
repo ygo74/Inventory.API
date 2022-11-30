@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Inventory.UnitTests.Base\Inventory.UnitTests.Base.csproj" />
+    <ProjectReference Include="..\..\common\Inventory.Common.UnitTests\Inventory.Common.UnitTests.csproj" />
     <ProjectReference Include="..\Inventory.Configuration.Api\Inventory.Configuration.Api.csproj" />
     <ProjectReference Include="..\Inventory.Configuration.Domain\Inventory.Configuration.Domain.csproj" />
     <ProjectReference Include="..\Inventory.Configuration.Infrastructure\Inventory.Configuration.Infrastructure.csproj" />

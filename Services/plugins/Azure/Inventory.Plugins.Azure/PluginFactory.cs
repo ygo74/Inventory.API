@@ -1,4 +1,4 @@
-﻿using Inventory.Plugins.Base;
+﻿using Inventory.Common.Plugins;
 using Inventory.Plugins.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;

@@ -1,5 +1,5 @@
-﻿using Inventory.Domain.Base.Repository;
-using Inventory.Infrastructure.Base.Database;
+﻿using Inventory.Common.Domain.Repository;
+using Inventory.Common.Infrastructure.Database;
 using Inventory.Devices.Domain.Models;
 using Inventory.Devices.Infrastructure.EntityConfiguration;
 using MediatR;

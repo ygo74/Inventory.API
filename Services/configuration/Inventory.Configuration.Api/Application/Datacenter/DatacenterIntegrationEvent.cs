@@ -1,4 +1,4 @@
-﻿using Inventory.Infrastructure.Base.Events;
+﻿using Inventory.Common.Infrastructure.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;

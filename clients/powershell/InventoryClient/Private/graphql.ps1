@@ -54,7 +54,7 @@ function Invoke-InternalGraphql
 
             Trace-Message -Message "Body: $jsonBody" -CommandName $MyInvocation.MyCommand.Name
 
-            $result = Invoke-RestMethod -Uri $Uri -Method Post -Body $jsonBody -ContentType "application/json" -ErrorAction stop
+            $result = Invoke-webrequest -Uri $Uri -Method Post -Body $jsonBody -ContentType "application/json" -ErrorAction stop
             $result
 
         }

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Inventory.Configuration.Domain.Events;
-using Inventory.Domain.Base.Models;
-using Inventory.Infrastructure.Base.Events;
+using Inventory.Common.Domain.Models;
+using Inventory.Common.Infrastructure.Events;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;

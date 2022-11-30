@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using FluentValidation;
-using Inventory.Api.Base.Dto;
-using Inventory.Api.Base.Validators;
+using Inventory.Common.Application.Dto;
+using Inventory.Common.Application.Validators;
 using Inventory.Devices.Api.Applications.OperatingSystem.Dto;
 using Inventory.Devices.Domain.Models;
-using Inventory.Domain.Base.Repository;
+using Inventory.Common.Domain.Repository;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;

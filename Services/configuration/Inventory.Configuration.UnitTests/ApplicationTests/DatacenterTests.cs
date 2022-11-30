@@ -26,7 +26,7 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
         public async Task Should_throws_validation_exeption_when_empty_values(CreateDatacenter.Command newEntity)
         {
             //// Arrange
-            ////var result = Assert.Throws<Inventory.Api.Base.Exceptions.ValidationException>(async () => 
+            ////var result = Assert.Throws<Inventory.Common.Application.Exceptions.ValidationException>(async () => 
             ////{
             ////    await _mediator.Send(newEntity);
             ////});
@@ -52,7 +52,7 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
         public async Task Should_successfull_create_application_with_valid_values(CreateDatacenter.Command newEntity)
         {
             // Arrange
-            //var result = Assert.Throws<Inventory.Api.Base.Exceptions.ValidationException>(async () => 
+            //var result = Assert.Throws<Inventory.Common.Application.Exceptions.ValidationException>(async () => 
             //{
             //    await _mediator.Send(newEntity);
             //});

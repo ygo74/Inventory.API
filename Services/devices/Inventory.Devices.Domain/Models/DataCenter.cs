@@ -1,4 +1,4 @@
-﻿using Inventory.Domain.Base.Models;
+﻿using Inventory.Common.Domain.Models;
 
 namespace Inventory.Devices.Domain.Models
 {

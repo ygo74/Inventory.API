@@ -1,7 +1,7 @@
 ﻿using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure.EntityConfiguration;
-using Inventory.Domain.Base.Repository;
-using Inventory.Infrastructure.Base.Database;
+using Inventory.Common.Domain.Repository;
+using Inventory.Common.Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;

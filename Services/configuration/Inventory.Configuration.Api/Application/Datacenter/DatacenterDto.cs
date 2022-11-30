@@ -1,4 +1,4 @@
-﻿using Inventory.Api.Base.Dto;
+﻿using Inventory.Common.Application.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;

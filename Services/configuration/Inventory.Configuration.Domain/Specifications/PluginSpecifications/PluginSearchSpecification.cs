@@ -1,6 +1,6 @@
 ﻿using Ardalis.Specification;
 using Inventory.Configuration.Domain.Models;
-using Inventory.Domain.Base.Filters;
+using Inventory.Common.Domain.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;

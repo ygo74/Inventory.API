@@ -14,7 +14,7 @@
       <FileName>Models\Configuration\Environment.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Inventory.Domain.BaseModels.ConfigurationEntity">
+  <Class Name="Inventory.Common.DomainModels.ConfigurationEntity">
     <Position X="6" Y="4" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAACAAAAAAAAA=</HashCode>
@@ -42,14 +42,14 @@
       <FileName>Models\Configuration\TrustLevel.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Inventory.Domain.BaseModels.Entity">
+  <Class Name="Inventory.Common.DomainModels.Entity">
     <Position X="6" Y="8" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAACAAgAAAAAAAAAgAAAAAAAAAAAAIEEQAABAAAOAiA=</HashCode>
       <FileName>BaseModels\Entity.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Inventory.Domain.BaseModels.AuditEntity" Collapsed="true">
+  <Class Name="Inventory.Common.DomainModels.AuditEntity" Collapsed="true">
     <Position X="6" Y="6.5" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAQAAAAAAAAAAAAAAAACAAAAAAQAAAAAAAAAAAE=</HashCode>

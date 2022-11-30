@@ -2,7 +2,7 @@
 using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Domain.Specifications.DatacenterSpecifications;
 using Inventory.Configuration.UnitTests.SeedWork;
-using Inventory.Domain.Base.Filters;
+using Inventory.Common.Domain.Filters;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

@@ -21,15 +21,15 @@
       <FileName>Models\Plugin.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Inventory.Domain.Base.Models.ConfigurationEntity" Collapsed="true">
+  <Class Name="Inventory.Common.Domain.Models.ConfigurationEntity" Collapsed="true">
     <Position X="5.5" Y="3.25" Width="1.5" />
     <TypeIdentifier />
   </Class>
-  <Class Name="Inventory.Domain.Base.Models.AuditEntity" Collapsed="true">
+  <Class Name="Inventory.Common.Domain.Models.AuditEntity" Collapsed="true">
     <Position X="7.5" Y="1.75" Width="1.5" />
     <TypeIdentifier />
   </Class>
-  <Class Name="Inventory.Domain.Base.Models.Entity" Collapsed="true">
+  <Class Name="Inventory.Common.Domain.Models.Entity" Collapsed="true">
     <Position X="7.5" Y="0.5" Width="1.5" />
     <TypeIdentifier />
   </Class>

@@ -1,6 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using AutoMapper;
-using Inventory.Api.Base.Plugins;
+using Inventory.Common.Application.Plugins;
 using Inventory.Plugins.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;

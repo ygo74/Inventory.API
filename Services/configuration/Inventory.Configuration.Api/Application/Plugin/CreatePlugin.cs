@@ -2,11 +2,11 @@
 using AutoMapper;
 using FluentValidation;
 using HotChocolate;
-using Inventory.Api.Base.Core;
-using Inventory.Api.Base.Dto;
-using Inventory.Api.Base.Exceptions;
-using Inventory.Api.Base.Validators;
-using Inventory.Domain.Base.Repository;
+using Inventory.Common.Application.Core;
+using Inventory.Common.Application.Dto;
+using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Application.Validators;
+using Inventory.Common.Domain.Repository;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;

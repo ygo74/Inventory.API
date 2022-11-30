@@ -1,5 +1,5 @@
 ﻿using Ardalis.GuardClauses;
-using Inventory.Domain.Base.Models;
+using Inventory.Common.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Inventory.Domain.Base\Inventory.Domain.Base.csproj" />
+    <ProjectReference Include="..\..\common\Inventory.Common.Domain\Inventory.Common.Domain.csproj" />
   </ItemGroup>
 
 </Project>

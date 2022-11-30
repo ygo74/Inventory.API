@@ -1,12 +1,12 @@
 using AutoMapper;
 using FluentValidation;
-using Inventory.Api.Base.Behaviors;
-using Inventory.Api.Base.Users;
+using Inventory.Common.Application.Behaviors;
+using Inventory.Common.Application.Users;
 using Inventory.Configuration.Api.Configuration;
 using Inventory.Configuration.Infrastructure;
-using Inventory.Domain.Base.Repository;
-using Inventory.Infrastructure.Base.Events.RabbitMQ;
-using Inventory.Infrastructure.Base.Telemetry;
+using Inventory.Common.Domain.Repository;
+using Inventory.Common.Infrastructure.Events.RabbitMQ;
+using Inventory.Common.Infrastructure.Telemetry;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,7 +26,7 @@ using OpenTelemetry.Trace;
 using OpenTelemetry.Resources;
 using System.Diagnostics;
 using Inventory.Configuration.Api.Application.Plugin;
-using Inventory.Api.Base.Plugins;
+using Inventory.Common.Application.Plugins;
 
 namespace Inventory.Configuration.Api
 {

@@ -1,4 +1,4 @@
-﻿using Inventory.Infrastructure.Base.Database;
+﻿using Inventory.Common.Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;

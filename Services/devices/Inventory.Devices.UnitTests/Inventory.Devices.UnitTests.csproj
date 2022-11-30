@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Inventory.UnitTests.Base\Inventory.UnitTests.Base.csproj" />
+    <ProjectReference Include="..\..\common\Inventory.Common.UnitTests\Inventory.Common.UnitTests.csproj" />
     <ProjectReference Include="..\Inventory.Devices.Api\Inventory.Devices.Api.csproj" />
     <ProjectReference Include="..\Inventory.Devices.Domain\Inventory.Devices.Domain.csproj" />
     <ProjectReference Include="..\Inventory.Devices.Infrastructure\Inventory.Devices.Infrastructure.csproj" />
