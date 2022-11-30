@@ -25,10 +25,7 @@ fragment pluginDto on PluginDto
   createdBy
   lastModified
   lastModifiedBy
-  capacities {
-    key
-    value
-  }
+  capacities
 }
 "@
 

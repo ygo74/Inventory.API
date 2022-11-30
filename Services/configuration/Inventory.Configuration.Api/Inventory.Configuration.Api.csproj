@@ -19,20 +19,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="HotChocolate.AspNetCore" Version="12.15.2" />
-    <PackageReference Include="HotChocolate.Data" Version="12.15.2" />
-    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="12.15.2" />
-    <PackageReference Include="HotChocolate.Types.CursorPagination" Version="12.15.2" />
-    <PackageReference Include="HotChocolate.Diagnostics" Version="12.15.2" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     
-    <PackageReference Include="FluentValidation" Version="11.4.0" />
-    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.4.0" />
-    <PackageReference Include="MediatR" Version="9.0.0" />
-    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
   </ItemGroup>
 
   <ItemGroup>
