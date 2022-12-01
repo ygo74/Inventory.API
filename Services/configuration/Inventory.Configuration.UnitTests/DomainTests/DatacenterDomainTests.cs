@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Inventory.Configuration.UnitTests.DomainTests
 {
     [TestFixture]
-    class DatacenterDomainTests
+    class DatacenterDomainTests : DbUnitTests
     {
         [Test]
         public void Should_successfull_Create_DatacenterEntity()
@@ -23,7 +23,7 @@ namespace Inventory.Configuration.UnitTests.DomainTests
             // Arrange
 
             // Act
-            var datacenter = new Datacenter("TEST", "test", DatacenterType.Cloud);
+            var datacenter = new Datacenter("TEST", "test", DatacenterType.Cloud,"");
 
             // Assert
             Assert.IsNotNull(datacenter);

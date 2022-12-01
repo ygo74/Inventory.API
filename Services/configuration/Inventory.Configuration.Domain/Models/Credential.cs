@@ -12,13 +12,13 @@ namespace Inventory.Configuration.Domain.Models
     {
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public Plugin PluginProvider { get; private set; }
+        public Dictionary<string, Object> PropertyBag { get; private set; }
 
         protected Credential() { }
-        public Credential(string name, string description, Plugin provider)
+        public Credential(string name, string description)
         {
             Name = Guard.Against.NullOrWhiteSpace(name, nameof(name));
-            PluginProvider = Guard.Against.Null(provider, nameof(provider));
+            PropertyBag = new Dictionary<string, object>();
         }
 
     }

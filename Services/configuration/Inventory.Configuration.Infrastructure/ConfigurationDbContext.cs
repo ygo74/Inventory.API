@@ -25,6 +25,7 @@ namespace Inventory.Configuration.Infrastructure
         public DbSet<Datacenter> Datacenters { get; set; }
         public DbSet<Plugin> Plugins { get; set; }
         public DbSet<Credential> Credentials { get; set; }
+        public DbSet<Location> Locations { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,6 +33,7 @@ namespace Inventory.Configuration.Infrastructure
             modelBuilder.ApplyConfiguration(new DatacenterEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new PluginEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new CredentialEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new LocationEntityTypeConfiguration());
         }
 
     }

@@ -11,16 +11,16 @@ namespace Inventory.Configuration.UnitTests.SeedWork
     {
 
         public const string AZURE_INVENTORY = "Azure.Inventory";
+        public const string AZURE_INVENTORY_VERSION = "1.0";
         public const string EFFICIENTIP_INVENTORY = "EfficientIP.Inventory";
+        public const string EFFICIENTIP_INVENTORY_VERSION = "1.0";
 
-        public static List<Plugin> Get()
+        public static IEnumerable<Plugin> Get()
         {
-            var plugins = new List<Plugin>();
 
-            plugins.Add(new Plugin(AZURE_INVENTORY, AZURE_INVENTORY));
-            plugins.Add(new Plugin(EFFICIENTIP_INVENTORY, EFFICIENTIP_INVENTORY));
+            yield return new Plugin(AZURE_INVENTORY, AZURE_INVENTORY, AZURE_INVENTORY_VERSION);
+            yield return new Plugin(EFFICIENTIP_INVENTORY, EFFICIENTIP_INVENTORY, EFFICIENTIP_INVENTORY_VERSION);
 
-            return plugins;
         }
 
     }

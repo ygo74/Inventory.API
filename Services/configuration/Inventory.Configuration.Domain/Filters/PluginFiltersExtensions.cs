@@ -22,10 +22,4 @@ namespace Inventory.Configuration.Domain.Filters
         }
 
     }
-
-    public class ValidPluginFilter : ExpressionFilter<Plugin>
-    {
-        public override Expression<Func<Plugin, bool>> Predicate => e => !e.Deprecated;
-    }
-
 }

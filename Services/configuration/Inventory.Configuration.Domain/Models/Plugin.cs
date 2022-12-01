@@ -12,20 +12,19 @@ namespace Inventory.Configuration.Domain.Models
     {
         public string Name { get; private set; }
         public string Code { get; private set; }
+        public string Version { get; private set; }
+
 
         public string Path { get; private set; }
 
         protected Plugin() { }
 
-        public Plugin(string name, string code, bool? deprecated = null, DateTime? startDate = null, DateTime? endDate = null)
+        public Plugin(string name, string code, string version, bool? deprecated = null, DateTime? startDate = null, DateTime? endDate = null) 
+            : base(deprecated, startDate, endDate)
         {
             Name = Guard.Against.NullOrWhiteSpace(name, nameof(name));
             Code = Guard.Against.NullOrWhiteSpace(code, nameof(code));
-
-            // configuration entity properties
-            Deprecated = deprecated.HasValue ? deprecated.Value : false;
-            SetAvailabilityDate(startDate, endDate);
-
+            Version = Guard.Against.NullOrWhiteSpace(version, nameof(version));
         }
 
         public void SetPath(string path)

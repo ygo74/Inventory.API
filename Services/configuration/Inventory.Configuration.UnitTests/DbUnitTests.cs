@@ -25,12 +25,14 @@ namespace Inventory.Configuration.UnitTests
         {
             var dbContext = UnitTestsContext.Current.GetService<ConfigurationDbContext>();
 
-            dbContext.Datacenters.AddRange(DataCenterSeed.Get());
+            // No dependencies
+            dbContext.Locations.AddRange(LocationSeed.Get());
+            dbContext.Credentials.AddRange(CredentialSeed.Get());
             dbContext.Plugins.AddRange(PluginSeed.Get());
             dbContext.SaveChanges();
 
-            dbContext.Credentials.AddRange(CredentialSeed.Get());
-
+            // dependencies
+            dbContext.Datacenters.AddRange(DataCenterSeed.Get());
             dbContext.SaveChanges();
 
         }

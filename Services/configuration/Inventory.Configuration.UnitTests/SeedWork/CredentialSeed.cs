@@ -10,16 +10,14 @@ namespace Inventory.Configuration.UnitTests.SeedWork
 {
     public static class CredentialSeed
     {
-        public static List<Credential> Get()
+
+        public const string ADMINISTRATOR = "admin";
+
+        public static IEnumerable<Credential> Get()
         {
 
-            var AzPlugin = UnitTestsContext.Current.GetService<ConfigurationDbContext>().Plugins.First(e => e.Name == PluginSeed.AZURE_INVENTORY);
+            yield return new Credential(ADMINISTRATOR, "test azure");
 
-            var credentials = new List<Credential>();
-
-            credentials.Add(new Credential("azureTenant1", "test azure", AzPlugin));
-
-            return credentials;
         }
 
     }

@@ -3,21 +3,21 @@
   <Class Name="Inventory.Configuration.Domain.Models.Credential">
     <Position X="9.5" Y="5.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAgAAAAAAAAQAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAgEAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Credential.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Inventory.Configuration.Domain.Models.Datacenter">
     <Position X="6.75" Y="5.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAABgAAAgAAIgAAQEAAAAAAAgAgAEAAAAAAA=</HashCode>
       <FileName>Models\Datacenter.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Inventory.Configuration.Domain.Models.Plugin">
-    <Position X="3.75" Y="5.25" Width="1.5" />
+    <Position X="4.5" Y="5.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>IAAAAAAAAAAAAAIAAAAgAAQAAAAAIAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Plugin.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -32,6 +32,20 @@
   <Class Name="Inventory.Common.Domain.Models.Entity" Collapsed="true">
     <Position X="7.5" Y="0.5" Width="1.5" />
     <TypeIdentifier />
+  </Class>
+  <Class Name="Inventory.Configuration.Domain.Models.Location">
+    <Position X="1.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAARAAAAAgAAAAAAAABAQAAAAAAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Location.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Inventory.Configuration.Domain.Models.PluginEndpoint">
+    <Position X="11.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAEAAAAAAEAAAAAAAAAAAAAAAAAAIAAAQ=</HashCode>
+      <FileName>Models\PluginEndpoint.cs</FileName>
+    </TypeIdentifier>
   </Class>
   <Enum Name="Inventory.Configuration.Domain.Models.DatacenterType" Collapsed="true">
     <Position X="6.75" Y="8.25" Width="1.5" />
