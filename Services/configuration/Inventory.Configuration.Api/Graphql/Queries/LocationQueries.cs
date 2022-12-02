@@ -17,6 +17,7 @@ namespace Inventory.Configuration.Api.Graphql.Queries
     [ExtendObjectType(OperationTypeNames.Query)]
     public class LocationQueries
     {
+#nullable enable
         [UsePaging(DefaultPageSize = 10)]
         public async Task<Connection<LocationDto>> GetLocations([Service] IMediator mediator,
             CancellationToken cancellationToken, IResolverContext ctx,
@@ -43,6 +44,8 @@ namespace Inventory.Configuration.Api.Graphql.Queries
             var connection = new Connection<LocationDto>(edges, pageInfo, result.TotalCount);
             return connection;
         }
+
+# nullable disable
 
         public async Task<Payload<LocationDto>> GetLocation([Service] IMediator mediator,
             CancellationToken cancellationToken, IResolverContext ctx,

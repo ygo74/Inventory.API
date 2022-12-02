@@ -61,6 +61,8 @@ namespace Inventory.Configuration.Api.Graphql.Queries
         }
 
 
+# nullable enable
+
         [UsePaging(DefaultPageSize = 10)]
         public async Task<Connection<PluginDto>> GetPlugins([Service] IMediator mediator,
             CancellationToken cancellationToken, IResolverContext ctx, 
@@ -120,9 +122,6 @@ namespace Inventory.Configuration.Api.Graphql.Queries
 
     }
 
-    [ExtendObjectType(typeof(object), IgnoreProperties = new[] { "Last", "last" })]
-    public class PluginsExtension
-    {
+# nullable disable
 
-    }
 }

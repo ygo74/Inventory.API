@@ -74,7 +74,6 @@ namespace Inventory.Configuration.Api.Configuration
                 .AddFiltering()
                 .AddSorting()
                 .AddProjections()
-                .AddTypeExtension<PluginsExtension>()
                 .AddQueryType(d => d.Name("Query"))
                     .AddTypeExtension<DatacenterQueries>()
                     .AddTypeExtension<PluginQueries>()
