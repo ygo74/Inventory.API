@@ -1,4 +1,5 @@
-﻿using Inventory.Common.Domain.Exceptions;
+﻿using Ardalis.GuardClauses;
+using Inventory.Common.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,23 @@ namespace Inventory.Common.Domain.Models
 
         public string InventoryCode { get; protected set; }
 
-        public void SetAvailabilityDate(DateTime? startDate=null, DateTime? endDate=null)
+        protected ConfigurationEntity(bool? deprecated = null, DateTime? startDate = null, DateTime? endDate = null)
+        {
+            // configuration entity properties
+            InventoryCode = string.Empty;
+            Deprecated = deprecated.HasValue ? deprecated.Value : false;
+            SetAvailabilityDate(startDate, endDate);
+        }
+
+        protected ConfigurationEntity(string inventoryCode, bool? deprecated = null, DateTime? startDate = null, DateTime? endDate = null)
+        {
+            // configuration entity properties
+            InventoryCode = Guard.Against.NullOrWhiteSpace(inventoryCode, nameof(inventoryCode)); ;
+            Deprecated = deprecated.HasValue ? deprecated.Value : false;
+            SetAvailabilityDate(startDate, endDate);
+        }
+
+        public void SetAvailabilityDate(DateTime? startDate = null, DateTime? endDate = null)
         {
 
             // Default start date is the date of creation
@@ -34,7 +51,7 @@ namespace Inventory.Common.Domain.Models
 
         public void SetDeprecatedValue(bool value)
         {
-            Deprecated= value;
+            Deprecated = value;
         }
 
     }

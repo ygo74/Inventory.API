@@ -12,21 +12,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Inventory.Common.Application.Dto;
 
 namespace Inventory.Configuration.Api.Application.Datacenter
 {
     public class CreateDatacenter
     {
         [GraphQLName("CreateDatacenterInput")]
-        public class Command : CreateConfigurationEntity<Payload>
+        public class Command : CreateConfigurationEntityRequest<DatacenterDto>
         {
             public string Name { get; set; }
             public string Code { get; set; }
-        }
-
-        public class Payload : BasePayload<Payload, ValidationError>
-        {
-            public DatacenterDto Datacenter { get; set; }
         }
 
         public class Validator : AbstractValidator<Command>
@@ -54,7 +50,7 @@ namespace Inventory.Configuration.Api.Application.Datacenter
             }
         }
 
-        public class Handler : IRequestHandler<Command, Payload>
+        public class Handler : IRequestHandler<Command, Payload<DatacenterDto>>
         {
 
             private readonly IAsyncRepository<Domain.Models.Datacenter> _repository;
@@ -68,23 +64,21 @@ namespace Inventory.Configuration.Api.Application.Datacenter
                 _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             }
 
-            public async Task<Payload> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Payload<DatacenterDto>> Handle(Command request, CancellationToken cancellationToken)
             {
                 _logger.LogInformation($"Start adding datacenter '{request.Name}' with code '{request.Code}'");
 
                 // Map request to Domain entity
                 //var newEntity = _mapper.Map<Domain.Models.Datacenter>(request);
-                var newEntity = new Domain.Models.Datacenter(request.Code, request.Name, Domain.Models.DatacenterType.Cloud, request.ValidFrom, request.ValidTo);
+                var newEntity = new Domain.Models.Datacenter(request.Code, request.Name, Domain.Models.DatacenterType.Cloud, "", 
+                                                             startDate: request.ValidFrom, endDate: request.ValidTo);
 
                 // Add entity
                 var result = await _repository.AddAsync(newEntity, cancellationToken);
 
                 // Map response
                 _logger.LogInformation($"End adding datacenter '{request.Name}' with code '{request.Code}'");
-                return new Payload
-                {
-                    Datacenter = _mapper.Map<DatacenterDto>(result)
-                };
+                return Payload<DatacenterDto>.Success(_mapper.Map<DatacenterDto>(result));
             }
         }
 

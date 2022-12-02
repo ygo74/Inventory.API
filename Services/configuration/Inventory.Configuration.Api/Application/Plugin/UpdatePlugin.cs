@@ -17,17 +17,12 @@ using System.Threading.Tasks;
 namespace Inventory.Configuration.Api.Application.Plugin
 {
 #nullable enable
-    public class UpdatePluginRequest : UpdateConfigurationEntityDto<UpdatePluginPayLoad>
+    public class UpdatePluginRequest : UpdateConfigurationEntityRequest<PluginDto>
     {
         public string? Path { get; set; }
     }
 #nullable disable
 
-    public class UpdatePluginPayLoad : BasePayload<UpdatePluginPayLoad, IApiError>
-    {
-        public PluginDto Plugin { get; set; }
-
-    }
 
     public class UpdatePluginValidator : AbstractValidator<UpdatePluginRequest>
     {
@@ -56,7 +51,7 @@ namespace Inventory.Configuration.Api.Application.Plugin
 
     }
 
-    public class UpdatePluginHanlder : IRequestHandler<UpdatePluginRequest, UpdatePluginPayLoad>
+    public class UpdatePluginHanlder : IRequestHandler<UpdatePluginRequest, Payload<PluginDto>>
     {
         private readonly ILogger<UpdatePluginHanlder> _logger;
         private readonly IMapper _mapper;
@@ -72,7 +67,7 @@ namespace Inventory.Configuration.Api.Application.Plugin
             _factory = Guard.Against.Null(factory, nameof(factory));
         }
 
-        public async Task<UpdatePluginPayLoad> Handle(UpdatePluginRequest request, CancellationToken cancellationToken)
+        public async Task<Payload<PluginDto>> Handle(UpdatePluginRequest request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Start Update plugin {0}", request.Id);
 
@@ -87,10 +82,7 @@ namespace Inventory.Configuration.Api.Application.Plugin
 
             _logger.LogInformation("End Update plugin {0}", request.Id);
 
-            return new UpdatePluginPayLoad
-            {
-                Plugin = _pluginService.GetPluginDto(plugin)
-            };
+            return Payload<PluginDto>.Success(_pluginService.GetPluginDto(plugin));
 
 
         }

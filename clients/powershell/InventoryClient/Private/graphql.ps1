@@ -55,6 +55,16 @@ function Invoke-InternalGraphql
             Trace-Message -Message "Body: $jsonBody" -CommandName $MyInvocation.MyCommand.Name
 
             $result = Invoke-RestMethod -Uri $Uri -Method Post -Body $jsonBody -ContentType "application/json" -ErrorAction stop
+
+            if ($null -ne $result.errors -and $result.errors.length -gt 0)
+            {
+                $errorMessage = ""
+                foreach($resultErr in $result.errors)
+                {
+                    $errorMessage += "{0} - {1} : {2}`n" -f ($resultErr.path -join ","), $resultErr.message, $resultErr.extensions.message
+                }
+                throw $errorMessage
+            }
             $result
 
         }

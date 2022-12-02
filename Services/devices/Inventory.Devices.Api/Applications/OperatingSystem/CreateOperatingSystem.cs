@@ -12,13 +12,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Inventory.Common.Application.Core;
 
 namespace Inventory.Devices.Api.Applications.OperatingSystem
 {
     public class CreateOperatingSystem
     {
 
-        public class Command2 : CreateConfigurationEntityDto<OperatingSystemDto>
+        public class Command2 : CreateConfigurationEntityRequest<OperatingSystemDto>
         {
             public OperatingSystemFamilyDto OperatingSystemFamily { get; set; }
             public string Model { get; set; }
@@ -51,7 +52,7 @@ namespace Inventory.Devices.Api.Applications.OperatingSystem
             }
         }
 
-        public class Handler : IRequestHandler<Command2, OperatingSystemDto>
+        public class Handler : IRequestHandler<Command2, Payload<OperatingSystemDto>>
         {
 
             private readonly IAsyncRepository<Inventory.Devices.Domain.Models.OperatingSystem> _repository;
@@ -65,7 +66,7 @@ namespace Inventory.Devices.Api.Applications.OperatingSystem
                 _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             }
 
-            public async Task<OperatingSystemDto> Handle(Command2 request, CancellationToken cancellationToken)
+            public async Task<Payload<OperatingSystemDto>> Handle(Command2 request, CancellationToken cancellationToken)
             {
                 _logger.LogInformation($"Start adding Operating system '{request.OperatingSystemFamily}' with Model '{request.Model}' and version '{request.Version}'");
 
@@ -83,7 +84,7 @@ namespace Inventory.Devices.Api.Applications.OperatingSystem
                     // Map response
                     var resultDto = _mapper.Map<OperatingSystemDto>(result);
                     success = true;
-                    return resultDto;
+                    return Payload<OperatingSystemDto>.Success(resultDto);
 
                 }
                 finally

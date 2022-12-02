@@ -78,15 +78,16 @@ namespace Inventory.Configuration.Api.Configuration
                 .AddQueryType(d => d.Name("Query"))
                     .AddTypeExtension<DatacenterQueries>()
                     .AddTypeExtension<PluginQueries>()
+                    .AddTypeExtension<LocationQueries>()
                 .AddMutationType(d => d.Name("Mutation"))
                     .AddTypeExtension<DatacenterMutations>()
                     .AddTypeExtension<PluginMutations>()
+                    .AddTypeExtension<LocationMutations>()
                 .AddType<DatacenterType>()
                 .AddType<CreateDatacenterInputType>()
                 .AddType<CreateDatacenterPayloadType>()
                 .AddType<PluginType>()
                 .AddType<CreatePluginInputType>()
-                .AddType<CreatePluginPayloadType>()
 
                 //.AddMutationConventions(
                 //    new MutationConventionOptions

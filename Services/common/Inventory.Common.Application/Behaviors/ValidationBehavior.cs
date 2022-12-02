@@ -59,7 +59,7 @@ namespace Inventory.Common.Application.Behaviors
     /// <typeparam name="TRequest"></typeparam>
     /// <typeparam name="TResponse"></typeparam>
     public class ValidationBehavior<TRequest, TResponse>
-     : IPipelineBehavior<TRequest, TResponse>
+     : IPipelineBehavior<TRequest, TResponse> where TResponse: class
     {
         private readonly ICurrentUser _currentUser;
         private readonly IEnumerable<IValidator<TRequest>> _validators;
@@ -139,11 +139,11 @@ namespace Inventory.Common.Application.Behaviors
 
             // In case it is Mutation Response Payload = handled as payload error union
             if (Common.IsSubclassOfRawGeneric(
-                typeof(BasePayload<,>),
+                typeof(Payload<>),
                 typeof(TResponse))
             )
             {
-                var payload = ((IPayload)Activator.CreateInstance<TResponse>());
+                var payload = ((IPayload<TResponse>)Activator.CreateInstance<TResponse>());
 
                 foreach (var item in error_obj)
                 {

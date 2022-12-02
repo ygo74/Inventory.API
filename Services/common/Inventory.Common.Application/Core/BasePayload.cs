@@ -7,52 +7,44 @@ using System.Threading.Tasks;
 
 namespace Inventory.Common.Application.Core
 {
-    public interface IPayload
+
+    public interface IPayload<T> where T : class
     {
 
-        void AddError(object o);
+        void AddError(IApiError error);
 
         bool HasError();
 
+        public T Data { get; set; }
+
     }
 
-    public abstract class BasePayload<U, T> : IPayload where U : BasePayload<U, T>, new()
+    public class Payload<T> : IPayload<T> where T : class
     {
-        protected BasePayload()
+        public Payload()
         {
-            this.errors = new List<T>();
+            this.Errors = new List<IApiError>();
         }
 
-        /// <summary>
-        /// List of possible union errors
-        /// </summary>
-        /// <value></value>
-        public List<T> errors { get; set; }
+        public T Data { get; set; }
+
+        public List<IApiError> Errors { get; set; }
+
+        [GraphQLIgnore()]
+        public bool HasError()
+        {
+            return this.Errors.Any();
+        }
 
         /// <summary>
         /// Add errors collection and return itself
         /// </summary>
         [GraphQLIgnore()]
-        public U PushError(params T[] errors)
+        public Payload<T> PushError(params IApiError[] errors)
         {
-            this.errors.AddRange(errors);
+            this.Errors.AddRange(errors);
 
-            return (U)this;
-        }
-
-        /// <summary>
-        /// Check if any error exist
-        /// </summary>
-        [GraphQLIgnore()]
-        public bool HasError()
-        {
-
-            if (errors != null)
-            {
-                return errors.Any();
-            }
-
-            return false;
+            return this;
         }
 
         /// <summary>
@@ -60,35 +52,32 @@ namespace Inventory.Common.Application.Core
         /// </summary>
         /// <param name="errors"></param>
         [GraphQLIgnore()]
-        public static U Error(params T[] errors)
+        public static Payload<T> Error(params IApiError[] errors)
         {
-            U u = new U();
-            u.errors.AddRange(errors);
-            return u;
+            var entity = new Payload<T>();
+            entity.Errors.AddRange(errors);
+            return entity;
         }
 
         /// <summary>
         /// Returns new instance
         /// </summary>
         [GraphQLIgnore()]
-        public static U Success()
+        public static Payload<T> Success(T data)
         {
-            return new U();
+            var entity = new Payload<T>();
+            entity.Data = data;
+            return entity;
         }
 
         [GraphQLIgnore()]
-        public void AddError(object o)
+        public void AddError(IApiError error)
         {
-
-            if (o is T)
-            {
-                T tmp = (T)o;
-                this.errors.Add(tmp);
-            }
-            else
-            {
-                throw new NotSupportedException("Error type does not match base payload supported types");
-            }
+            this.Errors.Add(error);
+            
         }
+
+
     }
+
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Common.Application.Validators
 {
-    public class ConfigurationEntityDtoValidator<T> : AbstractValidator<ICreateOrUpdateConfigurationEntityDto>
+    public class ConfigurationEntityDtoValidator<T> : AbstractValidator<ICreateOrUpdateConfigurationEntityRequest>
     {
         public ConfigurationEntityDtoValidator()
         {

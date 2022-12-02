@@ -20,19 +20,13 @@ namespace Inventory.Configuration.Api.Application.Plugin
     public class CreatePlugin
     {
         [GraphQLName("CreatePluginInput")]
-        public class Command : CreateConfigurationEntityDto<Payload>
+        public class Command : CreateConfigurationEntityRequest<PluginDto>
         {
             public string Name { get; set; }
             public string Code { get; set; }
             public string Version { get; set; }
             public string Path { get; set; }
 
-        }
-
-        [GraphQLName("CreatePluginPayload")]
-        public class Payload : BasePayload<Payload, IApiError>
-        {
-            public PluginDto Plugin { get; set; }
         }
 
         public class Validator : AbstractValidator<Command>
@@ -55,7 +49,7 @@ namespace Inventory.Configuration.Api.Application.Plugin
             }
         }
 
-        public class Handler : IRequestHandler<Command, Payload>
+        public class Handler : IRequestHandler<Command, Payload<PluginDto>>
         {
 
             private readonly IAsyncRepository<Domain.Models.Plugin> _repository;
@@ -71,26 +65,22 @@ namespace Inventory.Configuration.Api.Application.Plugin
                 _pluginService = Guard.Against.Null(pluginService, nameof(pluginService));
             }
 
-            public async Task<Payload> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Payload<PluginDto>> Handle(Command request, CancellationToken cancellationToken)
             {
                 _logger.LogInformation($"Start adding Plugin '{request.Name}' with code '{request.Code}'");
 
                 bool success = false;
                 try
                 {
-                    var newEntity = new Domain.Models.Plugin(request.Name, request.Code, request.Deprecated, request.ValidFrom, request.ValidTo);
+                    var newEntity = new Domain.Models.Plugin(request.Name, request.Code, request.Version, request.Deprecated, request.ValidFrom, request.ValidTo);
                     newEntity.SetPath(request.Path);
 
                     // Add entity
                     var result = await _repository.AddAsync(newEntity, cancellationToken);
 
                     // Map response
-                    var resultDto = new Payload
-                    {
-                        Plugin = _pluginService.GetPluginDto(result)
-                    };
                     success = true;
-                    return resultDto;
+                    return Payload<PluginDto>.Success(_pluginService.GetPluginDto(result));
                 }
                 finally
                 {

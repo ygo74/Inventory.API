@@ -6,12 +6,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Common.Application.Core
 {
-    public class QueryPayload<T> : BasePayload<QueryPayload<T>, IApiError>
-    {
-        public T Data { get; set; }
-    }
-
-    public class CursorPaginationdPayload<T> : QueryPayload<IReadOnlyList<T>>
+    public class CursorPaginationdPayload<T> : Payload<IReadOnlyList<T>>
     {
         public int TotalCount { get; set; }
         public bool HasPrevious { get; set; }
@@ -20,7 +15,7 @@ namespace Inventory.Common.Application.Core
         public string EndCursor { get; set; }
     }
 
-    public class OffsetPaginationPayload<T> : QueryPayload<IReadOnlyList<T>>
+    public class OffsetPaginationPayload<T> : Payload<IReadOnlyList<T>>
     {
         public int TotalCount { get; set; }
         public int PageSize { get; set; }

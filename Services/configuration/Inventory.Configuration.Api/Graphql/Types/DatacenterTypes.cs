@@ -1,4 +1,5 @@
 ﻿using HotChocolate.Types;
+using Inventory.Common.Application.Core;
 using Inventory.Configuration.Api.Application.Datacenter;
 using System;
 using System.Collections.Generic;
@@ -25,12 +26,12 @@ namespace Inventory.Configuration.Api.Graphql.Types
         }
     }
 
-    public class CreateDatacenterPayloadType : ObjectType<CreateDatacenter.Payload>
+    public class CreateDatacenterPayloadType : ObjectType<Payload<DatacenterDto>>
     {
-        protected override void Configure(IObjectTypeDescriptor<CreateDatacenter.Payload> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<Payload<DatacenterDto>> descriptor)
         {
             descriptor.Name("CreateDatacenterPayload");
-            descriptor.Field(e => e.Datacenter).Type<DatacenterType>();
+            descriptor.Field(e => e.Data).Type<DatacenterType>();
         }
     }
 

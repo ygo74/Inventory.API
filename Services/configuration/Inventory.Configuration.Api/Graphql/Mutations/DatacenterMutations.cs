@@ -1,5 +1,6 @@
 ﻿using HotChocolate;
 using HotChocolate.Types;
+using Inventory.Common.Application.Core;
 using Inventory.Configuration.Api.Application.Datacenter;
 using MediatR;
 using System;
@@ -12,7 +13,7 @@ namespace Inventory.Configuration.Api.Graphql.Mutations
     [ExtendObjectType(OperationTypeNames.Mutation)]
     public class DatacenterMutations
     {
-        public async Task<CreateDatacenter.Payload> CreateDatacenter(
+        public async Task<Payload<DatacenterDto>> CreateDatacenter(
             CreateDatacenter.Command input,
             [Service] IMediator _mediator
             )

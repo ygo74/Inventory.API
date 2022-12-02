@@ -27,12 +27,12 @@ namespace Inventory.Configuration.Api.Graphql.Types
         }
     }
 
-    public class CreatePluginPayloadType : ObjectType<CreatePlugin.Payload>
-    {
-        protected override void Configure(IObjectTypeDescriptor<CreatePlugin.Payload> descriptor)
-        {
-            descriptor.Name("CreatePluginPayload");
-            descriptor.Field(e => e.Plugin).Type<PluginType>();
-        }
-    }
+    //public class CreatePluginPayloadType : ObjectType<CreatePlugin.Payload>
+    //{
+    //    protected override void Configure(IObjectTypeDescriptor<CreatePlugin.Payload> descriptor)
+    //    {
+    //        descriptor.Name("CreatePluginPayload");
+    //        descriptor.Field(e => e.Plugin).Type<PluginType>();
+    //    }
+    //}
 }

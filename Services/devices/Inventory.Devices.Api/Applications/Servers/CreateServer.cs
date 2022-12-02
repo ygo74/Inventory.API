@@ -24,9 +24,8 @@ namespace Inventory.Devices.Api.Applications.Servers
             public string Hostname { get; set; }
         }
 
-        public class CreateServerPayload : BasePayload<CreateServerPayload, ValidationError>
+        public class CreateServerPayload : Payload<ServerDto>
         {
-            public ServerDto Server { get; set; }
         }
 
         public class Validator : AbstractValidator<Command>
@@ -87,7 +86,7 @@ namespace Inventory.Devices.Api.Applications.Servers
                 // Map response
                 return new CreateServerPayload
                 {
-                    Server = _mapper.Map<ServerDto>(result)
+                    Data = _mapper.Map<ServerDto>(result)
                 };
 
             }

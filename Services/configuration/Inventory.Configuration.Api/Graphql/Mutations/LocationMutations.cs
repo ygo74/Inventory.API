@@ -1,6 +1,7 @@
 ﻿using HotChocolate;
 using HotChocolate.Types;
 using Inventory.Common.Application.Core;
+using Inventory.Configuration.Api.Application.Locations;
 using Inventory.Configuration.Api.Application.Plugin;
 using MediatR;
 using System;
@@ -13,11 +14,11 @@ using static Inventory.Configuration.Api.Application.Plugin.CreatePlugin;
 namespace Inventory.Configuration.Api.Graphql.Mutations
 {
     [ExtendObjectType(OperationTypeNames.Mutation)]
-    public class PluginMutations
+    public class LocationMutations
     {
 
-        public async Task<Payload<PluginDto>> CreatePlugin(
-            CreatePlugin.Command input,
+        public async Task<Payload<LocationDto>> CreateLocation(
+            CreateLocationRequest input,
             [Service] IMediator _mediator,
             CancellationToken cancellationToken
             )
@@ -25,8 +26,8 @@ namespace Inventory.Configuration.Api.Graphql.Mutations
             return await _mediator.Send(input,cancellationToken);
         }
 
-        public async Task<Payload<PluginDto>> UpdatePlugin(
-            UpdatePluginRequest input,
+        public async Task<Payload<LocationDto>> UpdateLocation(
+            UpdateLocationRequest input,
             [Service] IMediator _mediator,
             CancellationToken cancellationToken
             )
@@ -34,21 +35,14 @@ namespace Inventory.Configuration.Api.Graphql.Mutations
             return await _mediator.Send(input, cancellationToken);
         }
 
-        //public async Task<CreatePlugin.Payload> CreatePlugin(
-        //    string name, string code, string version, bool? deprecated, DateTime? validFrom, DateTime? validTo,
-        //    [Service] IMediator _mediator
-        //    )
-        //{
-        //    return await _mediator.Send(new CreatePlugin.Command()
-        //    {
-        //        Code = code,
-        //        Name = name,
-        //        Version = version,
-        //        Deprecated = deprecated,
-        //        ValidFrom = validFrom,
-        //        ValidTo = validTo
-        //    });
-        //}
+        public async Task<Payload<LocationDto>> RemoveLocation(
+            DeleteLocationRequest input,            
+            [Service] IMediator _mediator,
+            CancellationToken cancellationToken
+            )
+        {
+            return await _mediator.Send(input, cancellationToken);
+        }
 
     }
 

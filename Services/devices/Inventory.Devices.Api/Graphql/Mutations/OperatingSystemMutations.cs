@@ -1,5 +1,6 @@
 ﻿using HotChocolate;
 using HotChocolate.Types;
+using Inventory.Common.Application.Core;
 using Inventory.Devices.Api.Applications.OperatingSystem;
 using Inventory.Devices.Api.Applications.OperatingSystem.Dto;
 using MediatR;
@@ -14,7 +15,7 @@ namespace Inventory.Devices.Api.Graphql.Mutations
     public class OperatingSystemMutations
     {
 
-        public async Task<OperatingSystemDto> CreateOperatingSystem(
+        public async Task<Payload<OperatingSystemDto>> CreateOperatingSystem(
             CreateOperatingSystem.Command2 command,
             [Service] IMediator _mediator
             )

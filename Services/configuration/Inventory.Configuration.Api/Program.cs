@@ -42,7 +42,7 @@ namespace Inventory.Configuration.Api
                     using (var dbcontext = factory.CreateDbContext())
                     {
                         dbcontext.Database.EnsureCreated();
-                        dbcontext.Database.Migrate();
+                        //dbcontext.Database.Migrate();
                     }
 
                     //new InventoryContextSeed().SeedAsync(context, logger).Wait();
