@@ -3,6 +3,7 @@ using AutoMapper;
 using GreenDonut;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
+using Inventory.Common.Application.Exceptions;
 using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Infrastructure;
 using MediatR;
@@ -145,7 +146,7 @@ namespace Inventory.Configuration.Api.Application.Locations
                 var location = await dbContext.Locations.FindAsync(request.Id);
 
                 if (null == location)
-                    return Payload<LocationDto>.Error();
+                    return Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Id {request.Id}"));
 
                 // delete location
                 dbContext.Locations.Remove(location);

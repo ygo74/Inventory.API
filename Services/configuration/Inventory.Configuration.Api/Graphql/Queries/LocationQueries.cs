@@ -27,8 +27,8 @@ namespace Inventory.Configuration.Api.Graphql.Queries
             var request = new GetLocationRequest
             {
                 Pagination = ctx.GetCursorPaggingRequest(),
-                AllEntities = includeAllEntitites.Value,
-                IncludeDeprecated = includeDeprecated.Value,
+                AllEntities = includeAllEntitites.HasValue ? includeAllEntitites.Value : false,
+                IncludeDeprecated = includeDeprecated.HasValue ? includeDeprecated.Value : false,
                 CityCode = cityCode,
                 CountryCode = countryCode,
                 RegionCode = regionCode,

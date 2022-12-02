@@ -13,6 +13,7 @@ namespace Inventory.Common.Application.Core
         int? Size { get; set; }
     }
 
+# nullable enable
     public class CursorPaginationRequest : IPaginationRequest
     {
         public string? After { get; set; }
@@ -21,6 +22,7 @@ namespace Inventory.Common.Application.Core
         public bool FirstPage { get; set; }
         public bool LasttPage { get; set; }
     }
+# nullable disable
 
     public class OffsetPaginationRequest : IPaginationRequest
     {
