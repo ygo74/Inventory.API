@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Common.Application.Dto
 {
-    public abstract class AuditEntityDto
+    public abstract class AuditEntityDto : EntityDto
     {
         public DateTime Created { get; set; }
         public string CreatedBy { get; set; }
