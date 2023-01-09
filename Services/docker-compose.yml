@@ -1,82 +1,32 @@
 version: '3.4'
 
 networks:
-  dockerapi-dev:
-    driver: bridge 
+  dockerapi:
+    external:
+      name: backends_dockerapi-dev
+
   elastic:
     external:
       name: monitoring_elastic
 
 services:
-
-  seq:
-    image: datalust/seq:latest
+  inventory.configuration.api:
+    image: ${DOCKER_REGISTRY-}inventoryconfigurationapi
+    build:
+      context: .
+      dockerfile: configuration/Inventory.Configuration.Api/Dockerfile
     networks:
-      - dockerapi-dev
+      - dockerapi
+      - elastic
 
-  caching:
-    image: redis:alpine
-    networks:
-      - dockerapi-dev
-
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    networks:
-      - dockerapi-dev
-
-
-
-  #inventory.api:
-  #  image: ${DOCKER_REGISTRY-}inventoryapi
-  #  build:
-  #    context: .
-  #    dockerfile: Inventory.API/Dockerfile
-  #  depends_on:
-  #    - "postgres_image"
-  #  networks:
-  #    - dockerapi-dev
-  #  volumes:
-  #    - D:/devel/github/ansible_inventory/tests/inventories/:/inventories
-
-  Inventory.Devices.api:
-    image: ${DOCKER_REGISTRY-}inventoryserversapi
+  inventory.devices.api:
+    image: ${DOCKER_REGISTRY-}inventorydevicesapi
     build:
       context: .
       dockerfile: devices/Inventory.Devices.Api/Dockerfile
     depends_on:
-      - "postgres_image"
       - "inventory.configuration.api"
     networks:
-      - dockerapi-dev
+      - dockerapi
       - elastic
 
-
-
-  inventory.configuration.api:
-    image: ${DOCKER_REGISTRY-}inventory.configuration.api
-    build:
-      context: .
-      dockerfile: configuration/Inventory.Configuration.Api/Dockerfile
-    depends_on:
-      - "postgres_image"
-    networks:
-      - dockerapi-dev
-      - elastic
-
-  postgres_image:
-    image: postgres:latest
-    ports:
-      - "32781:5432"
-    restart: always
-#    volumes:
-#      - db_volume:/var/lib/postgresql/data
-#      - ./dbscripts/seed.sql :/docker-entrypoint-initdb.d/seed.sql
-    environment:
-      POSTGRES_USER: "bloguser"
-      POSTGRES_PASSWORD: "bloguser"
-      POSTGRES_DB: "serversDB"
-    networks:
-      - dockerapi-dev
-
-volumes:
-  db_volume:

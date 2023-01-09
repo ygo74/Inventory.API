@@ -2,18 +2,14 @@
   "profiles": {
     "Docker Compose": {
       "commandName": "DockerCompose",
-      "composeLaunchServiceName": "Inventory.Devices.api",
-      "serviceActions": {
-        "caching": "StartWithoutDebugging",
-        "inventory.configuration.api": "StartDebugging",
-        "Inventory.Devices.api": "StartDebugging",
-        "postgres_image": "StartWithoutDebugging",
-        "rabbitmq": "StartWithoutDebugging",
-        "seq": "StartWithoutDebugging"
-      },
-      "composeLaunchAction": "LaunchBrowser",
       "commandVersion": "1.0",
-      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/{Scheme}://{ServiceHost}:{ServicePort}/swagger"
+      "composeLaunchAction": "LaunchBrowser",
+      "composeLaunchServiceName": "inventory.configuration.api",
+      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/graphql",
+      "serviceActions": {
+        "inventory.configuration.api": "StartDebugging",
+        "inventory.devices.api": "StartDebugging"
+      }
     }
   }
 }

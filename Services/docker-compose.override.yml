@@ -1,36 +1,6 @@
 version: '3.4'
 
 services:
-  seq:
-    environment:
-      - ACCEPT_EULA=Y
-    ports:
-      - "5340:80"
-
-  caching:
-    ports:
-      - "6379:6379"
-    volumes:
-      - cachingdata:/data
-
-  rabbitmq:
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-
-  Inventory.Devices.api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ConnectionStrings__InventoryDatabase=host=postgres_image;port=5432;database=serversDB;username=bloguser;password=bloguser
-      - InventoryPath=/inventories/{0}/group_vars
-      - EventBusConnection=rabbitmq
-      - EventBusUserName=guest
-      - EventBusPassword=guest
-      - EventBusRetryCount=2
-    ports:
-      - "32773:80"
-      - "32772:443"
   inventory.configuration.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -48,7 +18,23 @@ services:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
+  inventory.devices.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ConnectionStrings__InventoryDatabase=host=postgres_image;port=5432;database=serversDB;username=bloguser;password=bloguser
+      - InventoryPath=/inventories/{0}/group_vars
+      - EventBusConnection=rabbitmq
+      - EventBusUserName=guest
+      - EventBusPassword=guest
+      - EventBusRetryCount=2
+    ports:
+      - "32773:80"
+      - "32772:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
 volumes:
   cachingdata:
     external: false
-
