@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace Inventory.Configuration.Api.Application.Locations
 {
 #nullable enable
-    public class GetLocationRequest : QueryConfigurationCursorPaginationRequest<Location, LocationDto>
+    public class GetLocationRequest : QueryConfigurationCursorPaginationRequest<LocationDto>
     {
         public string? CountryCode { get; set; }
         public string? CityCode { get; set; }
@@ -70,13 +70,19 @@ namespace Inventory.Configuration.Api.Application.Locations
 
         }
 
+        /// <summary>
+        /// Get Locations
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<CursorPaginationdPayload<LocationDto>> Handle(GetLocationRequest request, CancellationToken cancellationToken)
         {
             await using var dbContext = _factory.CreateDbContext();
             var query = dbContext.Locations.AsQueryable().AsNoTracking();
 
             // Filtering data
-            var filter = request.GetConfigurationEntityFilter();
+            var filter = request.GetConfigurationEntityFilter<Location, LocationDto>();
             if (!string.IsNullOrWhiteSpace(request.CityCode))    { filter = filter.WithCityCode(request.CityCode); }
             if (!string.IsNullOrWhiteSpace(request.CountryCode)) { filter = filter.WithCountryCode(request.CountryCode); }
             if (!string.IsNullOrWhiteSpace(request.RegionCode))  { filter = filter.WithRegionCode(request.RegionCode); }

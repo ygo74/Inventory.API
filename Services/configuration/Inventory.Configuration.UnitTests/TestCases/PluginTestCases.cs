@@ -9,15 +9,15 @@ using System.Threading.Tasks;
 
 namespace Inventory.Configuration.UnitTests.TestCases
 {
-    public static class PluginTestCases
+    internal static class PluginTestCases
     {
-        public static IEnumerable GetCreatePluginsWithCorrectMandatoryValues()
+        internal static IEnumerable GetCreatePluginsWithCorrectMandatoryValues()
         {
             yield return new CreatePlugin.Command() { Name = "", Code = "TEST-XX" };
             yield return new CreatePlugin.Command() { Name = "TEST-XX", Code = "TEST-XX" };
         }
 
-        public static IEnumerable GetPluginsByCode()
+        internal static IEnumerable GetPluginsByCode()
         {
             yield return new GetPluginRequest() { Code = PluginSeed.AZURE_INVENTORY };
             yield return new GetPluginRequest() { Code = PluginSeed.EFFICIENTIP_INVENTORY };

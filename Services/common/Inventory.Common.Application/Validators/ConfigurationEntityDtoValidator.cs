@@ -8,10 +8,17 @@ using System.Threading.Tasks;
 
 namespace Inventory.Common.Application.Validators
 {
-    public class ConfigurationEntityDtoValidator<T> : AbstractValidator<ICreateOrUpdateConfigurationEntityRequest>
+    public class ConfigurationEntityDtoValidator<T> : AbstractValidator<T> where T : ICreateOrUpdateConfigurationEntityRequest
     {
         public ConfigurationEntityDtoValidator()
         {
+
+            RuleFor(e => e.InventoryCode).Cascade(CascadeMode.Stop)
+                .NotNull()
+                .NotEmpty()
+                .WithMessage("{PropertyName} is mandatory");
+
+
             When(e => e.ValidTo.HasValue, () =>
             {
                 RuleFor(e => e.ValidTo).Must((model, validTo) =>

@@ -91,32 +91,32 @@ namespace Inventory.Configuration.Api.Graphql.Queries
         }
 
 
-        [UseOffsetPaging]
-        public async Task<CollectionSegment<PluginDto>> GetPlugins2([Service] IMediator mediator,
-            CancellationToken cancellationToken, IResolverContext ctx,
-            string? code, string? name, string? version, bool? includeDeprecated = false, bool? includeAllEntitites = false)
-        {
+        //[UseOffsetPaging]
+        //public async Task<CollectionSegment<PluginDto>> GetPlugins2([Service] IMediator mediator,
+        //    CancellationToken cancellationToken, IResolverContext ctx,
+        //    string? code, string? name, string? version, bool? includeDeprecated = false, bool? includeAllEntitites = false)
+        //{
 
-            var request = new GetPluginRequest2
-            {
-                Pagination = ctx.GetOffsetPagingRequest(),
-                AllEntities = includeAllEntitites.Value,
-                IncludeDeprecated = includeDeprecated.Value,
-                Code = code,
-            };
+        //    var request = new GetPluginRequest2
+        //    {
+        //        Pagination = ctx.GetOffsetPagingRequest(),
+        //        AllEntities = includeAllEntitites.Value,
+        //        IncludeDeprecated = includeDeprecated.Value,
+        //        Code = code,
+        //    };
 
-            var plugins = await mediator.Send(request, cancellationToken);
+        //    var plugins = await mediator.Send(request, cancellationToken);
 
-            var pageInfo = new CollectionSegmentInfo(false, false);
+        //    var pageInfo = new CollectionSegmentInfo(false, false);
 
-            var collectionSegment = new CollectionSegment<PluginDto>(
-                plugins.Data,
-                pageInfo,
-                plugins.TotalCount);
+        //    var collectionSegment = new CollectionSegment<PluginDto>(
+        //        plugins.Data,
+        //        pageInfo,
+        //        plugins.TotalCount);
                 
 
-            return collectionSegment;
-        }
+        //    return collectionSegment;
+        //}
 
         
 

@@ -1,9 +1,11 @@
 ﻿using Ardalis.GuardClauses;
 using AutoMapper;
+using FluentValidation;
 using GreenDonut;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Application.Validators;
 using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Infrastructure;
 using MediatR;
@@ -30,26 +32,36 @@ namespace Inventory.Configuration.Api.Application.Locations
 
     }
 
-    /// <summary>
-    /// Update Location request
-    /// </summary>
-    public class UpdateLocationRequest : UpdateConfigurationEntityRequest<LocationDto> 
+    public class CreateLocationValidator : ConfigurationEntityDtoValidator<CreateLocationRequest>
     {
-        public string Description { get; set; }
+        public CreateLocationValidator() 
+        {
+            RuleFor(e => e.Name).Cascade(CascadeMode.Stop)
+                .NotNull()
+                .NotEmpty()
+                .WithMessage("{PropertyName} is mandatory");
+
+            RuleFor(e => e.CountryCode).Cascade(CascadeMode.Stop)
+                .NotNull()
+                .NotEmpty()
+                .WithMessage("{PropertyName} is mandatory");
+
+            RuleFor(e => e.CityCode).Cascade(CascadeMode.Stop)
+                .NotNull()
+                .NotEmpty()
+                .WithMessage("{PropertyName} is mandatory");
+
+            RuleFor(e => e.RegionCode).Cascade(CascadeMode.Stop)
+                .NotNull()
+                .NotEmpty()
+                .WithMessage("{PropertyName} is mandatory");
+        }
     }
-
-    /// <summary>
-    /// Delete location request
-    /// </summary>
-    public class DeleteLocationRequest : DeleteConfigurationEntityRequest<LocationDto> { }
-
 
     /// <summary>
     /// CRUD Handler for locations
     /// </summary>
-    public class CreateLocationHanlder : IRequestHandler<CreateLocationRequest, Payload<LocationDto>>,
-                                         IRequestHandler<UpdateLocationRequest, Payload<LocationDto>>,
-                                         IRequestHandler<DeleteLocationRequest, Payload<LocationDto>>
+    public class CreateLocationHanlder : IRequestHandler<CreateLocationRequest, Payload<LocationDto>>
     {
 
         private readonly ILogger<CreateLocationHanlder> _logger;
@@ -99,72 +111,5 @@ namespace Inventory.Configuration.Api.Application.Locations
             }
         }
 
-        /// <summary>
-        /// Update location
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task<Payload<LocationDto>> Handle(UpdateLocationRequest request, CancellationToken cancellationToken)
-        {
-            _logger.LogInformation($"Start updating Location '{request.Id}'");
-
-            bool success = false;
-            try
-            {
-                // Find entity
-                await using var dbContext = _factory.CreateDbContext();
-                var location = await dbContext.Locations.FindAsync(request.Id);
-
-                if (request.Deprecated.HasValue) { location.SetDeprecatedValue(request.Deprecated.Value); }
-
-
-                // Update location
-                var changes = await dbContext.SaveChangesAsync(cancellationToken);
-
-                success = true;
-                return Payload<LocationDto>.Success(_mapper.Map<LocationDto>(location));
-            }
-            finally
-            {
-                if (success)
-                    _logger.LogInformation($"Successfully updating Location '{request.Id}'");
-                else
-                    _logger.LogInformation($"Error when updating Location '{request.Id}'");
-            }
-        }
-
-        public async Task<Payload<LocationDto>> Handle(DeleteLocationRequest request, CancellationToken cancellationToken)
-        {
-            _logger.LogInformation($"Start deleting Location '{request.Id}'");
-
-            bool success = false;
-            try
-            {
-                // Find entity
-                await using var dbContext = _factory.CreateDbContext();
-                var location = await dbContext.Locations.FindAsync(request.Id);
-
-                if (null == location)
-                    return Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Id {request.Id}"));
-
-                // delete location
-                dbContext.Locations.Remove(location);
-                var changes = await dbContext.SaveChangesAsync(cancellationToken);
-
-                if (changes <= 0)
-                    return Payload<LocationDto>.Error();
-
-                success = true;
-                return Payload<LocationDto>.Success(default(LocationDto));
-            }
-            finally
-            {
-                if (success)
-                    _logger.LogInformation($"Successfully deleting Location '{request.Id}'");
-                else
-                    _logger.LogInformation($"Error when deleting Location '{request.Id}'");
-            }
-        }
     }
 }

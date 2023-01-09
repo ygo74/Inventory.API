@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace Inventory.Configuration.UnitTests.TestCases
 {
-    public static class DatacenterTestCases
+    internal static class DatacenterTestCases
     {
-        public static IEnumerable GetCreateDatacenterWithEmptyMandatoryValues()
+        internal static IEnumerable GetCreateDatacenterWithEmptyMandatoryValues()
         {
             yield return new CreateDatacenter.Command() { Name = "", Code = "" };
             yield return new CreateDatacenter.Command() { Name = "   ", Code = "  " };
             yield return new CreateDatacenter.Command() { Name = null, Code = null };
         }
 
-        public static IEnumerable GetCreateDatacenterWithCorrectMandatoryValues()
+        internal static IEnumerable GetCreateDatacenterWithCorrectMandatoryValues()
         {
             yield return new CreateDatacenter.Command() { Name = "TEST-XX", Code = "TEST-XX" };
         }

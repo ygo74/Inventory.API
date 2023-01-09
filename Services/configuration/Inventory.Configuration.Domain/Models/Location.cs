@@ -33,9 +33,9 @@ namespace Inventory.Configuration.Domain.Models
         {
             // Mandatory
             Name = Guard.Against.NullOrWhiteSpace(name, nameof(name));
-            CountryCode = Guard.Against.NullOrWhiteSpace(countryCode, nameof(countryCode));
-            CityCode = Guard.Against.NullOrWhiteSpace(cityCode, nameof(cityCode));
-            RegionCode = Guard.Against.NullOrWhiteSpace(regionCode, nameof(regionCode));
+            CountryCode = Guard.Against.NullOrWhiteSpace(countryCode, nameof(countryCode)).ToLower();
+            CityCode = Guard.Against.NullOrWhiteSpace(cityCode, nameof(cityCode)).ToLower();
+            RegionCode = Guard.Against.NullOrWhiteSpace(regionCode, nameof(regionCode)).ToLower();
 
             //Optional
             Description = description;
