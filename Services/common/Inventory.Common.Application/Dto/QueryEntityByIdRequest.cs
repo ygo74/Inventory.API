@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Common.Application.Dto
 {
-    public class QueryEntityByIdRequest<T> : IRequest<Payload<T>> where T : class
+    public class QueryEntityByIdRequest<TDto> : IRequest<Payload<TDto>> where TDto : class
     {
         public int Id { get; set; }
     }

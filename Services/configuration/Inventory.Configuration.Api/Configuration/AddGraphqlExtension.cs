@@ -78,6 +78,7 @@ namespace Inventory.Configuration.Api.Configuration
                     .AddTypeExtension<DatacenterQueries>()
                     .AddTypeExtension<PluginQueries>()
                     .AddTypeExtension<LocationQueries>()
+                    .AddTypeExtension<CredentialQueries>()
                 .AddMutationType(d => d.Name("Mutation"))
                     .AddTypeExtension<DatacenterMutations>()
                     .AddTypeExtension<PluginMutations>()
@@ -87,6 +88,7 @@ namespace Inventory.Configuration.Api.Configuration
                 .AddType<CreateDatacenterPayloadType>()
                 .AddType<PluginType>()
                 .AddType<CreatePluginInputType>()
+                .AddType<CredentialType>()
 
                 //.AddMutationConventions(
                 //    new MutationConventionOptions
