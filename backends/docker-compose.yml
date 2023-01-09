@@ -1,0 +1,65 @@
+version: '3.4'
+
+networks:
+  dockerapi-dev:
+    driver: bridge
+  elastic:
+    name: monitoring_elastic
+
+services:
+
+  seq:
+    image: datalust/seq:latest
+    networks:
+      - dockerapi-dev
+    ports:
+      - "9481:80"
+    environment:
+     ACCEPT_EULA: "Y"
+
+  caching:
+    image: redis:alpine
+    networks:
+      - dockerapi-dev
+    ports:
+      - "6379:6379"
+    # volumes:
+    #   - cachingdata:/data
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    networks:
+      - dockerapi-dev
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  postgres_image:
+    image: postgres:latest
+    ports:
+      - "32781:5432"
+    restart: always
+#    volumes:
+#      - db_volume:/var/lib/postgresql/data
+#      - ./dbscripts/seed.sql :/docker-entrypoint-initdb.d/seed.sql
+    environment:
+      POSTGRES_USER: "bloguser"
+      POSTGRES_PASSWORD: "bloguser"
+      POSTGRES_DB: "serversDB"
+    networks:
+      - dockerapi-dev
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "9480:80"
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@domain.com
+      PGADMIN_DEFAULT_PASSWORD: SuperSecret
+    networks:
+      - dockerapi-dev
+
+volumes:
+  db_volume:
+  cachingdata:
