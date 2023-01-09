@@ -125,6 +125,9 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
         public void SubscribeDynamic<TH>(string eventName)
             where TH : IDynamicIntegrationEventHandler
         {
+            if (!_configuration.GetValue<bool>("PublishIntegrationEvent"))
+                return;
+
             _logger.LogInformation("Subscribing to dynamic event {EventName} with {EventHandler}", eventName, typeof(TH).GetGenericTypeName());
 
             DoInternalSubscription(eventName);
@@ -136,6 +139,9 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
+            if (!_configuration.GetValue<bool>("PublishIntegrationEvent"))
+                return;
+
             if (string.IsNullOrEmpty(eventName))
                 eventName = _subsManager.GetEventKey<T>();
 
