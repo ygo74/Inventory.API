@@ -5,6 +5,7 @@ using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Application.Graphql;
 using Inventory.Common.Application.Users;
 using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Api.Graphql.Mutations;
@@ -33,6 +34,7 @@ namespace Inventory.Configuration.Api.Configuration
         {
 
             serviceCollection.AddGraphQLServer()
+                .AddDiagnosticEventListener<ErrorLoggingDiagnosticsEventListener>()
                 .RegisterDbContext<ConfigurationDbContext>(DbContextKind.Pooled)
                 .SetPagingOptions(
                     new PagingOptions
@@ -83,11 +85,21 @@ namespace Inventory.Configuration.Api.Configuration
                     .AddTypeExtension<DatacenterMutations>()
                     .AddTypeExtension<PluginMutations>()
                     .AddTypeExtension<LocationMutations>()
+                .AddType<GenericApiError>()
+                .AddType<ValidationError>()
+                .AddType<UnAuthorisedError>()
+                .AddType<NotFoundError>()
+                .AddType<BaseErrorInterfaceType>()
+                // Locations
+                .AddType<GetLocationRequestType>()
+                // Datacenters
                 .AddType<DatacenterType>()
                 .AddType<CreateDatacenterInputType>()
                 .AddType<CreateDatacenterPayloadType>()
+                // Plugins
                 .AddType<PluginType>()
                 .AddType<CreatePluginInputType>()
+                // Credentials
                 .AddType<CredentialType>()
 
                 //.AddMutationConventions(
@@ -103,12 +115,8 @@ namespace Inventory.Configuration.Api.Configuration
                 .BindRuntimeType<DateTime, DateTimeType>()
                 .BindRuntimeType<int, IntType>()
                 .BindRuntimeType<long, LongType>()
-                .BindRuntimeType<Dictionary<string, bool>, AnyType>()
+                //.BindRuntimeType<Dictionary<string, bool>, AnyType>()
                 //.AddType<CreateWebHookErrorUnion>()
-                .AddType<GenericApiError>()
-                .AddType<ValidationError>()
-                .AddType<UnAuthorisedError>()
-                .AddType<BaseErrorInterfaceType>()
                 ;
 
             return serviceCollection;

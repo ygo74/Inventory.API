@@ -16,7 +16,12 @@ function New-InventoryPlugin
 
         [Parameter(ParameterSetName="Default", Position=3, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
-        $Path
+        $Path,
+
+        [Parameter(ParameterSetName="Default", Position=4, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [String]
+        $InventoryCode
+
 
 
     )
@@ -45,6 +50,7 @@ function New-InventoryPlugin
                 code = $Code
                 version = $Version
                 path = $Path
+                inventoryCode = $InventoryCode
             }
         }
 

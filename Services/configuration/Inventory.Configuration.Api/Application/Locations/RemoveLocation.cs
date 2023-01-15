@@ -1,9 +1,11 @@
 ﻿using Ardalis.GuardClauses;
 using AutoMapper;
+using FluentValidation;
 using GreenDonut;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Application.Validators;
 using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Infrastructure;
 using MediatR;
@@ -22,8 +24,38 @@ namespace Inventory.Configuration.Api.Application.Locations
     public class DeleteLocationRequest : DeleteConfigurationEntityRequest<LocationDto> { }
 
 
+    public class DeleteLocationValidator : AbstractValidator<DeleteLocationRequest>
+    {
+        private readonly IDbContextFactory<ConfigurationDbContext> _factory;
+
+        public DeleteLocationValidator(IDbContextFactory<ConfigurationDbContext> factory)
+        {
+
+            _factory = Guard.Against.Null(factory, nameof(factory));
+
+            RuleFor(e => e.Id).Cascade(CascadeMode.Stop)
+                .NotNull()
+                .NotEmpty()
+                .GreaterThan(0)
+                .WithMessage("{PropertyName} is mandatory")
+                .MustAsync(MustExists).WithMessage("Location with {PropertyName} {PropertyValue} doesn't exists in the database");
+        }
+
+        public async Task<bool> MustExists(
+                   int id,
+                   CancellationToken cancellationToken)
+        {
+
+            await using ConfigurationDbContext dbContext =
+                _factory.CreateDbContext();
+
+            return (await dbContext.Locations.FindAsync(new object[] { id } , cancellationToken) != null);
+        }
+    }
+
+
     /// <summary>
-    /// CRUD Handler for locations
+    /// Delete Handler for location
     /// </summary>
     public class DeleteLocationHanlder : IRequestHandler<DeleteLocationRequest, Payload<LocationDto>>
     {

@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using Inventory.Common.Application.Core;
+using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Exceptions;
 using Inventory.Common.Application.Users;
 using Inventory.Common.Infrastructure.Telemetry;
@@ -59,7 +60,7 @@ namespace Inventory.Common.Application.Behaviors
     /// <typeparam name="TRequest"></typeparam>
     /// <typeparam name="TResponse"></typeparam>
     public class ValidationBehavior<TRequest, TResponse>
-     : IPipelineBehavior<TRequest, TResponse> where TResponse: class
+     : IPipelineBehavior<TRequest, TResponse> where TResponse: IPayload
     {
         private readonly ICurrentUser _currentUser;
         private readonly IEnumerable<IValidator<TRequest>> _validators;
@@ -143,7 +144,7 @@ namespace Inventory.Common.Application.Behaviors
                 typeof(TResponse))
             )
             {
-                var payload = ((IPayload<TResponse>)Activator.CreateInstance<TResponse>());
+                var payload = ((IPayload)Activator.CreateInstance<TResponse>());
 
                 foreach (var item in error_obj)
                 {

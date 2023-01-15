@@ -72,7 +72,7 @@ namespace Inventory.Configuration.Api.Application.Plugin
                 bool success = false;
                 try
                 {
-                    var newEntity = new Domain.Models.Plugin(request.Name, request.Code, request.Version, request.Deprecated, request.ValidFrom, request.ValidTo);
+                    var newEntity = new Domain.Models.Plugin(request.Name, request.Code, request.Version, request.InventoryCode, request.Deprecated, request.ValidFrom, request.ValidTo);
                     newEntity.SetPath(request.Path);
 
                     // Add entity

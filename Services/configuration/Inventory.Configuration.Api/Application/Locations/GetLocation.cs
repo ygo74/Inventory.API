@@ -4,6 +4,7 @@ using AutoMapper.QueryableExtensions;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Domain.Filters;
 using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Domain.Filters;
 using Inventory.Configuration.Domain.Models;
@@ -29,9 +30,14 @@ namespace Inventory.Configuration.Api.Application.Locations
 
     public class GetLocationByIdRequest : QueryEntityByIdRequest<LocationDto> { }
 
+    public class GetLocationByNameRequest : IRequest<Payload<LocationDto>> 
+    { 
+        public string Name { get; set; }
+    }
 
     public class LocationQueriesHandler : IRequestHandler<GetLocationRequest, CursorPaginationdPayload<LocationDto>>,
-                                          IRequestHandler<GetLocationByIdRequest, Payload<LocationDto>>
+                                          IRequestHandler<GetLocationByIdRequest, Payload<LocationDto>>,
+                                          IRequestHandler<GetLocationByNameRequest, Payload<LocationDto>>
     {
 
         private readonly ILogger<LocationQueriesHandler> _logger;
@@ -65,6 +71,29 @@ namespace Inventory.Configuration.Api.Application.Locations
 
             if (null == location)
                 Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Id {request.Id}"));
+
+            return Payload<LocationDto>.Success(_mapper.Map<LocationDto>(location));
+
+        }
+
+
+        /// <summary>
+        /// Get Location By Name
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="System.NotImplementedException"></exception>
+        public async Task<Payload<LocationDto>> Handle(GetLocationByNameRequest request, CancellationToken cancellationToken)
+        {
+            await using var dbContext = _factory.CreateDbContext();
+
+            var filter = ExpressionFilterFactory.Create<Location>();
+            filter = filter.WithName(request.Name);
+            var location = await dbContext.Locations.FirstOrDefaultAsync(filter.Predicate);
+
+            if (null == location)
+                Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Name {request.Name}"));
 
             return Payload<LocationDto>.Success(_mapper.Map<LocationDto>(location));
 

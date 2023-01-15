@@ -13,12 +13,6 @@ namespace Inventory.Common.Application.Validators
         public ConfigurationEntityDtoValidator()
         {
 
-            RuleFor(e => e.InventoryCode).Cascade(CascadeMode.Stop)
-                .NotNull()
-                .NotEmpty()
-                .WithMessage("{PropertyName} is mandatory");
-
-
             When(e => e.ValidTo.HasValue, () =>
             {
                 RuleFor(e => e.ValidTo).Must((model, validTo) =>
@@ -28,6 +22,19 @@ namespace Inventory.Common.Application.Validators
                     return validTo.Value.CompareTo(ValidFrom) > 0;
                 }).WithMessage("{PropertyName} with {PropertyValue} must be greather than ValidFrom date");
             });
+
+        }
+    }
+
+    public class CreateConfigurationEntityDtoValidator<T> : ConfigurationEntityDtoValidator<T> where T : ICreateOrUpdateConfigurationEntityRequest
+    {
+        public CreateConfigurationEntityDtoValidator() 
+        {
+
+            RuleFor(e => e.InventoryCode).Cascade(CascadeMode.Stop)
+            .NotNull()
+            .NotEmpty()
+            .WithMessage("{PropertyName} is mandatory");
 
         }
     }

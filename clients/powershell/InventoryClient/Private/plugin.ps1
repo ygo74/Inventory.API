@@ -3,7 +3,7 @@ $script:CreatePluginMutation=@"
 mutation createPlugin(`$input: CreatePluginInput)
 {
  createPlugin(input: `$input) {
-   plugin {
+   data {
     ...pluginDto
    }
    errors {
@@ -15,6 +15,7 @@ mutation createPlugin(`$input: CreatePluginInput)
 
 fragment pluginDto on PluginDto
 {
+  id
   name
   code
   version
@@ -54,6 +55,7 @@ query plugins(`$first: Int `$after: String) {
 $script:pluginDtoFragment=@"
 fragment pluginDto on PluginDto
 {
+  id
   name
   code
   version

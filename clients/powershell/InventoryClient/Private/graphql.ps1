@@ -9,6 +9,33 @@ fragment pageInfo on PageInfo
 }
 "@
 
+$script:ErrorsFragment=@"
+fragment error on ApiError
+{
+    __typename
+    ... genericError
+    ... validationError
+    ... unAuthorisedError
+    ... notFoundError
+}
+fragment genericError on GenericApiError
+{
+  message
+}
+fragment validationError on ValidationError
+{
+  message
+}
+fragment unAuthorisedError on UnAuthorisedError
+{
+  message
+}
+fragment notFoundError on NotFoundError
+{
+  message
+}
+"@
+
 
 function Invoke-InternalGraphql
 {
@@ -41,6 +68,9 @@ function Invoke-InternalGraphql
 
         try
         {
+            Trace-Message -Message "Query: =>" -CommandName $MyInvocation.MyCommand.Name
+            Trace-Message -Message "$Query" -CommandName $MyInvocation.MyCommand.Name
+
             $body = @{
                 query = $Query
             }
@@ -62,11 +92,39 @@ function Invoke-InternalGraphql
                 foreach($resultErr in $result.errors)
                 {
                     $errorMessage += "{0} - {1} : {2}`n" -f ($resultErr.path -join ","), $resultErr.message, $resultErr.extensions.message
+                    $errorMessage += $resultErr.extensions.stackTrace
                 }
                 throw $errorMessage
             }
-            $result
 
+            $result.data
+
+        }
+        catch [System.Net.WebException]
+        {
+            if ($null -eq $_.Exception.Response)
+            {
+                throw $_
+            }
+
+            Trace-Message -Message "ERROR" -CommandName $MyInvocation.MyCommand.Name
+            $errorMessage = $_.exception.Response | ConvertTo-Json
+            Trace-Message -Message $errorMessage -CommandName $MyInvocation.MyCommand.Name
+            $respStream = $_.Exception.Response.GetResponseStream()
+            $reader = New-Object System.IO.StreamReader($respStream)
+            $respBody = $reader.ReadToEnd() | ConvertFrom-Json
+            if ($null -ne $respBody -and $respBody.errors.length -gt 0)
+            {
+                $errorMessage = ""
+                foreach($resultErr in $respBody.errors)
+                {
+                    $errorMessage += "{0} - {1} : {2}`n" -f ($resultErr.path -join ","), $resultErr.message, $resultErr.extensions.message
+                }
+                Trace-Message -Message $errorMessage -CommandName $MyInvocation.MyCommand.Name
+                throw $errorMessage
+            }
+
+            throw $_
         }
         catch
         {

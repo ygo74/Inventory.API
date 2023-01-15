@@ -19,8 +19,8 @@ namespace Inventory.Configuration.Domain.Models
 
         protected Plugin() { }
 
-        public Plugin(string name, string code, string version, bool? deprecated = null, DateTime? startDate = null, DateTime? endDate = null) 
-            : base(deprecated, startDate, endDate)
+        public Plugin(string name, string code, string version, string InventoryCode, bool? deprecated = null, DateTime? startDate = null, DateTime? endDate = null) 
+            : base(InventoryCode, deprecated, startDate, endDate)
         {
             Name = Guard.Against.NullOrWhiteSpace(name, nameof(name));
             Code = Guard.Against.NullOrWhiteSpace(code, nameof(code));

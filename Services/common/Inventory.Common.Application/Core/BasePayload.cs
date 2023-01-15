@@ -7,8 +7,17 @@ using System.Threading.Tasks;
 
 namespace Inventory.Common.Application.Core
 {
+    public interface IPayload
+    {
 
-    public interface IPayload<T> where T : class
+        void AddError(IApiError error);
+
+        bool HasError();
+
+    }
+
+
+    public interface IPayload<T> : IPayload where T : class
     {
 
         void AddError(IApiError error);

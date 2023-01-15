@@ -30,3 +30,28 @@ services:
       - dockerapi
       - elastic
 
+
+  inventory.gateway.api:
+    image: ${DOCKER_REGISTRY-}inventorygatewayapi
+    build:
+      context: .
+      dockerfile: gateway/Inventory.Gateway.Api/Dockerfile
+    depends_on:
+      - "inventory.configuration.api"
+      - "inventory.devices.api"
+    networks:
+      - dockerapi
+      - elastic
+
+
+  inventory.networks.api:
+    image: ${DOCKER_REGISTRY-}inventorynetworksapi
+    build:
+      context: .
+      dockerfile: networks/Inventory.Networks.Api/Dockerfile
+    depends_on:
+      - "inventory.configuration.api"
+    networks:
+      - dockerapi
+      - elastic
+

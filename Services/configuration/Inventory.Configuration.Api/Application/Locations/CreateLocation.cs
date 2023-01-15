@@ -32,7 +32,7 @@ namespace Inventory.Configuration.Api.Application.Locations
 
     }
 
-    public class CreateLocationValidator : ConfigurationEntityDtoValidator<CreateLocationRequest>
+    public class CreateLocationValidator : CreateConfigurationEntityDtoValidator<CreateLocationRequest>
     {
         public CreateLocationValidator() 
         {
