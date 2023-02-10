@@ -21,7 +21,7 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
         }
 
         [TestCaseSource(typeof(PluginTestCases), nameof(PluginTestCases.GetCreatePluginsWithCorrectMandatoryValues))]
-        public async Task Should_successfull_create_application_with_valid_values(CreatePlugin.Command newEntity)
+        public async Task Should_successfull_create_application_with_valid_values(CreatePluginRequest newEntity)
         {
             // Arrange
             //var result = Assert.Throws<Inventory.Common.Application.Exceptions.ValidationException>(async () => 

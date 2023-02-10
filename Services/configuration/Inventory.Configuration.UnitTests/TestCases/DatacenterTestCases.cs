@@ -12,14 +12,14 @@ namespace Inventory.Configuration.UnitTests.TestCases
     {
         internal static IEnumerable GetCreateDatacenterWithEmptyMandatoryValues()
         {
-            yield return new CreateDatacenter.Command() { Name = "", Code = "" };
-            yield return new CreateDatacenter.Command() { Name = "   ", Code = "  " };
-            yield return new CreateDatacenter.Command() { Name = null, Code = null };
+            yield return new CreateDatacenterRequest() { Name = "", Code = "" };
+            yield return new CreateDatacenterRequest() { Name = "   ", Code = "  " };
+            yield return new CreateDatacenterRequest() { Name = null, Code = null };
         }
 
         internal static IEnumerable GetCreateDatacenterWithCorrectMandatoryValues()
         {
-            yield return new CreateDatacenter.Command() { Name = "TEST-XX", Code = "TEST-XX" };
+            yield return new CreateDatacenterRequest() { Name = "TEST-XX", Code = "TEST-XX" };
         }
 
     }

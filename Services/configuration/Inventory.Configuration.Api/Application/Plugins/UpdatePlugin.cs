@@ -24,29 +24,17 @@ namespace Inventory.Configuration.Api.Application.Plugin
 #nullable disable
 
 
-    public class UpdatePluginValidator : AbstractValidator<UpdatePluginRequest>
+    public class UpdatePluginValidator : ConfigurationEntityDtoValidator<UpdatePluginRequest>
     {
-        private readonly IDbContextFactory<ConfigurationDbContext> _factory;
 
-        public UpdatePluginValidator(IDbContextFactory<ConfigurationDbContext> factory)
+        public UpdatePluginValidator(PluginService service)
         {
-            _factory = Guard.Against.Null(factory, nameof(factory));
 
             RuleFor(e => e.Id).Cascade(CascadeMode.Stop)
                 .NotNull()
                 .GreaterThan(0)
                 .WithMessage("{PropertyName} is mandatory and must be greather than 0")
-                .MustAsync(PluginExist).WithMessage("Plugin with id {PropertyValue} doesn't exist");
-
-            Include(new ConfigurationEntityDtoValidator<UpdatePluginRequest>());
-
-        }
-
-        public async Task<bool> PluginExist(UpdatePluginRequest request, int id, CancellationToken cancellationToken)
-        {
-            await using var dbContext = _factory.CreateDbContext();
-
-            return await dbContext.Plugins.AnyAsync(e => e.Id == request.Id);
+                .MustAsync(service.PluginExist).WithMessage("Plugin with id {PropertyValue} doesn't exist");
         }
 
     }
@@ -70,19 +58,30 @@ namespace Inventory.Configuration.Api.Application.Plugin
         public async Task<Payload<PluginDto>> Handle(UpdatePluginRequest request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Start Update plugin {0}", request.Id);
+            bool success = false;
+            try
+            {
 
-            await using var dbContext = _factory.CreateDbContext();
+                await using var dbContext = _factory.CreateDbContext();
 
-            var plugin = await dbContext.Plugins.FindAsync(request.Id);
+                var plugin = await dbContext.Plugins.FindAsync(new object[] { request.Id },cancellationToken);
 
-            if (request.Deprecated.HasValue) { plugin.SetDeprecatedValue(request.Deprecated.Value); }
-            if (!string.IsNullOrWhiteSpace(request.Path)) { plugin.SetPath(request.Path); }
+                if (request.Deprecated.HasValue) { plugin.SetDeprecatedValue(request.Deprecated.Value); }
+                if (!string.IsNullOrWhiteSpace(request.Path)) { plugin.SetPath(request.Path); }
 
-            var changes = await dbContext.SaveChangesAsync(cancellationToken);
+                var changes = await dbContext.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("End Update plugin {0}", request.Id);
+                success = true;
+                return Payload<PluginDto>.Success(_pluginService.GetPluginDto(plugin));
+            }
+            finally
+            {
+                if (success)
+                    _logger.LogInformation("Successfully Updating plugin {0}", request.Id);
+                else
+                    _logger.LogError("Error when updating plugin {0}", request.Id);
 
-            return Payload<PluginDto>.Success(_pluginService.GetPluginDto(plugin));
+            }
 
 
         }

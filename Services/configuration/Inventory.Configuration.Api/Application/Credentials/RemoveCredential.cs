@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using AutoMapper;
+using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Exceptions;
 using Inventory.Configuration.Api.Application.Locations;
@@ -23,7 +24,24 @@ namespace Inventory.Configuration.Api.Application.Credentials
     }
 
     /// <summary>
-    /// Remove Credential
+    /// Remove credential request validator
+    /// </summary>
+    public class RemoveCredentialRequestValidator : AbstractValidator<RemoveCredentialRequest>
+    {
+        public RemoveCredentialRequestValidator(CredentialService service) 
+        {
+            RuleFor(e => e.Id).Cascade(CascadeMode.Stop)
+                .NotNull()
+                .NotEmpty()
+                .GreaterThan(0)
+                .WithMessage("{PropertyName} is mandatory")
+                .MustAsync(service.CredentialExists).WithMessage("Credential with {PropertyName} {PropertyValue} doesn't exists in the database");
+        }
+    }
+
+
+    /// <summary>
+    /// Remove Credential handler
     /// </summary>
     public class RemoveCredentialHanlder : IRequestHandler<RemoveCredentialRequest, Payload<CredentialDto>>
     {
@@ -48,7 +66,7 @@ namespace Inventory.Configuration.Api.Application.Credentials
             {
                 // Find entity
                 await using var dbContext = _factory.CreateDbContext();
-                var entity = await dbContext.Credentials.FindAsync(request.Id);
+                var entity = await dbContext.Credentials.FindAsync(new object[] { request.Id }, cancellationToken);
 
                 if (null == entity)
                     return Payload<CredentialDto>.Error(new NotFoundError($"Don't find Credential with Id {request.Id}"));

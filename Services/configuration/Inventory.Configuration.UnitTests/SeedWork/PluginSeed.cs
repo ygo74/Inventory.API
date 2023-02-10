@@ -18,8 +18,8 @@ namespace Inventory.Configuration.UnitTests.SeedWork
         public static IEnumerable<Plugin> Get()
         {
 
-            yield return new Plugin(AZURE_INVENTORY, AZURE_INVENTORY, AZURE_INVENTORY_VERSION);
-            yield return new Plugin(EFFICIENTIP_INVENTORY, EFFICIENTIP_INVENTORY, EFFICIENTIP_INVENTORY_VERSION);
+            yield return new Plugin(AZURE_INVENTORY, AZURE_INVENTORY, AZURE_INVENTORY_VERSION,"az.plugin");
+            yield return new Plugin(EFFICIENTIP_INVENTORY, EFFICIENTIP_INVENTORY, EFFICIENTIP_INVENTORY_VERSION,"efficientip.plugin");
 
         }
 

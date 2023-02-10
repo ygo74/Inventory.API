@@ -16,9 +16,9 @@ namespace Inventory.Configuration.Api.Graphql.Types
         }
     }
 
-    public class CreatePluginInputType : ObjectType<CreatePlugin.Command>
+    public class CreatePluginInputType : ObjectType<CreatePluginRequest>
     {
-        protected override void Configure(IObjectTypeDescriptor<CreatePlugin.Command> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<CreatePluginRequest> descriptor)
         {
             descriptor.Name("CreatePlugin");
             descriptor.Field(e => e.Name).Name("name").Description("Plugin Name");

@@ -2,13 +2,13 @@
 using HotChocolate.Types;
 using Inventory.Common.Application.Core;
 using Inventory.Configuration.Api.Application.Plugin;
+using Inventory.Configuration.Api.Application.Plugins;
 using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using static Inventory.Configuration.Api.Application.Plugin.CreatePlugin;
 
 namespace Inventory.Configuration.Api.Graphql.Mutations
 {
@@ -17,7 +17,7 @@ namespace Inventory.Configuration.Api.Graphql.Mutations
     {
 
         public async Task<Payload<PluginDto>> CreatePlugin(
-            CreatePlugin.Command input,
+            CreatePluginRequest input,
             [Service] IMediator _mediator,
             CancellationToken cancellationToken
             )
@@ -27,6 +27,15 @@ namespace Inventory.Configuration.Api.Graphql.Mutations
 
         public async Task<Payload<PluginDto>> UpdatePlugin(
             UpdatePluginRequest input,
+            [Service] IMediator _mediator,
+            CancellationToken cancellationToken
+            )
+        {
+            return await _mediator.Send(input, cancellationToken);
+        }
+
+        public async Task<Payload<PluginDto>> RemovePlugin(
+            RemovePluginRequest input,
             [Service] IMediator _mediator,
             CancellationToken cancellationToken
             )

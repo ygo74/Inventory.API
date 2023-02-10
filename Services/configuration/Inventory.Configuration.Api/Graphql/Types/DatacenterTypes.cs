@@ -17,9 +17,9 @@ namespace Inventory.Configuration.Api.Graphql.Types
         }
     }
 
-    public class CreateDatacenterInputType : ObjectType<CreateDatacenter.Command>
+    public class CreateDatacenterInputType : ObjectType<CreateDatacenterRequest>
     {
-        protected override void Configure(IObjectTypeDescriptor<CreateDatacenter.Command> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<CreateDatacenterRequest> descriptor)
         {
             descriptor.Name("CreateDatacenter");
             descriptor.Field(e => e.Code).Name("Code").Description("Data center unique code");

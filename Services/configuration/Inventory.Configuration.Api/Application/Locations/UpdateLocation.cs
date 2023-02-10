@@ -28,13 +28,14 @@ namespace Inventory.Configuration.Api.Application.Locations
 
     public class UpdateLocationValidator : ConfigurationEntityDtoValidator<UpdateLocationRequest>
     {
-        public UpdateLocationValidator() 
+        public UpdateLocationValidator(LocationService service) 
         {
             RuleFor(e => e.Id).Cascade(CascadeMode.Stop)
                 .NotNull()
                 .NotEmpty()
                 .GreaterThan(0)
-                .WithMessage("{PropertyName} is mandatory");
+                .WithMessage("{PropertyName} is mandatory")
+                .MustAsync(service.LocationExists).WithMessage("Location with {PropertyName} {PropertyValue} doesn't exists in the database");
         }
     }
 
@@ -73,7 +74,6 @@ namespace Inventory.Configuration.Api.Application.Locations
                 var location = await dbContext.Locations.FindAsync(request.Id);
 
                 if (request.Deprecated.HasValue) { location.SetDeprecatedValue(request.Deprecated.Value); }
-
 
                 // Update location
                 var changes = await dbContext.SaveChangesAsync(cancellationToken);

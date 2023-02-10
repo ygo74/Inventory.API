@@ -11,7 +11,7 @@ namespace Inventory.Configuration.Api.Application.Datacenter
     {
         public DatacenterMappingProfile()
         {
-            CreateMap<CreateDatacenter.Command, Domain.Models.Datacenter>();
+            CreateMap<CreateDatacenterRequest, Domain.Models.Datacenter>();
             CreateMap<Domain.Models.Datacenter, DatacenterDto>()
                  //.IncludeBase<ConfigurationEntity, ConfigurationEntityDto>();
                  .ForMember(d => d.StartDate, options =>

@@ -27,6 +27,8 @@ using OpenTelemetry.Resources;
 using System.Diagnostics;
 using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Common.Application.Plugins;
+using Inventory.Configuration.Api.Application.Locations;
+using Inventory.Configuration.Api.Application.Credentials;
 
 namespace Inventory.Configuration.Api
 {
@@ -77,6 +79,8 @@ namespace Inventory.Configuration.Api
             // Application
             services.AddSingleton<PluginResolver>();
             services.AddScoped<PluginService>();
+            services.AddScoped<LocationService>();
+            services.AddScoped<CredentialService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

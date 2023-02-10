@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using AutoMapper;
+using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Configuration.Api.Application.Locations;
 using Inventory.Configuration.Domain.Models;
@@ -13,6 +14,9 @@ using System.Threading.Tasks;
 
 namespace Inventory.Configuration.Api.Application.Credentials
 {
+    /// <summary>
+    /// Create credential request
+    /// </summary>
     public class CreateCredentialRequest : IRequest<Payload<CredentialDto>>
     {
         public string Name { get; private set; }
@@ -21,6 +25,24 @@ namespace Inventory.Configuration.Api.Application.Credentials
         public string Password { get; private set; }
     }
 
+    /// <summary>
+    /// Create credential request validator
+    /// </summary>
+    public class CreateCredentialRequestValidator : AbstractValidator<CreateCredentialRequest>
+    {
+        public CreateCredentialRequestValidator() 
+        {
+            RuleFor(e => e.Name).Cascade(CascadeMode.Stop)
+                .NotNull()
+                .NotEmpty()
+                .WithMessage("{PropertyName} is mandatory");
+
+        }
+    }
+
+    /// <summary>
+    /// Create credential request handler
+    /// </summary>
     public class CreateCredentialHanlder : IRequestHandler<CreateCredentialRequest, Payload<CredentialDto>>
     {
         private readonly ILogger<CreateCredentialHanlder> _logger;

@@ -13,8 +13,8 @@ namespace Inventory.Configuration.UnitTests.TestCases
     {
         internal static IEnumerable GetCreatePluginsWithCorrectMandatoryValues()
         {
-            yield return new CreatePlugin.Command() { Name = "", Code = "TEST-XX" };
-            yield return new CreatePlugin.Command() { Name = "TEST-XX", Code = "TEST-XX" };
+            yield return new CreatePluginRequest() { Name = "", Code = "TEST-XX" };
+            yield return new CreatePluginRequest() { Name = "TEST-XX", Code = "TEST-XX" };
         }
 
         internal static IEnumerable GetPluginsByCode()

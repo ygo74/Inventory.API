@@ -26,31 +26,19 @@ namespace Inventory.Configuration.Api.Application.Locations
 
     public class DeleteLocationValidator : AbstractValidator<DeleteLocationRequest>
     {
-        private readonly IDbContextFactory<ConfigurationDbContext> _factory;
 
-        public DeleteLocationValidator(IDbContextFactory<ConfigurationDbContext> factory)
+        public DeleteLocationValidator(LocationService service)
         {
 
-            _factory = Guard.Against.Null(factory, nameof(factory));
 
             RuleFor(e => e.Id).Cascade(CascadeMode.Stop)
                 .NotNull()
                 .NotEmpty()
                 .GreaterThan(0)
                 .WithMessage("{PropertyName} is mandatory")
-                .MustAsync(MustExists).WithMessage("Location with {PropertyName} {PropertyValue} doesn't exists in the database");
+                .MustAsync(service.LocationExists).WithMessage("Location with {PropertyName} {PropertyValue} doesn't exists in the database");
         }
 
-        public async Task<bool> MustExists(
-                   int id,
-                   CancellationToken cancellationToken)
-        {
-
-            await using ConfigurationDbContext dbContext =
-                _factory.CreateDbContext();
-
-            return (await dbContext.Locations.FindAsync(new object[] { id } , cancellationToken) != null);
-        }
     }
 
 

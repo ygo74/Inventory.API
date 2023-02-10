@@ -26,6 +26,8 @@ using Inventory.Common.UnitTests.Events;
 using Inventory.Common.Application.Plugins;
 using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Common.Infrastructure.Logging;
+using Inventory.Configuration.Api.Application.Locations;
+using Inventory.Configuration.Api.Application.Credentials;
 
 namespace Inventory.Configuration.UnitTests
 {
@@ -65,10 +67,14 @@ namespace Inventory.Configuration.UnitTests
             });
 
 
+            //pagination
+            services.AddPagination();
 
-// Applications
-services.AddSingleton<PluginResolver>();
+            // Applications
+            services.AddSingleton<PluginResolver>();
             services.AddScoped<PluginService>();
+            services.AddScoped<LocationService>();
+            services.AddScoped<CredentialService>();
 
 
             // Unit tests specific configuration

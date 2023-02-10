@@ -14,7 +14,7 @@ namespace Inventory.Configuration.Api.Graphql.Mutations
     public class DatacenterMutations
     {
         public async Task<Payload<DatacenterDto>> CreateDatacenter(
-            CreateDatacenter.Command input,
+            CreateDatacenterRequest input,
             [Service] IMediator _mediator
             )
         {

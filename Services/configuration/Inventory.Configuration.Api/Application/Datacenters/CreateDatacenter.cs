@@ -13,74 +13,75 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Inventory.Common.Application.Dto;
+using Inventory.Common.Application.Validators;
 
 namespace Inventory.Configuration.Api.Application.Datacenter
 {
-    public class CreateDatacenter
+    public class CreateDatacenterRequest : CreateConfigurationEntityRequest<DatacenterDto>
     {
-        [GraphQLName("CreateDatacenterInput")]
-        public class Command : CreateConfigurationEntityRequest<DatacenterDto>
+        public string Name { get; set; }
+        public string Code { get; set; }
+    }
+
+    public class CreateDatacenterValidator : CreateConfigurationEntityDtoValidator<CreateDatacenterRequest>
+    {
+        public CreateDatacenterValidator()
         {
-            public string Name { get; set; }
-            public string Code { get; set; }
+
+            RuleFor(e => e.Name).Cascade(CascadeMode.Stop)
+                .NotNull().WithMessage("{PropertyName} is mandatory")
+                .NotEmpty().WithMessage("{PropertyName} is mandatory");
+
+            RuleFor(e => e.Code).Cascade(CascadeMode.Stop)
+                .NotNull()
+                .NotEmpty()
+                .WithMessage("{PropertyName} is mandatory");
+
+        }
+    }
+
+    public class CreateDatacenterHandler : IRequestHandler<CreateDatacenterRequest, Payload<DatacenterDto>>
+    {
+
+        private readonly IAsyncRepository<Domain.Models.Datacenter> _repository;
+        private readonly ILogger<CreateDatacenterHandler> _logger;
+        private readonly IMapper _mapper;
+
+        public CreateDatacenterHandler(IAsyncRepository<Domain.Models.Datacenter> repository, ILogger<CreateDatacenterHandler> logger, IMapper mapper)
+        {
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public class Validator : AbstractValidator<Command>
+        public async Task<Payload<DatacenterDto>> Handle(CreateDatacenterRequest request, CancellationToken cancellationToken)
         {
-            public Validator()
+            _logger.LogInformation($"Start adding datacenter '{request.Name}' with code '{request.Code}'");
+            bool success = false;
+            try
             {
-
-                RuleFor(e => e.Name).Cascade(CascadeMode.Stop)
-                    .NotNull().WithMessage("{PropertyName} is mandatory")
-                    .NotEmpty().WithMessage("{PropertyName} is mandatory");
-
-                RuleFor(e => e.Code).Cascade(CascadeMode.Stop)
-                    .NotNull()
-                    .NotEmpty()
-                    .WithMessage("{PropertyName} is mandatory");
-
-                When(e => e.ValidTo.HasValue && e.ValidFrom.HasValue, () =>
-                {
-                    RuleFor(e => e.ValidTo).Must((model, validTo) =>
-                    {
-                        return validTo.Value.CompareTo(model.ValidFrom.Value) > 0;
-                    }).WithMessage("{PropertyName} with {PropertyValue} must be greather than ValidFrom date");
-                });
-
-            }
-        }
-
-        public class Handler : IRequestHandler<Command, Payload<DatacenterDto>>
-        {
-
-            private readonly IAsyncRepository<Domain.Models.Datacenter> _repository;
-            private readonly ILogger<Handler> _logger;
-            private readonly IMapper _mapper;
-
-            public Handler(IAsyncRepository<Domain.Models.Datacenter> repository, ILogger<Handler> logger, IMapper mapper)
-            {
-                _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-                _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-                _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            }
-
-            public async Task<Payload<DatacenterDto>> Handle(Command request, CancellationToken cancellationToken)
-            {
-                _logger.LogInformation($"Start adding datacenter '{request.Name}' with code '{request.Code}'");
 
                 // Map request to Domain entity
                 //var newEntity = _mapper.Map<Domain.Models.Datacenter>(request);
-                var newEntity = new Domain.Models.Datacenter(request.Code, request.Name, Domain.Models.DatacenterType.Cloud, "", 
-                                                             startDate: request.ValidFrom, endDate: request.ValidTo);
+                var newEntity = new Domain.Models.Datacenter(request.Code, request.Name, Domain.Models.DatacenterType.Cloud, request.InventoryCode,
+                                                         startDate: request.ValidFrom, endDate: request.ValidTo);
 
                 // Add entity
                 var result = await _repository.AddAsync(newEntity, cancellationToken);
 
                 // Map response
-                _logger.LogInformation($"End adding datacenter '{request.Name}' with code '{request.Code}'");
+                success = true;
                 return Payload<DatacenterDto>.Success(_mapper.Map<DatacenterDto>(result));
             }
-        }
+            finally
+            {
+                if (success)
+                    _logger.LogInformation($"Successfully adding datacenter '{request.Name}' with code '{request.Code}'");
+                else
+                    _logger.LogError($"Error when adding datacenter '{request.Name}' with code '{request.Code}'");
 
+            }
+        }
     }
+
 }

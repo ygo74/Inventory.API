@@ -10,7 +10,7 @@ namespace Inventory.Configuration.Api.Application.Plugin
     {
         public PluginMappingProfile()
         {
-            CreateMap<CreatePlugin.Command, Domain.Models.Plugin>();
+            CreateMap<CreatePluginRequest, Domain.Models.Plugin>();
             CreateMap<Domain.Models.Plugin, PluginDto>();
 
         }

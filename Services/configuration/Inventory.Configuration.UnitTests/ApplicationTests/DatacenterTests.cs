@@ -23,7 +23,7 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
         }
 
         [TestCaseSource(typeof(DatacenterTestCases), nameof(DatacenterTestCases.GetCreateDatacenterWithEmptyMandatoryValues))]
-        public async Task Should_throws_validation_exeption_when_empty_values(CreateDatacenter.Command newEntity)
+        public async Task Should_throws_validation_exeption_when_empty_values(CreateDatacenterRequest newEntity)
         {
             //// Arrange
             ////var result = Assert.Throws<Inventory.Common.Application.Exceptions.ValidationException>(async () => 
@@ -37,7 +37,7 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
             //Assert.IsNotNull(result);
 
             // Arrange
-            var validator = UnitTestsContext.Current.GetService<CreateDatacenter.Validator>();
+            var validator = UnitTestsContext.Current.GetService<CreateDatacenterValidator>();
 
             // Act
             var actual = validator.TestValidate(newEntity);
@@ -49,7 +49,7 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
         }
 
         [TestCaseSource(typeof(DatacenterTestCases), nameof(DatacenterTestCases.GetCreateDatacenterWithCorrectMandatoryValues))]
-        public async Task Should_successfull_create_application_with_valid_values(CreateDatacenter.Command newEntity)
+        public async Task Should_successfull_create_application_with_valid_values(CreateDatacenterRequest newEntity)
         {
             // Arrange
             //var result = Assert.Throws<Inventory.Common.Application.Exceptions.ValidationException>(async () => 

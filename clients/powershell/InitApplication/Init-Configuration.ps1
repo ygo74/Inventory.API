@@ -34,7 +34,8 @@ $configuration.locations | Foreach-Object {
     }
     else
     {
-        Update-InventoryLocation -Id $existingLocation.Id -Name $_.Name
+        $_ | Add-Member -MemberType NoteProperty -Name Id -Value $existingLocation.id
+        Update-InventoryLocation -InputObject $_
     }
 
     write-Host "Ok"

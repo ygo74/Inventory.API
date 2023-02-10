@@ -23,7 +23,7 @@ namespace Inventory.Configuration.UnitTests.DomainTests
             // Arrange
 
             // Act
-            var datacenter = new Datacenter("TEST", "test", DatacenterType.Cloud,"");
+            var datacenter = new Datacenter("TEST", "test", DatacenterType.Cloud, "test");
 
             // Assert
             Assert.IsNotNull(datacenter);
