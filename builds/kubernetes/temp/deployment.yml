@@ -1,0 +1,29 @@
+---
+# -----------------------------------------------------------------------------
+# Deployment for inventory.configuration.api
+# -----------------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: configuration-api-deployment
+  labels:
+    app: configuration-api
+spec: 
+  replicas: 3
+  selector:
+    matchLabels:
+      app: configuration-api
+  template:
+    metadata:
+      labels:
+        app: configuration-api
+    spec:
+      containers:
+        - name: configuration-api
+          image: aksbootstrap.azurecr.io/inventoryconfigurationapi:dev
+          # resources:
+          #   limits:
+          #     memory: 400mi
+          #     cpu: 500m
+          ports:
+            - containerPort: 80

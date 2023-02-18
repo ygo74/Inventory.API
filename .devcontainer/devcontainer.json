@@ -1,0 +1,22 @@
+{
+	"image": "mcr.microsoft.com/devcontainers/universal:2",
+	"features": {
+		"ghcr.io/devcontainers/features/azure-cli:1": {}
+	},
+
+	"customizations": {
+		"vscode": {
+            //extensions
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"ms-dotnettools.csharp",
+				"davidanson.vscode-markdownlint",
+				"ms-kubernetes-tools.vscode-kubernetes-tools",
+				"ms-azure-devops.azure-pipelines"
+			],
+            "settings": {
+                "files.trimTrailingWhitespace": false
+            }
+		}
+	}
+}
