@@ -28,6 +28,9 @@ using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Common.Infrastructure.Logging;
 using Inventory.Configuration.Api.Application.Locations;
 using Inventory.Configuration.Api.Application.Credentials;
+using Microsoft.AspNetCore.Http;
+using Moq;
+using MR.AspNetCore.Pagination;
 
 namespace Inventory.Configuration.UnitTests
 {
@@ -68,6 +71,9 @@ namespace Inventory.Configuration.UnitTests
 
 
             //pagination
+            var mockHttpContext = new Mock<HttpContext>();
+            services.AddSingleton<IHttpContextAccessor>(new HttpContextAccessor { HttpContext = mockHttpContext.Object });
+            services.AddHttpContextAccessor();
             services.AddPagination();
 
             // Applications
@@ -79,11 +85,6 @@ namespace Inventory.Configuration.UnitTests
 
             // Unit tests specific configuration
             services.AddScoped<ICurrentUser, CurrentTestUserService>();
-
-            services.AddScoped<Microsoft.AspNetCore.Http.IHttpContextAccessor>(factory =>
-            {
-                return new Microsoft.AspNetCore.Http.HttpContextAccessor();
-            });
 
         }
 

@@ -11,6 +11,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -77,26 +78,24 @@ namespace Inventory.Devices.UnitTests.Tests.OperatingSystemTests
         }
 
         [TestCaseSource(typeof(OperatingSystemTestCases), nameof(OperatingSystemTestCases.GetOperatingSystemWithMissingMandatoryValues))]
-        public void Should_fail_create_operating_system_with_missing_mandatory_values(CreateOperatingSystem.Command2 newEntity)
+        public async Task Should_fail_create_operating_system_with_missing_mandatory_values(CreateOperatingSystem.Command2 newEntity)
         {
-            // Assert
-            Assert.ThrowsAsync<ValidationException>(async () =>
-            {
-                await _mediator.Send(newEntity);
+            // Act
+            var result = await _mediator.Send(newEntity);
 
-            });
+            // Assert
+            Assert.IsTrue(result.Errors.Any());
         }
 
         [TestCaseSource(typeof(OperatingSystemTestCases), nameof(OperatingSystemTestCases.GetOperatingSystemWithBadValues))]
-        public void Should_fail_create_operating_system_with_bad_values(CreateOperatingSystem.Command2 newEntity)
+        public async Task  Should_fail_create_operating_system_with_bad_values(CreateOperatingSystem.Command2 newEntity)
         {
+            // Act
+            var result = await _mediator.Send(newEntity);
 
             // Assert
-            Assert.ThrowsAsync<ValidationException>(async () =>
-            {
-                await _mediator.Send(newEntity);
+            Assert.IsTrue(result.Errors.Any());
 
-            });
         }
 
 

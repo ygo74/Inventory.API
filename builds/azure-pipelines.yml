@@ -64,7 +64,7 @@ stages:
         - task: Docker@2
           displayName: Build Inventory API Images
           inputs:
-            containerRegistry: 'mesfcontainerregistry'
+            containerRegistry: 'aksbootstrap'
             repository: 'DynamicInventory/InventoryAPI'
             command: 'build'
             Dockerfile: '**/Dockerfile'
@@ -75,7 +75,7 @@ stages:
         - task: Docker@2
           displayName: Deploy image to mesfcontainerregistry
           inputs:
-            containerRegistry: 'mesfcontainerregistry'
+            containerRegistry: 'aksbootstrap'
             repository: 'DynamicInventory/InventoryAPI'
             command: 'push'
             tags: '$(tag)'

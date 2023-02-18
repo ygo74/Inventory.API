@@ -21,6 +21,9 @@ namespace Inventory.Devices.Domain.Models
         // Property bags
         public Dictionary<string, object> PropertyBag { get; protected set; }
 
+        protected Device()
+        { }
+
         public Device(string hostname, string dnsDomain, string subnetIP)
         {
             Hostname = Guard.Against.Null(hostname, nameof(hostname));

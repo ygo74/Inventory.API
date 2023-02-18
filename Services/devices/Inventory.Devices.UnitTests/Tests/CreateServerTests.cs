@@ -1,8 +1,10 @@
 ﻿using HotChocolate;
 using HotChocolate.Execution;
 using HotChocolate.Types;
+using Inventory.Devices.Api.Applications.Servers;
 using Inventory.Devices.Api.Configuration;
 using Inventory.Devices.Api.Graphql.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -19,10 +21,24 @@ namespace Inventory.Devices.UnitTests.Tests
     class CreateServerTests : BaseDbInventoryTests
     {
 
-        [Test]
-        public void AddNewServer()
+        private readonly IMediator _mediator;
+
+        public CreateServerTests()
         {
-            Assert.Fail();
+            _mediator = this.GetMediator();
+        }
+
+        [TestCase("xxx")]
+        public async Task AddNewServer(string hostName)
+        {
+            var newServer = new CreateServer.Command()
+            {
+                Hostname = hostName
+            };
+
+            var result = await _mediator.Send(newServer);
+
+            Assert.NotNull(result);
         }
 
         [Test]
@@ -31,6 +47,9 @@ namespace Inventory.Devices.UnitTests.Tests
             var env = new TestWebEnvironment();
             ISchema schema = await new ServiceCollection()
                 .AddGraphQL()
+                .AddFiltering()
+                .AddSorting()
+                .AddProjections()
                 .AddQueryType(d => d.Name("Query"))
                     .AddTypeExtension<ServerQueries>()
 
@@ -50,6 +69,9 @@ namespace Inventory.Devices.UnitTests.Tests
             // Arrange
             IRequestExecutor executor = await new ServiceCollection()
                 .AddGraphQL()
+                .AddFiltering()
+                .AddSorting()
+                .AddProjections()
                 .AddQueryType(d => d.Name("Query"))
                     .AddTypeExtension<ServerQueries>()
 

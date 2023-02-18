@@ -13,6 +13,9 @@ namespace Inventory.Devices.Domain.Models
         public int OperatingSystemId { get; protected set; }
         public OperatingSystem OperatingSystem { get; private set; }
 
+        protected Server()
+        { }
+
         public Server(string hostname, string dnsDomain, string subnetIP) :
             base(hostname, dnsDomain, subnetIP)
         {
@@ -24,6 +27,9 @@ namespace Inventory.Devices.Domain.Models
     public class VirtualServer : Server
     {
         public int ProviderId { get; set; }
+
+        protected VirtualServer()
+        { }
 
         //public OperatingSystem OperatingSystem { get; set; }
         public VirtualServer(string hostname, string dnsDomain, string subnetIP) :

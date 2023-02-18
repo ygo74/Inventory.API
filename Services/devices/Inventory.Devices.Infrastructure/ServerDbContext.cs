@@ -27,14 +27,16 @@ namespace Inventory.Devices.Infrastructure
         public ServerDbContext(DbContextOptions<ServerDbContext> options) : base(options) { }
 
         // Configuration tables
-        //public DbSet<Device> Devices { get; set; }
+        public DbSet<Server> Servers { get; set; }
+        public DbSet<VirtualServer> VirtualServers { get; set; }
         public DbSet<OperatingSystem> OperatingSystems { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new OperatingSystemTypeConfiguration());
-            //modelBuilder.ApplyConfiguration(new DeviceEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new DeviceEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new DatacenterEntityTypeConfiguration());
         }
 
     }
@@ -64,10 +66,10 @@ namespace Inventory.Devices.Infrastructure
 
             //services.AddMediatR(typeof(ServerDbContext));
             services.AddScoped<IMediator, NoMediator>();
-            services.BuildServiceProvider();
+            var serviceProvider = services.BuildServiceProvider();
 
 
-            return new ServerDbContext(optionsBuilder.Options);
+            return serviceProvider.GetService<ServerDbContext>();
         }
 
         class NoMediator : IMediator
