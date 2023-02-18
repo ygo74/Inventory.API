@@ -65,9 +65,9 @@ stages:
           displayName: Build Inventory API Images
           inputs:
             containerRegistry: 'aksbootstrap'
-            repository: 'DynamicInventory/InventoryAPI'
+            repository: 'DynamicInventory/inventoryconfigurationapi'
             command: 'build'
-            Dockerfile: '**/Dockerfile'
+            Dockerfile: 'Services/configuration/Inventory.Configuration.Api/Dockerfile'
             buildContext: '$(Build.SourcesDirectory)/Services'
             tags: |
               $(tag)
@@ -76,7 +76,7 @@ stages:
           displayName: Deploy image to mesfcontainerregistry
           inputs:
             containerRegistry: 'aksbootstrap'
-            repository: 'DynamicInventory/InventoryAPI'
+            repository: 'DynamicInventory/inventoryconfigurationapi'
             command: 'push'
             tags: '$(tag)'
 
