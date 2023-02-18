@@ -25,7 +25,7 @@ stages:
           inputs:
             targetType: 'inline'
             script: |
-              $pathToJson = "Services/plugins/Inventory.Plugins.Azure.UnitTests/appsettings.json"
+              $pathToJson = "Services/plugins/Azure/Inventory.Plugins.Azure.UnitTests/appsettings.json"
               $a = Get-Content $pathToJson | ConvertFrom-Json
               $a.Azure.ClientSecret = $env:VAR_CLIENT_SECRET
               $a.Azure.TenantId = $env:VAR_TENANT_ID
