@@ -127,10 +127,12 @@ namespace Inventory.Devices.UnitTests.Tests.OperatingSystemTests
                     deprecated: false
                   }) 
                   {
-                    operatingSystemFamily
-                    model
-                    version
+                    data {
+                        operatingSystemFamily
+                        model
+                        version
                     }
+                  }
                 }");
 
             // assert
