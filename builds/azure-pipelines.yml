@@ -43,14 +43,28 @@ stages:
           inputs:
             command: 'test'
             projects: 'Services/Inventory.API.sln'
-            arguments: '--collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura'
+            arguments: >-
+              --collect:"XPlat Code Coverage"
+              -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByFile=**/*Migrations/*.cs
             publishTestResults: true
 
+        - task: Bash@3
+          displayName: 'Convert opencover to cobertura'
+          inputs:
+            targetType:       'inline'
+            workingDirectory: '.'
+            script: |
+              reportgenerator "-reports:$(Agent.TempDirectory)/**/coverage.opencover.xml" \
+                        "-targetDir:$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports" \
+                        "-tag:$(Build.BuildNumber)" "-reportTypes:Cobertura" \
+                        "-filefilters:-**/*Migrations/*.cs"
+                        
         - task: PublishCodeCoverageResults@1
           displayName: 'Publish code coverage report'
           inputs:
             codeCoverageTool: 'Cobertura'
-            summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+            summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports/**/*.xml'
+            reportDirectory: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports'
 
     - job: DockerBuild
       displayName: Build and publish docker images
