@@ -20,6 +20,16 @@ stages:
       dependsOn: DotnetBuild
       steps:
 
+        - task: DotNetCoreCLI@2
+            displayName: Install ReportGenerator Global Tool
+            inputs:
+              command: custom
+              custom: tool
+              arguments: install dotnet-reportgenerator-globaltool -g
+
+        - script: echo "##vso[task.prependpath]$HOME/.dotnet/tools"
+          displayName: 'Update PATH'
+          
         - task: PowerShell@2
           displayName: 'Update AppSettings file before testing'
           inputs:
