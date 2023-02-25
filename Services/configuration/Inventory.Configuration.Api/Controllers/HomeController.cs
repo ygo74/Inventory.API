@@ -15,7 +15,8 @@ namespace Inventory.Configuration.Api.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            return new RedirectResult("~/graphql");
+            //return new RedirectResult("~/graphql");
+            return Ok();
         }
     }
 }
