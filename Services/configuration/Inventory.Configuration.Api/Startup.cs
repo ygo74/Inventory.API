@@ -81,6 +81,8 @@ namespace Inventory.Configuration.Api
             services.AddScoped<PluginService>();
             services.AddScoped<LocationService>();
             services.AddScoped<CredentialService>();
+
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -99,6 +101,7 @@ namespace Inventory.Configuration.Api
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapGraphQLEndpoint();
             });
 
