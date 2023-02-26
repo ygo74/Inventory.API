@@ -29,7 +29,7 @@ stages:
 
         - script: echo "##vso[task.prependpath]$HOME/.dotnet/tools"
           displayName: 'Update PATH'
-          
+
         - task: PowerShell@2
           displayName: 'Update AppSettings file before testing'
           inputs:
@@ -68,7 +68,7 @@ stages:
                         "-targetDir:$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports" \
                         "-tag:$(Build.BuildNumber)" "-reportTypes:Cobertura" \
                         "-filefilters:-**/*Migrations/*.cs"
-                        
+
         - task: PublishCodeCoverageResults@1
           displayName: 'Publish code coverage report'
           inputs:
@@ -76,22 +76,35 @@ stages:
             summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports/**/*.xml'
             reportDirectory: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports'
 
+- stage: BuildImages
+  displayName: Build Container Images
+  dependsOn:
+    - BuildApplication
+
+  jobs:
     - job: DockerBuild
       displayName: Build and publish docker images
-      dependsOn:
-        - DotnetBuild
-        - DotnetTest
       variables:
         tag: $(Build.BuildId)
+      strategy:
+        matrix:
+          configuration-api:
+            docker_file: Services/configuration/Inventory.Configuration.Api/Dockerfile
+            repository_name: DynamicInventory/inventoryconfigurationapi
+          device-api:
+            docker_file: Services/devices/Inventory.Devices.Api/Dockerfile
+            repository_name: DynamicInventory/devicesapi
+
+        maxParallel: 2
       steps:
 
         - task: Docker@2
           displayName: Build Inventory API Images
           inputs:
             containerRegistry: 'aksbootstrap'
-            repository: 'DynamicInventory/inventoryconfigurationapi'
+            repository: '$(repository_name)'
             command: 'build'
-            Dockerfile: 'Services/configuration/Inventory.Configuration.Api/Dockerfile'
+            Dockerfile: '$(docker_file)'
             buildContext: '$(Build.SourcesDirectory)/Services'
             tags: |
               $(tag)
@@ -100,7 +113,7 @@ stages:
           displayName: Deploy image to mesfcontainerregistry
           inputs:
             containerRegistry: 'aksbootstrap'
-            repository: 'DynamicInventory/inventoryconfigurationapi'
+            repository: '$(repository_name)'
             command: 'push'
             tags: '$(tag)'
 
