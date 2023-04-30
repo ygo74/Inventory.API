@@ -8,12 +8,12 @@ namespace Inventory.Common.Domain.Exceptions
 {
     public class InvalidDataException : InventoryException
     {
-        public InvalidDataException(string message) : base(message)
+        public InvalidDataException(string message) : base("Invalid data", message)
         {
 
         }
 
-        public InvalidDataException(string message, params object[] values) : base(string.Format(message, values))
+        public InvalidDataException(string message, params object[] values) : base("Invalid Data", string.Format(message, values))
         {            
         }
 
