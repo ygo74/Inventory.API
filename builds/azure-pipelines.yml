@@ -22,8 +22,10 @@ stages:
             configFilePath: 'GitVersion.yml'
             additionalArguments: '/showConfig'
 
-        - displayName: Display GitVersion outputs (step output)
-          script: |
+        - task: Bash@3
+          displayName: Display GitVersion outputs (step output)
+          inputs:
+            script: |
               echo "Major: $(version.major)"
               echo "Minor: $(version.minor)"
               echo "Patch: $(version.patch)"
