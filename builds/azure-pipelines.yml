@@ -25,6 +25,7 @@ stages:
         - task: Bash@3
           displayName: Display GitVersion outputs (step output)
           inputs:
+            targetType: 'inline'
             script: |
               echo "Major: $(version.major)"
               echo "Minor: $(version.minor)"
