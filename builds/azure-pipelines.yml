@@ -9,11 +9,26 @@ stages:
       displayName: Build Service
       steps:
 
+        - task: gitversion/setup@0
+          displayName: Install GitVersion
+          inputs:
+            versionSpec: '5.x'
+
+        - task: gitversion/execute@0
+          displayName: Determine Version
+          name: version
+          inputs:
+            useConfigFile: true
+            configFilePath: 'GitVersion.yml'
+            additionalArguments: '/showConfig'
+
         - task: DotNetCoreCLI@2
           displayName: Build Inventory.API.sln
           inputs:
             command: 'build'
             projects: 'Services/Inventory.API.sln'
+            versioningScheme: byEnvVar
+            versionEnvVar: 'version.semVer'
 
     - job: DotnetTest
       displayName: Test Service
@@ -120,12 +135,12 @@ stages:
 
 - stage: DeployApplication
   dependsOn:
-    - BuildApplication
+    - BuildImages
 
   jobs:
     - deployment: B1
-      pool:
-        vmImage: 'ubuntu-16.04'
+      # pool:
+      #   vmImage: 'ubuntu-16.04'
       environment: env1
       strategy:
         runOnce:
