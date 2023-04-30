@@ -22,6 +22,41 @@ stages:
             configFilePath: 'GitVersion.yml'
             additionalArguments: '/showConfig'
 
+        - displayName: Display GitVersion outputs (step output)
+          script: |
+              echo "Major: $(version.major)"
+              echo "Minor: $(version.minor)"
+              echo "Patch: $(version.patch)"
+              echo "PreReleaseTag: $(version.preReleaseTag)"
+              echo "PreReleaseTagWithDash: $(version.preReleaseTagWithDash)"
+              echo "PreReleaseLabel: $(version.preReleaseLabel)"
+              echo "PreReleaseNumber: $(version.preReleaseNumber)"
+              echo "WeightedPreReleaseNumber: $(version.weightedPreReleaseNumber)"
+              echo "BuildMetaData: $(version.buildMetaData)"
+              echo "BuildMetaDataPadded: $(version.buildMetaDataPadded)"
+              echo "FullBuildMetaData: $(version.fullBuildMetaData)"
+              echo "MajorMinorPatch: $(version.majorMinorPatch)"
+              echo "SemVer: $(version.semVer)"
+              echo "LegacySemVer: $(version.legacySemVer)"
+              echo "LegacySemVerPadded: $(version.legacySemVerPadded)"
+              echo "AssemblySemVer: $(version.assemblySemVer)"
+              echo "AssemblySemFileVer: $(version.assemblySemFileVer)"
+              echo "FullSemVer: $(version.fullSemVer)"
+              echo "InformationalVersion: $(version.informationalVersion)"
+              echo "BranchName: $(version.branchName)"
+              echo "EscapedBranchName: $(version.escapedBranchName)"
+              echo "Sha: $(version.sha)"
+              echo "ShortSha: $(version.shortSha)"
+              echo "NuGetVersionV2: $(version.nuGetVersionV2)"
+              echo "NuGetVersion: $(version.nuGetVersion)"
+              echo "NuGetPreReleaseTagV2: $(version.nuGetPreReleaseTagV2)"
+              echo "NuGetPreReleaseTag: $(version.nuGetPreReleaseTag)"
+              echo "VersionSourceSha: $(version.versionSourceSha)"
+              echo "CommitsSinceVersionSource: $(version.commitsSinceVersionSource)"
+              echo "CommitsSinceVersionSourcePadded: $(version.commitsSinceVersionSourcePadded)"
+              echo "UncommittedChanges: $(version.uncommittedChanges)"
+              echo "CommitDate: $(version.commitDate)"
+
         - task: DotNetCoreCLI@2
           displayName: Build Inventory.API.sln
           inputs:
@@ -147,3 +182,27 @@ stages:
           deploy:
             steps:
             - bash: echo $(myOutputVar)
+
+            - task: HelmInstaller@0
+              displayName: Install Helm tools
+              inputs:
+                helmVersion: '3.8.0'
+                checkLatestHelmVersion: false
+                installKubectl: true
+                kubectlVersion: '1.26.3'
+
+            - task: HelmDeploy@0
+              displayName: Package helm chart
+              inputs:
+                command: 'package'
+                chartPath: 'builds/kubernetes/charts/inventory-api'
+
+            - task: HelmDeploy@0
+              displayName: Save chart into ACR
+              inputs:
+                azureSubscriptionForACR: 'Ansible-Automation'
+                azureResourceGroupForACR: 'rg-acr-bootstrap'
+                azureContainerRegistry: 'aksbootstrap.azurecr.io'
+                command: 'save'
+                chartNameForACR: 'dynamic-inventory'
+                chartPathForACR: 'charts'
