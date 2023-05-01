@@ -25,9 +25,17 @@ namespace Inventory.Configuration.Api
             var loggerConfiguration = LoggingConfiguration.CreateSerilogLoggerConfiguration(configuration, AppName, "xxx");
             Log.Logger = loggerConfiguration.CreateLogger();
 
+            Log.Information("Start application");
             try
             {
                 var host = CreateHostBuilder(args).Build();
+
+                var testConnectionString = configuration.GetSection("ConnectionStrings").GetValue<string>("InventoryDatabase");
+                Log.Information("Connectionstring {0}", testConnectionString);
+
+                var testConnectionString2 = configuration.GetConnectionString("InventoryDatabase");
+                Log.Information("Connectionstring2 {0}", testConnectionString2);
+
 
                 using (var scope = host.Services.CreateScope())
                 {
