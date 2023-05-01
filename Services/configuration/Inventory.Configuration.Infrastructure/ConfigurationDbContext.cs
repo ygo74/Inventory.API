@@ -51,6 +51,7 @@ namespace Inventory.Configuration.Infrastructure
                 .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../Inventory.Configuration.API"))
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environment}.json", optional: true)
+                .AddJsonFile("secrets/appsettings.secrets.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
