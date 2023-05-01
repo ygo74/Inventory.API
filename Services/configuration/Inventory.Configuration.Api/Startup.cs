@@ -29,6 +29,7 @@ using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Common.Application.Plugins;
 using Inventory.Configuration.Api.Application.Locations;
 using Inventory.Configuration.Api.Application.Credentials;
+using Inventory.Common.Infrastructure.Http;
 
 namespace Inventory.Configuration.Api
 {
@@ -82,6 +83,9 @@ namespace Inventory.Configuration.Api
             services.AddScoped<LocationService>();
             services.AddScoped<CredentialService>();
 
+            // Http hosting
+            services.UseHttpHostingConfigurationServices(Configuration);
+
             services.AddControllers();
         }
 
@@ -94,6 +98,7 @@ namespace Inventory.Configuration.Api
             }
 
             app.UseHttpsRedirection();
+            app.UseHttpHostingConfiguration(Configuration);
 
             app.UseRouting();
 

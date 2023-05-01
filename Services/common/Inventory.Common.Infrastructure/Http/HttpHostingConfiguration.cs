@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inventory.Common.Infrastructure.Http.Configuration
+namespace Inventory.Common.Infrastructure.Http
 {
     public class HttpHostingConfiguration
     {
@@ -12,9 +12,9 @@ namespace Inventory.Common.Infrastructure.Http.Configuration
 
         public bool? UseReverseProxy { get; set; }
 
-        public string? ProxyBasePath { get; set; }
+        public string ProxyBasePath { get; set; }
 
-        public string? ProxyScheme { get; set; }
+        public string ProxyScheme { get; set; }
 
         public bool? EnableHttpHeadersLogging { get; set; }
 

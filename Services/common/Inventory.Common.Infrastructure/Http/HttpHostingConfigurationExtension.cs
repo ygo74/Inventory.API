@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inventory.Common.Infrastructure.Http.Configuration
+namespace Inventory.Common.Infrastructure.Http
 {
     public static class HttpHostingConfigurationExtension
     {

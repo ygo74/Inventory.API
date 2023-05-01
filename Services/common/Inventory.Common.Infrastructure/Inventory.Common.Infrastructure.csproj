@@ -40,8 +40,4 @@
     <ProjectReference Include="..\Inventory.Common.Domain\Inventory.Common.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="NewFolder\" />
-  </ItemGroup>
-
 </Project>
