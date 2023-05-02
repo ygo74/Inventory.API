@@ -49,6 +49,9 @@ namespace Inventory.Configuration.Api
                     var factory = services.GetService<IDbContextFactory<ConfigurationDbContext>>();
                     using (var dbcontext = factory.CreateDbContext())
                     {
+                        var testConnectionString3 = dbcontext.Database.GetConnectionString();
+                        Log.Information("Connectionstring3 {0}", testConnectionString3);
+
                         dbcontext.Database.EnsureCreated();
                         //dbcontext.Database.Migrate();
                     }
@@ -74,15 +77,25 @@ namespace Inventory.Configuration.Api
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
 
-            var configuration = GetConfiguration();
+            //var configuration = GetConfiguration();
 
             return Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration(builder =>
+                {
+                            builder
+                            .SetBasePath(Directory.GetCurrentDirectory())
+                            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                            .AddJsonFile("secrets/appsettings.secrets.json", optional: true, reloadOnChange: true)
+                            .AddEnvironmentVariables();
+
+
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
                         .UseSerilog()
-                        .UseStartup<Startup>()
-                        .UseConfiguration(configuration);
+                        .UseStartup<Startup>();
+                        //.UseConfiguration(configuration);
                 });
         }
 
