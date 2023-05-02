@@ -30,13 +30,6 @@ namespace Inventory.Configuration.Api
             {
                 var host = CreateHostBuilder(args).Build();
 
-                var testConnectionString = configuration.GetSection("ConnectionStrings").GetValue<string>("InventoryDatabase");
-                Log.Information("Connectionstring {0}", testConnectionString);
-
-                var testConnectionString2 = configuration.GetConnectionString("InventoryDatabase");
-                Log.Information("Connectionstring2 {0}", testConnectionString2);
-
-
                 using (var scope = host.Services.CreateScope())
                 {
                     var services = scope.ServiceProvider;
@@ -49,9 +42,6 @@ namespace Inventory.Configuration.Api
                     var factory = services.GetService<IDbContextFactory<ConfigurationDbContext>>();
                     using (var dbcontext = factory.CreateDbContext())
                     {
-                        var testConnectionString3 = dbcontext.Database.GetConnectionString();
-                        Log.Information("Connectionstring3 {0}", testConnectionString3);
-
                         dbcontext.Database.EnsureCreated();
                         //dbcontext.Database.Migrate();
                     }
