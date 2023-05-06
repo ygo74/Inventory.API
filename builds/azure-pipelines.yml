@@ -187,9 +187,10 @@ stages:
             steps:
 
               - checkout: self
-                displayName: "Checkout repositorw"
+                displayName: "Checkout repository"
 
               - task: AzureCLI@2
+                displayName: "Copy databases script files"
                 inputs:
                   azureSubscription: 'Ansible-Automation'
                   scriptType: 'pscore'
@@ -199,10 +200,12 @@ stages:
                     # Get credentials
                     az aks get-credentials --resource-group rg-aks-bootstrap-networking-spoke --name aksbootstrap --admin
 
-                    # Wait one minute
+                    # Copy files to pods
                     kubectl cp ./databases/configuration/createUsers.sql  postgresql-0:/tmp/createUsers.sql -c postgresql -n postgresql
+                    kubectl cp ./databases/configuration/configurationDB.sql  postgresql-0:/tmp/configurationDB.sql -c postgresql -n postgresql
 
               - task: Kubernetes@1
+                displayName: "Create Users"
                 inputs:
                   connectionType: 'Azure Resource Manager'
                   azureSubscriptionEndpoint: 'Ansible-Automation'
@@ -214,6 +217,20 @@ stages:
                     postgresql-0 -c postgresql -n postgresql
                     -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
                     -f /tmp/createUsers.sql
+
+              - task: Kubernetes@1
+                displayName: "Create Database objects"
+                inputs:
+                  connectionType: 'Azure Resource Manager'
+                  azureSubscriptionEndpoint: 'Ansible-Automation'
+                  azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
+                  kubernetesCluster: 'aksbootstrap'
+                  namespace: 'postgresql'
+                  command: 'exec'
+                  arguments: >-
+                    postgresql-0 -c postgresql -n postgresql
+                    -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
+                    -f /tmp/configurationDB.sql
 
           deploy:
             steps:
