@@ -196,7 +196,8 @@ stages:
                   arguments: >-
                     postgresql-0 -c postgresql -n postgresql
                     -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
-                    -c \l
+                    -tc "SELECT 1 FROM pg_catalog.pg_roles WHERE  rolname = 'acme2_admin'" | grep -q 1 ||
+                    psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB -c "CREATE ROLE my_user LOGIN PASSWORD '$(inventorydb-admin)';"
 
           deploy:
             steps:
