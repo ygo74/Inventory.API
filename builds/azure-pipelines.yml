@@ -194,7 +194,7 @@ stages:
                   namespace: 'postgresql'
                   command: 'exec'
                   arguments: |
-                    postgresql-0 -c postgresql -n postgresql -- psql postgresql://inventorydb-admin:$DB_PASSWORD@postgresql/ConfigurationDB -c '\l'
+                    postgresql-0 -c postgresql -n postgresql -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB -c '\l'
 
                 env:
                   DB_PASSWORD: $(inventorydb-admin)
