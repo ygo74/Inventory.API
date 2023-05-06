@@ -185,6 +185,23 @@ stages:
         runOnce:
           preDeploy:
             steps:
+
+              - checkout: self
+                displayName: "Checkout repositorw"
+
+              - task: AzureCLI@2
+                inputs:
+                  azureSubscription: 'Ansible-Automation'
+                  scriptType: 'pscore'
+                  scriptLocation: 'inlineScript'
+                  inlineScript: |
+
+                    # Get credentials
+                    az aks get-credentials --resource-group rg-aks-bootstrap-networking-spoke --name aksbootstrap --admin
+
+                    # Wait one minute
+                    kubectl cp ./databases/configuration/createUsers.sql  postgresql-0:/tmp/createUsers.sql -c postgresql -n postgresql
+
               - task: Kubernetes@1
                 inputs:
                   connectionType: 'Azure Resource Manager'
@@ -196,8 +213,7 @@ stages:
                   arguments: >-
                     postgresql-0 -c postgresql -n postgresql
                     -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
-                    -tc "SELECT 1 FROM pg_catalog.pg_roles WHERE  rolname = 'my_user'" | grep -q 1 ||
-                    psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB -c "CREATE ROLE my_user LOGIN PASSWORD '$(inventorydb-admin)';"
+                    -f /tmp/createUsers.sql
 
           deploy:
             steps:
