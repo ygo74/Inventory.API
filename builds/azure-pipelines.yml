@@ -195,7 +195,8 @@ stages:
                   command: 'exec'
                   arguments: >-
                     postgresql-0 -c postgresql -n postgresql
-                    -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB -c \l
+                    -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
+                    -c \l
 
           deploy:
             steps:
