@@ -1,174 +1,175 @@
 variables:
   - group: Azure_Credential
+  - group: inventorydb-deployment
 
 stages:
-- stage: BuildApplication
-  displayName: Build Inventory Service
-  jobs:
-    - job: DotnetBuild
-      displayName: Build Service
-      steps:
+# - stage: BuildApplication
+#   displayName: Build Inventory Service
+#   jobs:
+#     - job: DotnetBuild
+#       displayName: Build Service
+#       steps:
 
-        - task: gitversion/setup@0
-          displayName: Install GitVersion
-          inputs:
-            versionSpec: '5.x'
+#         - task: gitversion/setup@0
+#           displayName: Install GitVersion
+#           inputs:
+#             versionSpec: '5.x'
 
-        - task: gitversion/execute@0
-          displayName: Determine Version
-          name: version
-          inputs:
-            useConfigFile: true
-            configFilePath: 'GitVersion.yml'
-            additionalArguments: '/showConfig'
+#         - task: gitversion/execute@0
+#           displayName: Determine Version
+#           name: version
+#           inputs:
+#             useConfigFile: true
+#             configFilePath: 'GitVersion.yml'
+#             additionalArguments: '/showConfig'
 
-        - task: Bash@3
-          displayName: Display GitVersion outputs (step output)
-          inputs:
-            targetType: 'inline'
-            script: |
-              echo "Major: $(version.major)"
-              echo "Minor: $(version.minor)"
-              echo "Patch: $(version.patch)"
-              echo "PreReleaseTag: $(version.preReleaseTag)"
-              echo "PreReleaseTagWithDash: $(version.preReleaseTagWithDash)"
-              echo "PreReleaseLabel: $(version.preReleaseLabel)"
-              echo "PreReleaseNumber: $(version.preReleaseNumber)"
-              echo "WeightedPreReleaseNumber: $(version.weightedPreReleaseNumber)"
-              echo "BuildMetaData: $(version.buildMetaData)"
-              echo "BuildMetaDataPadded: $(version.buildMetaDataPadded)"
-              echo "FullBuildMetaData: $(version.fullBuildMetaData)"
-              echo "MajorMinorPatch: $(version.majorMinorPatch)"
-              echo "SemVer: $(version.semVer)"
-              echo "LegacySemVer: $(version.legacySemVer)"
-              echo "LegacySemVerPadded: $(version.legacySemVerPadded)"
-              echo "AssemblySemVer: $(version.assemblySemVer)"
-              echo "AssemblySemFileVer: $(version.assemblySemFileVer)"
-              echo "FullSemVer: $(version.fullSemVer)"
-              echo "InformationalVersion: $(version.informationalVersion)"
-              echo "BranchName: $(version.branchName)"
-              echo "EscapedBranchName: $(version.escapedBranchName)"
-              echo "Sha: $(version.sha)"
-              echo "ShortSha: $(version.shortSha)"
-              echo "NuGetVersionV2: $(version.nuGetVersionV2)"
-              echo "NuGetVersion: $(version.nuGetVersion)"
-              echo "NuGetPreReleaseTagV2: $(version.nuGetPreReleaseTagV2)"
-              echo "NuGetPreReleaseTag: $(version.nuGetPreReleaseTag)"
-              echo "VersionSourceSha: $(version.versionSourceSha)"
-              echo "CommitsSinceVersionSource: $(version.commitsSinceVersionSource)"
-              echo "CommitsSinceVersionSourcePadded: $(version.commitsSinceVersionSourcePadded)"
-              echo "UncommittedChanges: $(version.uncommittedChanges)"
-              echo "CommitDate: $(version.commitDate)"
+#         - task: Bash@3
+#           displayName: Display GitVersion outputs (step output)
+#           inputs:
+#             targetType: 'inline'
+#             script: |
+#               echo "Major: $(version.major)"
+#               echo "Minor: $(version.minor)"
+#               echo "Patch: $(version.patch)"
+#               echo "PreReleaseTag: $(version.preReleaseTag)"
+#               echo "PreReleaseTagWithDash: $(version.preReleaseTagWithDash)"
+#               echo "PreReleaseLabel: $(version.preReleaseLabel)"
+#               echo "PreReleaseNumber: $(version.preReleaseNumber)"
+#               echo "WeightedPreReleaseNumber: $(version.weightedPreReleaseNumber)"
+#               echo "BuildMetaData: $(version.buildMetaData)"
+#               echo "BuildMetaDataPadded: $(version.buildMetaDataPadded)"
+#               echo "FullBuildMetaData: $(version.fullBuildMetaData)"
+#               echo "MajorMinorPatch: $(version.majorMinorPatch)"
+#               echo "SemVer: $(version.semVer)"
+#               echo "LegacySemVer: $(version.legacySemVer)"
+#               echo "LegacySemVerPadded: $(version.legacySemVerPadded)"
+#               echo "AssemblySemVer: $(version.assemblySemVer)"
+#               echo "AssemblySemFileVer: $(version.assemblySemFileVer)"
+#               echo "FullSemVer: $(version.fullSemVer)"
+#               echo "InformationalVersion: $(version.informationalVersion)"
+#               echo "BranchName: $(version.branchName)"
+#               echo "EscapedBranchName: $(version.escapedBranchName)"
+#               echo "Sha: $(version.sha)"
+#               echo "ShortSha: $(version.shortSha)"
+#               echo "NuGetVersionV2: $(version.nuGetVersionV2)"
+#               echo "NuGetVersion: $(version.nuGetVersion)"
+#               echo "NuGetPreReleaseTagV2: $(version.nuGetPreReleaseTagV2)"
+#               echo "NuGetPreReleaseTag: $(version.nuGetPreReleaseTag)"
+#               echo "VersionSourceSha: $(version.versionSourceSha)"
+#               echo "CommitsSinceVersionSource: $(version.commitsSinceVersionSource)"
+#               echo "CommitsSinceVersionSourcePadded: $(version.commitsSinceVersionSourcePadded)"
+#               echo "UncommittedChanges: $(version.uncommittedChanges)"
+#               echo "CommitDate: $(version.commitDate)"
 
-        - task: DotNetCoreCLI@2
-          displayName: Build Inventory.API.sln
-          inputs:
-            command: 'build'
-            projects: 'Services/Inventory.API.sln'
-            versioningScheme: byEnvVar
-            versionEnvVar: 'version.semVer'
+#         - task: DotNetCoreCLI@2
+#           displayName: Build Inventory.API.sln
+#           inputs:
+#             command: 'build'
+#             projects: 'Services/Inventory.API.sln'
+#             versioningScheme: byEnvVar
+#             versionEnvVar: 'version.semVer'
 
-    - job: DotnetTest
-      displayName: Test Service
-      dependsOn: DotnetBuild
-      steps:
+#     - job: DotnetTest
+#       displayName: Test Service
+#       dependsOn: DotnetBuild
+#       steps:
 
-        - task: DotNetCoreCLI@2
-          displayName: Install ReportGenerator Global Tool
-          inputs:
-            command: custom
-            custom: tool
-            arguments: install dotnet-reportgenerator-globaltool -g
+#         - task: DotNetCoreCLI@2
+#           displayName: Install ReportGenerator Global Tool
+#           inputs:
+#             command: custom
+#             custom: tool
+#             arguments: install dotnet-reportgenerator-globaltool -g
 
-        - script: echo "##vso[task.prependpath]$HOME/.dotnet/tools"
-          displayName: 'Update PATH'
+#         - script: echo "##vso[task.prependpath]$HOME/.dotnet/tools"
+#           displayName: 'Update PATH'
 
-        - task: PowerShell@2
-          displayName: 'Update AppSettings file before testing'
-          inputs:
-            targetType: 'inline'
-            script: |
-              $pathToJson = "Services/plugins/Azure/Inventory.Plugins.Azure.UnitTests/appsettings.json"
-              $a = Get-Content $pathToJson | ConvertFrom-Json
-              $a.Azure.ClientSecret = $env:VAR_CLIENT_SECRET
-              $a.Azure.TenantId = $env:VAR_TENANT_ID
-              $a.Azure.ClientId = $env:VAR_CLIENT_ID
-              $a.Azure.SubscriptionId = $env:VAR_SUBSCRIPTION_ID
-              $a | ConvertTo-Json | set-content $pathToJson
-          env:
-            VAR_CLIENT_SECRET: $(ClientSecret)
-            VAR_TENANT_ID: $(TenantId)
-            VAR_CLIENT_ID: $(ClientId)
-            VAR_SUBSCRIPTION_ID: $(SubscriptionId)
+#         - task: PowerShell@2
+#           displayName: 'Update AppSettings file before testing'
+#           inputs:
+#             targetType: 'inline'
+#             script: |
+#               $pathToJson = "Services/plugins/Azure/Inventory.Plugins.Azure.UnitTests/appsettings.json"
+#               $a = Get-Content $pathToJson | ConvertFrom-Json
+#               $a.Azure.ClientSecret = $env:VAR_CLIENT_SECRET
+#               $a.Azure.TenantId = $env:VAR_TENANT_ID
+#               $a.Azure.ClientId = $env:VAR_CLIENT_ID
+#               $a.Azure.SubscriptionId = $env:VAR_SUBSCRIPTION_ID
+#               $a | ConvertTo-Json | set-content $pathToJson
+#           env:
+#             VAR_CLIENT_SECRET: $(ClientSecret)
+#             VAR_TENANT_ID: $(TenantId)
+#             VAR_CLIENT_ID: $(ClientId)
+#             VAR_SUBSCRIPTION_ID: $(SubscriptionId)
 
-        - task: DotNetCoreCLI@2
-          displayName: Test Inventory.API.sln
-          inputs:
-            command: 'test'
-            projects: 'Services/Inventory.API.sln'
-            arguments: >-
-              --collect:"XPlat Code Coverage"
-              -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByFile=**/*Migrations/*.cs
-            publishTestResults: true
+#         - task: DotNetCoreCLI@2
+#           displayName: Test Inventory.API.sln
+#           inputs:
+#             command: 'test'
+#             projects: 'Services/Inventory.API.sln'
+#             arguments: >-
+#               --collect:"XPlat Code Coverage"
+#               -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByFile=**/*Migrations/*.cs
+#             publishTestResults: true
 
-        - task: Bash@3
-          displayName: 'Convert opencover to cobertura'
-          inputs:
-            targetType:       'inline'
-            workingDirectory: '.'
-            script: |
-              reportgenerator "-reports:$(Agent.TempDirectory)/**/coverage.opencover.xml" \
-                        "-targetDir:$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports" \
-                        "-tag:$(Build.BuildNumber)" "-reportTypes:Cobertura" \
-                        "-filefilters:-**/*Migrations/*.cs"
+#         - task: Bash@3
+#           displayName: 'Convert opencover to cobertura'
+#           inputs:
+#             targetType:       'inline'
+#             workingDirectory: '.'
+#             script: |
+#               reportgenerator "-reports:$(Agent.TempDirectory)/**/coverage.opencover.xml" \
+#                         "-targetDir:$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports" \
+#                         "-tag:$(Build.BuildNumber)" "-reportTypes:Cobertura" \
+#                         "-filefilters:-**/*Migrations/*.cs"
 
-        - task: PublishCodeCoverageResults@1
-          displayName: 'Publish code coverage report'
-          inputs:
-            codeCoverageTool: 'Cobertura'
-            summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports/**/*.xml'
-            reportDirectory: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports'
+#         - task: PublishCodeCoverageResults@1
+#           displayName: 'Publish code coverage report'
+#           inputs:
+#             codeCoverageTool: 'Cobertura'
+#             summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports/**/*.xml'
+#             reportDirectory: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports'
 
-- stage: BuildImages
-  displayName: Build Container Images
-  dependsOn:
-    - BuildApplication
+# - stage: BuildImages
+#   displayName: Build Container Images
+#   dependsOn:
+#     - BuildApplication
 
-  jobs:
-    - job: DockerBuild
-      displayName: Build and publish docker images
-      variables:
-        tag: $(Build.BuildId)
-      strategy:
-        matrix:
-          configuration-api:
-            docker_file: Services/configuration/Inventory.Configuration.Api/Dockerfile
-            repository_name: DynamicInventory/inventoryconfigurationapi
-          device-api:
-            docker_file: Services/devices/Inventory.Devices.Api/Dockerfile
-            repository_name: DynamicInventory/devicesapi
+#   jobs:
+#     - job: DockerBuild
+#       displayName: Build and publish docker images
+#       variables:
+#         tag: $(Build.BuildId)
+#       strategy:
+#         matrix:
+#           configuration-api:
+#             docker_file: Services/configuration/Inventory.Configuration.Api/Dockerfile
+#             repository_name: DynamicInventory/inventoryconfigurationapi
+#           device-api:
+#             docker_file: Services/devices/Inventory.Devices.Api/Dockerfile
+#             repository_name: DynamicInventory/devicesapi
 
-        maxParallel: 2
-      steps:
+#         maxParallel: 2
+#       steps:
 
-        - task: Docker@2
-          displayName: Build Inventory API Images
-          inputs:
-            containerRegistry: 'aksbootstrap'
-            repository: '$(repository_name)'
-            command: 'build'
-            Dockerfile: '$(docker_file)'
-            buildContext: '$(Build.SourcesDirectory)/Services'
-            tags: |
-              $(tag)
+#         - task: Docker@2
+#           displayName: Build Inventory API Images
+#           inputs:
+#             containerRegistry: 'aksbootstrap'
+#             repository: '$(repository_name)'
+#             command: 'build'
+#             Dockerfile: '$(docker_file)'
+#             buildContext: '$(Build.SourcesDirectory)/Services'
+#             tags: |
+#               $(tag)
 
-        - task: Docker@2
-          displayName: Deploy image to mesfcontainerregistry
-          inputs:
-            containerRegistry: 'aksbootstrap'
-            repository: '$(repository_name)'
-            command: 'push'
-            tags: '$(tag)'
+#         - task: Docker@2
+#           displayName: Deploy image to mesfcontainerregistry
+#           inputs:
+#             containerRegistry: 'aksbootstrap'
+#             repository: '$(repository_name)'
+#             command: 'push'
+#             tags: '$(tag)'
 
 
 - stage: DeployApplication
@@ -182,6 +183,23 @@ stages:
       environment: env1
       strategy:
         runOnce:
+          preDeploy:
+            steps:
+              - task: Kubernetes@1
+                inputs:
+                  connectionType: 'Azure Resource Manager'
+                  azureSubscriptionEndpoint: 'Ansible-Automation'
+                  azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
+                  kubernetesCluster: 'aksbootstrap'
+                  namespace: 'postgresql'
+                  command: 'exec'
+                  arguments: |
+                    -c postgresql -n postgresql
+                    -- psql postgresql://inventorydb-admin:$DB_PASSWORD@postgresql/ConfigurationDB -c '\l'
+
+                env:
+                  DB_PASSWORD: $(inventorydb-admin)
+
           deploy:
             steps:
             - bash: echo $(myOutputVar)
