@@ -173,8 +173,8 @@ stages:
 
 
 - stage: DeployApplication
-  dependsOn:
-    - BuildImages
+  # dependsOn:
+  #   - BuildImages
 
   jobs:
     - deployment: B1
