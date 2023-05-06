@@ -193,8 +193,8 @@ stages:
                   kubernetesCluster: 'aksbootstrap'
                   namespace: 'postgresql'
                   command: 'exec'
-                  arguments: |
-                    postgresql-0 -c postgresql -n postgresql \
+                  arguments: >-
+                    postgresql-0 -c postgresql -n postgresql
                     -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB -c \l
 
           deploy:
