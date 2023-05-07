@@ -261,30 +261,30 @@ stages:
                     -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
                     -f /tmp/grantUsers.sql
 
-              - task: Bash@3
-                displayName: "Generate secret file"
-                inputs:
-                    targetType: 'inline'
-                    script: |
-                      cat <<EOF > $(Build.ArtifactStagingDirectory)/appsettings.secrets.json
-                      {
-                        "ConnectionStrings": {
-                          "InventoryDatabase": "host=postgresql.postgresql;port=5432;database=ConfigurationDB;username=configurationdb_rw;password=$(configurationdb-rw)"
-                        }
-                      }
-                      EOF
+              # - task: Bash@3
+              #   displayName: "Generate secret file"
+              #   inputs:
+              #       targetType: 'inline'
+              #       script: |
+              #         cat <<EOF > $(Build.ArtifactStagingDirectory)/appsettings.secrets.json
+              #         {
+              #           "ConnectionStrings": {
+              #             "InventoryDatabase": "host=postgresql.postgresql;port=5432;database=ConfigurationDB;username=configurationdb_rw;password=$(configurationdb-rw)"
+              #           }
+              #         }
+              #         EOF
 
-              - task: Kubernetes@1
-                displayName: "Create secret file"
-                inputs:
-                  connectionType: 'Azure Resource Manager'
-                  azureSubscriptionEndpoint: 'Ansible-Automation'
-                  azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
-                  kubernetesCluster: 'aksbootstrap'
-                  namespace: 'default'
-                  command: 'create'
-                  arguments: >-
-                    secret generic --from-file=$(Build.ArtifactStagingDirectory)/appsettings.secrets.json sampleapp-appsettings2
+              # - task: Kubernetes@1
+              #   displayName: "Create secret file"
+              #   inputs:
+              #     connectionType: 'Azure Resource Manager'
+              #     azureSubscriptionEndpoint: 'Ansible-Automation'
+              #     azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
+              #     kubernetesCluster: 'aksbootstrap'
+              #     namespace: 'default'
+              #     command: 'create'
+              #     arguments: >-
+              #       secret generic --from-file=$(Build.ArtifactStagingDirectory)/appsettings.secrets.json sampleapp-appsettings2
 
           deploy:
             steps:
@@ -302,7 +302,7 @@ stages:
               displayName: Package helm chart
               inputs:
                 command: 'package'
-                chartPath: 'builds/kubernetes/charts/inventory-api'
+                chartPath: 'builds/kubernetes/charts/configuration-api'
 
             - task: HelmDeploy@0
               displayName: Save chart into ACR
@@ -311,5 +311,5 @@ stages:
                 azureResourceGroupForACR: 'rg-acr-bootstrap'
                 azureContainerRegistry: 'aksbootstrap.azurecr.io'
                 command: 'save'
-                chartNameForACR: 'dynamic-inventory'
+                chartNameForACR: 'dynamic-inventory/configuration-api'
                 chartPathForACR: 'charts'

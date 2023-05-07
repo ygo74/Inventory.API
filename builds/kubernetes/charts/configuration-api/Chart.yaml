@@ -1,6 +1,6 @@
 apiVersion: v2
-name: inventory-api
-description: Infrastructure Inventory API
+name: configuration-api
+description: Dynamic inventory - Configuration API
 
 # A chart can be either an 'application' or a 'library' chart.
 #
