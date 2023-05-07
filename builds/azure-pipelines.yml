@@ -231,7 +231,7 @@ stages:
                   arguments: >-
                     postgresql-0 -c postgresql -n postgresql
                     -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
-                    -c "ALTER USER configurationdb_rw WITH PASSWORD $(configurationdb-rw)"
+                    -c "ALTER USER configurationdb_rw WITH PASSWORD '$(configurationdb-rw)'"
 
               - task: Kubernetes@1
                 displayName: "Create Database objects"
