@@ -328,3 +328,23 @@ stages:
                 useGlobalConfig: true
               displayName: Save chart into ACR
 
+
+            - task: HelmDeploy@0
+              displayName: Deploy chart to CLuster
+              inputs:
+                connectionType: 'Azure Resource Manager'
+                azureSubscription: 'Ansible-Automation'
+                azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
+                kubernetesCluster: 'aksbootstrap'
+                namespace: 'dynamic-inventory'
+                command: 'upgrade'
+                chartType: 'Name'
+                chartName: 'aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api'
+                chartVersion: '0.1.0'
+                releaseName: 'inventoryconfigurationapi'
+                overrideValues: |
+                  image.tag=915
+                  postgres.host=postgresql.postgresql
+                  postgres.database=ConfigurationDB
+                  postgres.user=configurationdb_rw
+                  postgres.password=$(configurationdb-rw)
