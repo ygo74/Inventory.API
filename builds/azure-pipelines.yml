@@ -314,12 +314,9 @@ stages:
                 scriptLocation: 'inlineScript'
                 inlineScript: |
 
-                  # Login to ACR
-                  az acr login -n aksbootstrap -g rg-acr-bootstrap
-
                   # Init User Name / token password
                   $USER_NAME="00000000-0000-0000-0000-000000000000"
-                  $password=az acr login -n aksbootstrap -g rg-acr-bootstrap --expose-token --output tsv --query accessToken
+                  $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
 
                   # Push helm chart to registry
                   helm push $(Build.ArtifactStagingDirectory)/configuration-api-0.1.0.tgz oci://aksbootstrap.azurecr.io/helm/dynamic-inventory
@@ -339,12 +336,9 @@ stages:
                   # Get credentials for the AKS cluster
                   az aks get-credentials --resource-group rg-aks-bootstrap-networking-spoke --name aksbootstrap
 
-                  # Login to ACR
-                  az acr login -n aksbootstrap -g rg-acr-bootstrap
-
                   # Init User Name / token password
                   $USER_NAME="00000000-0000-0000-0000-000000000000"
-                  $password=az acr login -n aksbootstrap -g rg-acr-bootstrap --expose-token --output tsv --query accessToken
+                  $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
 
                   # install helm chart from registry
                   helm upgrade inventoryconfigurationapi oci://aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api `
