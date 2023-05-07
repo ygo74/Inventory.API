@@ -8,8 +8,8 @@ metadata:
   name: configuration-api-deployment
   labels:
     app: configuration-api
-spec: 
-  replicas: 3
+spec:
+  replicas: 1
   selector:
     matchLabels:
       app: configuration-api
@@ -18,12 +18,38 @@ spec:
       labels:
         app: configuration-api
     spec:
+      hostAliases:
+        - ip: "20.199.123.249"
+          hostnames:
+          - "inventory.francecentral.cloudapp.azure.com"
       containers:
         - name: configuration-api
-          image: aksbootstrap.azurecr.io/inventoryconfigurationapi:dev
-          # resources:
-          #   limits:
-          #     memory: 400mi
-          #     cpu: 500m
+          image: aksbootstrap.azurecr.io/dynamicinventory/inventoryconfigurationapi:809
+          resources:
+            limits:
+              memory: 400Mi
+              cpu: 500m
           ports:
             - containerPort: 80
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
+            - name: ASPNETCORE_URLS
+              value: http://+:80
+            - name: ConnectionStrings__InventoryDatabase
+              value: host=localhost;port=5432;database=configurationDB;username=bloguser;password=bloguser
+        - name: postgres-image
+          image: postgres:latest
+          resources:
+            limits:
+              memory: 400Mi
+              cpu: 500m
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: "bloguser"
+            - name: POSTGRES_PASSWORD
+              value: "bloguser"
+            - name: POSTGRES_DB
+              value: "configurationDB"

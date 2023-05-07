@@ -5,9 +5,9 @@ networks:
     external:
       name: backends_dockerapi-dev
 
-  elastic:
-    external:
-      name: monitoring_elastic
+  #elastic:
+  #  external:
+  #    name: monitoring_elastic
 
 services:
   inventory.configuration.api:
@@ -17,7 +17,7 @@ services:
       dockerfile: configuration/Inventory.Configuration.Api/Dockerfile
     networks:
       - dockerapi
-      - elastic
+      #- elastic
 
   inventory.devices.api:
     image: ${DOCKER_REGISTRY-}inventorydevicesapi
@@ -28,7 +28,7 @@ services:
       - "inventory.configuration.api"
     networks:
       - dockerapi
-      - elastic
+      #- elastic
 
 
   inventory.gateway.api:
@@ -41,7 +41,7 @@ services:
       - "inventory.devices.api"
     networks:
       - dockerapi
-      - elastic
+      #- elastic
 
 
   inventory.networks.api:
@@ -53,5 +53,5 @@ services:
       - "inventory.configuration.api"
     networks:
       - dockerapi
-      - elastic
+      #- elastic
 
