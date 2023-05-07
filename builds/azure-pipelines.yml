@@ -261,6 +261,31 @@ stages:
                     -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
                     -f /tmp/grantUsers.sql
 
+              - task: Bash@3
+                displayName: "Generate secret file"
+                inputs:
+                    targetType: 'inline'
+                    script: |
+                      cat <<EOF > $(Build.ArtifactStagingDirectory)/appsettings.secrets.json
+                      {
+                        "ConnectionStrings": {
+                          "InventoryDatabase": "host=postgresql.postgresql;port=5432;database=ConfigurationDB;username=configurationdb_rw;password=$(configurationdb-rw)"
+                        }
+                      }
+                      EOF
+
+              - task: Kubernetes@1
+                displayName: "Create secret file"
+                inputs:
+                  connectionType: 'Azure Resource Manager'
+                  azureSubscriptionEndpoint: 'Ansible-Automation'
+                  azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
+                  kubernetesCluster: 'aksbootstrap'
+                  namespace: 'default'
+                  command: 'create'
+                  arguments: >-
+                    secret generic --from-file=$(Build.ArtifactStagingDirectory)/appsettings.secrets.json sampleapp-appsettings2
+
           deploy:
             steps:
             - bash: echo $(myOutputVar)
