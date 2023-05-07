@@ -329,23 +329,35 @@ stages:
               displayName: Save chart into ACR
 
 
-            - task: HelmDeploy@0
-              displayName: Deploy chart to CLuster
+            - task: AzureCLI@2
               inputs:
-                connectionType: 'Azure Resource Manager'
                 azureSubscription: 'Ansible-Automation'
-                azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
-                azureContainerRegistry: aksbootstrap.azurecr.io
-                kubernetesCluster: 'aksbootstrap'
-                namespace: 'dynamic-inventory'
-                command: 'upgrade'
-                chartType: 'Name'
-                chartName: 'aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api:0.1.0'
-                chartVersion: '0.1.0'
-                releaseName: 'inventoryconfigurationapi'
-                overrideValues: |
-                  image.tag=915
-                  postgres.host=postgresql.postgresql
-                  postgres.database=ConfigurationDB
-                  postgres.user=configurationdb_rw
-                  postgres.password=$(configurationdb-rw)
+                scriptType: 'pscore'
+                scriptLocation: 'inlineScript'
+                inlineScript: |
+
+                  # Login to ACR
+                  az acr login -n aksbootstrap -g rg-acr-bootstrap
+
+                  # Init User Name / token password
+                  $USER_NAME="00000000-0000-0000-0000-000000000000"
+                  $password=az acr login -n aksbootstrap -g rg-acr-bootstrap --expose-token --output tsv --query accessToken
+
+                  # install helm chart from registry
+                  helm upgrade inventoryconfigurationapi oci://aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api `
+                      --install `
+                      --namespace dynamic-inventory `
+                      --version 0.1.0 `
+                      --set image.tag=915 `
+                      --set postgres.host=postgresql.postgresql `
+                      --set postgres.database=ConfigurationDB `
+                      --set postgres.user=configurationdb_rw `
+                      --set postgres.password=$env:DB_PASSWORD
+
+                  helm push $(Build.ArtifactStagingDirectory)/configuration-api-0.1.0.tgz oci://aksbootstrap.azurecr.io/helm/dynamic-inventory
+
+                addSpnToEnvironment: true
+                useGlobalConfig: true
+              displayName: Deploy chart to CLuster
+              env:
+                DB_PASSWORD: $(configurationdb-rw)
