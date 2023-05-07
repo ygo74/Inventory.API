@@ -335,11 +335,12 @@ stages:
                 connectionType: 'Azure Resource Manager'
                 azureSubscription: 'Ansible-Automation'
                 azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
+                azureContainerRegistry: aksbootstrap.azurecr.io
                 kubernetesCluster: 'aksbootstrap'
                 namespace: 'dynamic-inventory'
                 command: 'upgrade'
                 chartType: 'Name'
-                chartName: 'aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api'
+                chartName: 'aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api:0.1.0'
                 chartVersion: '0.1.0'
                 releaseName: 'inventoryconfigurationapi'
                 overrideValues: |
