@@ -290,6 +290,9 @@ stages:
             steps:
             - bash: echo $(myOutputVar)
 
+            - checkout: self
+              displayName: "Checkout repository"
+
             - task: HelmInstaller@0
               displayName: Install Helm tools
               inputs:
