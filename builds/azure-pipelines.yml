@@ -296,7 +296,7 @@ stages:
             - task: HelmInstaller@0
               displayName: Install Helm tools
               inputs:
-                helmVersion: '3.8.0'
+                helmVersion: '3.6.0'
                 checkLatestHelmVersion: false
                 installKubectl: true
                 kubectlVersion: '1.26.3'
