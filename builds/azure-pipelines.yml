@@ -336,6 +336,9 @@ stages:
                 scriptLocation: 'inlineScript'
                 inlineScript: |
 
+                  # Get credentials for the AKS cluster
+                  az aks get-credentials --resource-group rg-aks-bootstrap-networking-spoke --name aksbootstrap
+
                   # Login to ACR
                   az acr login -n aksbootstrap -g rg-acr-bootstrap
 
