@@ -29,7 +29,7 @@ stages:
       - job: DotnetBuild
         displayName: Build Service
         steps:
-          - template: ./templates/dotnet-ci-steps.yaml
+          - template: ./pipelines/templates/dotnet-ci-steps.yaml
             parameters:
               serviceName: $(serviceName)
               projectPath: $(projectPath)
