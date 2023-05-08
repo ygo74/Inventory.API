@@ -1,0 +1,17 @@
+---
+parameters:
+  - name: serviceName
+    type: string
+
+  - name: projectPath
+    type: string
+
+steps:
+
+  - task: DotNetCoreCLI@2
+    displayName: Build ${{ parameters.serviceName }}
+    inputs:
+      command: 'build'
+      projects: '${{ parameters.serviceName }}'
+      versioningScheme: byEnvVar
+      versionEnvVar: 'version.semVer'
