@@ -1,3 +1,5 @@
+trigger:  none
+
 variables:
   - group: Azure_Credential
   - group: inventorydb-deployment

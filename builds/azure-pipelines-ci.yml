@@ -2,15 +2,18 @@ trigger:
   batch: true
   branches:
     include:
-    # for new release to production: release flow strategy
-    - release/configuration/v*
-    - refs/release/configuration/v*
-    - master
-    - feature/configuration/*
-    - topic/configuration/*
+      # for new release to production: release flow strategy
+      - release/configuration/v*
+      - refs/release/configuration/v*
+      - master
+      - feature/configuration/*
+      - topic/configuration/*
+      - Onion-Architecture
   paths:
     include:
-    - /Services/configuration/
+      - /Services/configuration/
+      - builds
+
 
 variables:
   - group: Azure_Credential
