@@ -33,16 +33,8 @@ variables:
     value: ./Services/configuration/Inventory.Configuration.UnitTests/Inventory.Configuration.UnitTests.csproj
 
 stages:
-  - stage: BuildApplication
-    displayName: Build Inventory Service
-    jobs:
-      - job: DotnetBuild
-        displayName: Build Service
-        steps:
-          - template: ./templates/service-build-ci.yaml
-            parameters:
-              serviceName:      $(serviceName)
-              projectPath:      $(projectPath)
-              testsProjectPath: $(testsProjectPath)
-
-
+  - template: ./templates/service-build-ci.yaml
+    parameters:
+      serviceName:      $(serviceName)
+      projectPath:      $(projectPath)
+      testsProjectPath: $(testsProjectPath)
