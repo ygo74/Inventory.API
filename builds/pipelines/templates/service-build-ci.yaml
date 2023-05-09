@@ -9,6 +9,16 @@ parameters:
   - name: testsProjectPath
     type: string
 
+  - name: 'preTest'
+    type: stepList
+    default: []
+
+  - name: dockerFile
+    type: string
+
+  - name: repositoryName
+    type: string
+
 stages:
 
   # ---------------------------------------------------------------------------
@@ -18,7 +28,7 @@ stages:
     displayName: Build Service
     jobs:
       - job: DotnetBuild
-        displayName: Build ${{ parameters.serviceName }}
+        displayName: Build Service
         steps:
           - task: DotNetCoreCLI@2
             displayName: Build ${{ parameters.serviceName }}
@@ -31,6 +41,8 @@ stages:
 
       - job: DotnetUnitTests
         displayName: Tests Service
+        dependsOn:
+          - DotnetBuild
         steps:
           - task: DotNetCoreCLI@2
             displayName: Install ReportGenerator Global Tool
@@ -41,6 +53,8 @@ stages:
 
           - script: echo "##vso[task.prependpath]$HOME/.dotnet/tools"
             displayName: 'Update PATH'
+
+          - ${{ parameters.preTest }}
 
           - task: DotNetCoreCLI@2
             displayName: Test ${{ parameters.serviceName }}
@@ -69,3 +83,41 @@ stages:
               codeCoverageTool: 'Cobertura'
               summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports/**/*.xml'
               reportDirectory: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports'
+
+
+  # ---------------------------------------------------------------------------
+  # Build and tests service
+  # ---------------------------------------------------------------------------
+
+  - stage: BuildImages
+    displayName: Build image and chart
+    dependsOn:
+      - BuildApplication
+
+    jobs:
+      - job: DockerBuild
+        displayName: Build and publish docker images
+        variables:
+          tag: $(Build.BuildId)
+
+        steps:
+
+          - task: Docker@2
+            displayName: Build ${{ parameters.serviceName }}
+            inputs:
+              containerRegistry: 'aksbootstrap'
+              repository:        '${{ parameters.repositoryName }}'
+              command:           'build'
+              Dockerfile:        '${{ parameters.dockerFile }}'
+              buildContext:      '$(Build.SourcesDirectory)/Services'
+              tags: |
+                $(tag)
+
+          - task: Docker@2
+            displayName: Deploy image to mesfcontainerregistry
+            inputs:
+              containerRegistry: 'aksbootstrap'
+              repository:        '$(repository_name)'
+              command:           'push'
+              tags: |
+                $(tag)

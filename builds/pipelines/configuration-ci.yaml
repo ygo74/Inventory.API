@@ -32,6 +32,12 @@ variables:
   - name: testsProjectPath
     value: ./Services/configuration/Inventory.Configuration.UnitTests/Inventory.Configuration.UnitTests.csproj
 
+  - name: repositoryName
+    value: DynamicInventory/configuration-api
+
+  - name: dockerFile
+    value: ./Services/configuration/Inventory.Configuration.Api/Dockerfile
+
 stages:
   - template: ./templates/service-build-ci.yaml
     parameters:
