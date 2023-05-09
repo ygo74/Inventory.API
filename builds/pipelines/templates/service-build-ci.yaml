@@ -1,0 +1,71 @@
+---
+parameters:
+  - name: serviceName
+    type: string
+
+  - name: projectPath
+    type: string
+
+  - name: testsProjectPath
+    type: string
+
+stages:
+
+  # ---------------------------------------------------------------------------
+  # Build and tests service
+  # ---------------------------------------------------------------------------
+  - stage: BuildApplication
+    displayName: Build Service
+    jobs:
+      - job: DotnetBuild
+        displayName: Build ${{ parameters.serviceName }}
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: Build ${{ parameters.serviceName }}
+            inputs:
+              command: 'build'
+              projects: '${{ parameters.projectPath }}'
+              versioningScheme: byEnvVar
+              versionEnvVar: 'version.semVer'
+
+
+      - job: DotnetUnitTests
+        displayName: Tests Service
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: Install ReportGenerator Global Tool
+            inputs:
+              command:   custom
+              custom:    tool
+              arguments: install dotnet-reportgenerator-globaltool -g
+
+          - script: echo "##vso[task.prependpath]$HOME/.dotnet/tools"
+            displayName: 'Update PATH'
+
+          - task: DotNetCoreCLI@2
+            displayName: Test ${{ parameters.serviceName }}
+            inputs:
+              command:  'test'
+              projects: '${{ parameters.testsProjectPath }}'
+              arguments: >-
+                --collect:"XPlat Code Coverage"
+                -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByFile=**/*Migrations/*.cs
+              publishTestResults: true
+
+          - task: Bash@3
+            displayName: 'Convert opencover to cobertura'
+            inputs:
+              targetType:       'inline'
+              workingDirectory: '.'
+              script: |
+                reportgenerator "-reports:$(Agent.TempDirectory)/**/coverage.opencover.xml" \
+                          "-targetDir:$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports" \
+                          "-tag:$(Build.BuildNumber)" "-reportTypes:Cobertura" \
+                          "-filefilters:-**/*Migrations/*.cs"
+
+          - task: PublishCodeCoverageResults@1
+            displayName: 'Publish code coverage report'
+            inputs:
+              codeCoverageTool: 'Cobertura'
+              summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports/**/*.xml'
+              reportDirectory: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports'

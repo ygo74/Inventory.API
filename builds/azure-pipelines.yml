@@ -321,6 +321,7 @@ stages:
                   $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
 
                   # Push helm chart to registry
+                  helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
                   helm push $(Build.ArtifactStagingDirectory)/configuration-api-0.1.0.tgz oci://aksbootstrap.azurecr.io/helm/dynamic-inventory
 
                 addSpnToEnvironment: true
@@ -343,6 +344,7 @@ stages:
                   $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
 
                   # install helm chart from registry
+                  helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
                   helm upgrade inventoryconfigurationapi oci://aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api `
                       --install `
                       --namespace dynamic-inventory `
@@ -352,8 +354,6 @@ stages:
                       --set postgres.database=ConfigurationDB `
                       --set postgres.user=configurationdb_rw `
                       --set postgres.password=$env:DB_PASSWORD
-
-                  helm push $(Build.ArtifactStagingDirectory)/configuration-api-0.1.0.tgz oci://aksbootstrap.azurecr.io/helm/dynamic-inventory
 
                 addSpnToEnvironment: true
                 useGlobalConfig: true

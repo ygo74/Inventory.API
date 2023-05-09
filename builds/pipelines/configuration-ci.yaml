@@ -1,0 +1,48 @@
+---
+# -----------------------------------------------------------------------------
+# Configuration API - Continuous Integration pipeline
+# -----------------------------------------------------------------------------
+trigger:
+  batch: true
+  branches:
+    include:
+      # for new release to production: release flow strategy
+      - release/configuration/v*
+      - refs/release/configuration/v*
+      - master
+      - feature/configuration/*
+      - topic/configuration/*
+      - Onion-Architecture
+  paths:
+    include:
+      - /Services/configuration/
+      - builds
+
+
+variables:
+  - group: Azure_Credential
+  - group: inventorydb-deployment
+
+  - name: serviceName
+    value: configuration-api
+
+  - name: projectPath
+    value: ./Services/configuration/Inventory.Configuration.Api/Inventory.Configuration.Api.csproj
+
+  - name: testsProjectPath
+    value: ./Services/configuration/Inventory.Configuration.UnitTests/Inventory.Configuration.UnitTests.csproj
+
+stages:
+  - stage: BuildApplication
+    displayName: Build Inventory Service
+    jobs:
+      - job: DotnetBuild
+        displayName: Build Service
+        steps:
+          - template: ./pipelines/templates/dotnet-ci-steps.yaml
+            parameters:
+              serviceName:      $(serviceName)
+              projectPath:      $(projectPath)
+              testsProjectPath: $(testsProjectPath)
+
+
