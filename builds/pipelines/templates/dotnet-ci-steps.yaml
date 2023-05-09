@@ -12,6 +12,6 @@ steps:
     displayName: Build ${{ parameters.serviceName }}
     inputs:
       command: 'build'
-      projects: '${{ parameters.serviceName }}'
+      projects: '${{ parameters.projectPath }}'
       versioningScheme: byEnvVar
       versionEnvVar: 'version.semVer'
