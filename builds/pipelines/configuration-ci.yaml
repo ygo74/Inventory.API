@@ -38,9 +38,15 @@ variables:
   - name: dockerFile
     value: ./Services/configuration/Inventory.Configuration.Api/Dockerfile
 
+  - name: chartName
+    value: configuration-api
+
 stages:
   - template: ./templates/service-build-ci.yaml
     parameters:
       serviceName:      $(serviceName)
       projectPath:      $(projectPath)
       testsProjectPath: $(testsProjectPath)
+      repositoryName:   $(repositoryName)
+      dockerFile:       $(dockerFile)
+      chartName:        $(chartName)

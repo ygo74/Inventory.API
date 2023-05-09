@@ -19,6 +19,13 @@ parameters:
   - name: repositoryName
     type: string
 
+  - name: chartPath
+    type: string
+    default: 'builds/kubernetes/charts'
+
+  - name: chartName
+    type: string
+
 stages:
 
   # ---------------------------------------------------------------------------
@@ -117,7 +124,51 @@ stages:
             displayName: Deploy image to mesfcontainerregistry
             inputs:
               containerRegistry: 'aksbootstrap'
-              repository:        '$(repository_name)'
+              repository:        '${{ parameters.repositoryName }}'
               command:           'push'
               tags: |
                 $(tag)
+
+      - job: HelmBuild
+        displayName: Build and publish Helm chart
+        dependsOn:
+          - DockerBuild
+
+        variables:
+          tag: $(Build.BuildId)
+
+        steps:
+          - task: HelmInstaller@0
+            displayName: Install Helm tools
+            inputs:
+              helmVersion: '3.8.0'
+              checkLatestHelmVersion: false
+              installKubectl: true
+              kubectlVersion: '1.26.3'
+
+          - task: HelmDeploy@0
+            displayName: Package helm chart
+            inputs:
+              command:   'package'
+              chartPath: '${{ parameters.chartPath}}/${{ parameters.chartName}}'
+
+          - task: AzureCLI@2
+            displayName: Save chart into ACR
+            inputs:
+              azureSubscription: 'Ansible-Automation'
+              scriptType: 'pscore'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+
+                # Init User Name / token password
+                $USER_NAME="00000000-0000-0000-0000-000000000000"
+                $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
+
+                # Push helm chart to registry
+                helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
+                helm push $(Build.ArtifactStagingDirectory)/${{ parameters.chartName}}-0.1.0.tgz oci://aksbootstrap.azurecr.io/helm/dynamic-inventory
+
+              addSpnToEnvironment: true
+              useGlobalConfig: true
+
+
