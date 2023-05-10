@@ -9,6 +9,13 @@ parameters:
   - name: projectPath
     type: string
 
+  - name: testsProjectPath
+    type: string
+
+  - name: 'preTest'
+    type: stepList
+    default: []
+
   - name: debugPipelineFlow
     type: boolean
     default: false

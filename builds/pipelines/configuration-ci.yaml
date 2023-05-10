@@ -36,6 +36,9 @@ variables:
   - name: testsProjectPath
     value: ./Services/configuration/Inventory.Configuration.UnitTests/Inventory.Configuration.UnitTests.csproj
 
+  - name: infrastructureProjectPath
+    value: ./Services/configuration/Inventory.Configuration.Infrastructure/Inventory.Configuration.Infrastructure.csproj
+
   - name: repositoryName
     value: DynamicInventory/configuration-api
 
@@ -48,9 +51,10 @@ variables:
 stages:
   - template: ./templates/service-build-ci.yaml
     parameters:
-      serviceName:      $(serviceName)
-      projectPath:      $(projectPath)
-      testsProjectPath: $(testsProjectPath)
-      repositoryName:   $(repositoryName)
-      dockerFile:       $(dockerFile)
-      chartName:        $(chartName)
+      serviceName:               $(serviceName)
+      projectPath:               $(projectPath)
+      testsProjectPath:          $(testsProjectPath)
+      infrastructureProjectPath: $(infrastructureProjectPath)
+      repositoryName:            $(repositoryName)
+      dockerFile:                $(dockerFile)
+      chartName:                 $(chartName)

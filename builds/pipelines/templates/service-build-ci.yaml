@@ -9,6 +9,9 @@ parameters:
   - name: testsProjectPath
     type: string
 
+  - name: infrastructureProjectPath
+    type: string
+
   - name: 'preTest'
     type: stepList
     default: []
@@ -55,9 +58,10 @@ stages:
         steps:
           - template: ./steps/dotnet-unittests-ci-steps.yaml
             parameters:
-              serviceName: ${{ parameters.serviceName }}
-              projectPath: ${{ parameters.projectPath }}
-
+              serviceName:      ${{ parameters.serviceName }}
+              projectPath:      ${{ parameters.projectPath }}
+              testsProjectPath: ${{ parameters.testsProjectPath }}
+              preTest:          ${{ parameters.preTest }}
 
   # ---------------------------------------------------------------------------
   # Build Container image and chart
