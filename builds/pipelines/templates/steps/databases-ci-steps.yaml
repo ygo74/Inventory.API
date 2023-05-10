@@ -50,12 +50,11 @@ steps:
       inputs:
         command: custom
         custom: 'ef '
-        arguments: |
+        arguments: >-
           migrations script --output $(Build.ArtifactStagingDirectory)/SQL/${{ parameters.serviceName }}.sql
           --idempotent
           --startup-project ${{ parameters.projectPath }}
           --project ${{ parameters.infrastructureProjectPath }}
-          --context TodoApiDbContext
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: SQLScripts'
