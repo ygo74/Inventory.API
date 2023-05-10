@@ -1,0 +1,33 @@
+---
+# -----------------------------------------------------------------------------
+# Dotnet build
+# -----------------------------------------------------------------------------
+parameters:
+  - name: serviceName
+    type: string
+
+  - name: projectPath
+    type: string
+
+  - name: debugPipelineFlow
+    type: boolean
+    default: false
+
+steps:
+  - ${{ if eq(parameters.debugPipelineFlow, true) }}:
+    - task: Bash@3
+      displayName: Display environment variables
+      inputs:
+        targetType: 'inline'
+        script: |
+          export
+
+  - ${{ if eq(parameters.debugPipelineFlow, false) }}:
+
+    - task: DotNetCoreCLI@2
+      displayName: Build ${{ parameters.serviceName }}
+      inputs:
+        command: 'build'
+        projects: '${{ parameters.projectPath }}'
+        versioningScheme: byEnvVar
+        versionEnvVar: 'version.semVer'

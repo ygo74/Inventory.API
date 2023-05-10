@@ -1,0 +1,65 @@
+---
+# -----------------------------------------------------------------------------
+# Dotnet build
+# -----------------------------------------------------------------------------
+parameters:
+  - name: serviceName
+    type: string
+
+  - name: projectPath
+    type: string
+
+  - name: debugPipelineFlow
+    type: boolean
+    default: false
+
+steps:
+
+  - ${{ if eq(parameters.debugPipelineFlow, true) }}:
+    - task: Bash@3
+      displayName: Display environment variables
+      inputs:
+        targetType: 'inline'
+        script: |
+          export
+
+  - ${{ if eq(parameters.debugPipelineFlow, false) }}:
+    - task: DotNetCoreCLI@2
+      displayName: Install ReportGenerator Global Tool
+      inputs:
+        command:   custom
+        custom:    tool
+        arguments: install dotnet-reportgenerator-globaltool -g
+
+    - script: echo "##vso[task.prependpath]$HOME/.dotnet/tools"
+      displayName: 'Update PATH'
+
+    - ${{ parameters.preTest }}
+
+    - task: DotNetCoreCLI@2
+      displayName: Test ${{ parameters.serviceName }}
+      inputs:
+        command:  'test'
+        projects: '${{ parameters.testsProjectPath }}'
+        arguments: >-
+          --collect:"XPlat Code Coverage"
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByFile=**/*Migrations/*.cs
+        publishTestResults: true
+
+    - task: Bash@3
+      displayName: 'Convert opencover to cobertura'
+      inputs:
+        targetType:       'inline'
+        workingDirectory: '.'
+        script: |
+          reportgenerator "-reports:$(Agent.TempDirectory)/**/coverage.opencover.xml" \
+                    "-targetDir:$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports" \
+                    "-tag:$(Build.BuildNumber)" "-reportTypes:Cobertura" \
+                    "-filefilters:-**/*Migrations/*.cs"
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish code coverage report'
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports/**/*.xml'
+        reportDirectory: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports'

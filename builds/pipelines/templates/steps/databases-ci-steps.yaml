@@ -1,0 +1,64 @@
+---
+# -----------------------------------------------------------------------------
+# Database scripts generation
+# -----------------------------------------------------------------------------
+
+parameters:
+  - name: serviceName
+    type: string
+
+  - name: projectPath
+    type: string
+
+  - name: infrastructureProjectPath
+    type: string
+
+  - name: debugPipelineFlow
+    type: boolean
+    default: false
+
+steps:
+  - ${{ if eq(parameters.debugPipelineFlow, true) }}:
+    - task: Bash@3
+      displayName: Display environment variables
+      inputs:
+        targetType: 'inline'
+        script: |
+          export
+
+  - ${{ if eq(parameters.debugPipelineFlow, false) }}:
+
+    - task: DotNetCoreCLI@2
+      displayName: Install EF Tool
+      inputs:
+        command: custom
+        custom: 'tool '
+        arguments: install dotnet-ef -g
+
+    - script: echo "##vso[task.prependpath]$HOME/.dotnet/tools"
+      displayName: 'Update PATH'
+
+    - task: DotNetCoreCLI@2
+      displayName: Restore
+      inputs:
+        command: restore
+        projects: ${{ parameters.projectPath }}
+
+
+    - task: DotNetCoreCLI@2
+      displayName: Create SQL Scripts for ${{ parameters.serviceName }}
+      inputs:
+        command: custom
+        custom: 'ef '
+        arguments: |
+          migrations script --output $(Build.ArtifactStagingDirectory)/SQL/${{ parameters.serviceName }}.sql
+          --idempotent
+          --startup-project ${{ parameters.projectPath }}
+          --project ${{ parameters.infrastructureProjectPath }}
+          --context TodoApiDbContext
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: SQLScripts'
+      inputs:
+        PathtoPublish: $(Build.ArtifactStagingDirectory)/SQL/${{ parameters.serviceName }}.sql
+        ArtifactName: SQLScripts

@@ -1,0 +1,52 @@
+---
+# -----------------------------------------------------------------------------
+# Container build
+# -----------------------------------------------------------------------------
+parameters:
+  - name: serviceName
+    type: string
+
+  - name: repositoryName
+    type: string
+
+  - name: dockerFile
+    type: string
+
+  - name: dockerTags
+    type: string
+
+  - name: debugPipelineFlow
+    type: boolean
+    default: false
+
+steps:
+
+  - ${{ if eq(parameters.debugPipelineFlow, true) }}:
+    - task: Bash@3
+      displayName: Display environment variables
+      inputs:
+        targetType: 'inline'
+        script: |
+          export
+
+  - ${{ if eq(parameters.debugPipelineFlow, false) }}:
+
+    - task: Docker@2
+      displayName: Build ${{ parameters.serviceName }}
+      inputs:
+        containerRegistry: 'aksbootstrap'
+        repository:        '${{ parameters.repositoryName }}'
+        command:           'build'
+        Dockerfile:        '${{ parameters.dockerFile }}'
+        buildContext:      '$(Build.SourcesDirectory)/Services'
+        tags: |
+          ${{ parameters.dockerTags }}
+
+    - task: Docker@2
+      displayName: Deploy image to mesfcontainerregistry
+      inputs:
+        containerRegistry: 'aksbootstrap'
+        repository:        '${{ parameters.repositoryName }}'
+        command:           'push'
+        tags: |
+          ${{ parameters.dockerTags }}

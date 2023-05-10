@@ -18,6 +18,10 @@ trigger:
       - /Services/configuration/
       - builds
 
+parameters:
+  - name: debugPipelineFlow
+    type: boolean
+    default: false
 
 variables:
   - group: Azure_Credential

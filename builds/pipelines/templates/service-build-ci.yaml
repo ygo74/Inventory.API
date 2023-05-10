@@ -26,6 +26,10 @@ parameters:
   - name: chartName
     type: string
 
+  - name: debugPipelineFlow
+    type: boolean
+    default: false
+
 stages:
 
   # ---------------------------------------------------------------------------
@@ -36,64 +40,27 @@ stages:
     jobs:
       - job: DotnetBuild
         displayName: Build Service
-        steps:
-          - task: DotNetCoreCLI@2
-            displayName: Build ${{ parameters.serviceName }}
-            inputs:
-              command: 'build'
-              projects: '${{ parameters.projectPath }}'
-              versioningScheme: byEnvVar
-              versionEnvVar: 'version.semVer'
 
+        steps:
+          - template: ./steps/dotnet-ci-steps.yaml
+            parameters:
+              serviceName: ${{ parameters.serviceName }}
+              projectPath: ${{ parameters.projectPath }}
 
       - job: DotnetUnitTests
         displayName: Tests Service
         dependsOn:
           - DotnetBuild
+
         steps:
-          - task: DotNetCoreCLI@2
-            displayName: Install ReportGenerator Global Tool
-            inputs:
-              command:   custom
-              custom:    tool
-              arguments: install dotnet-reportgenerator-globaltool -g
-
-          - script: echo "##vso[task.prependpath]$HOME/.dotnet/tools"
-            displayName: 'Update PATH'
-
-          - ${{ parameters.preTest }}
-
-          - task: DotNetCoreCLI@2
-            displayName: Test ${{ parameters.serviceName }}
-            inputs:
-              command:  'test'
-              projects: '${{ parameters.testsProjectPath }}'
-              arguments: >-
-                --collect:"XPlat Code Coverage"
-                -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByFile=**/*Migrations/*.cs
-              publishTestResults: true
-
-          - task: Bash@3
-            displayName: 'Convert opencover to cobertura'
-            inputs:
-              targetType:       'inline'
-              workingDirectory: '.'
-              script: |
-                reportgenerator "-reports:$(Agent.TempDirectory)/**/coverage.opencover.xml" \
-                          "-targetDir:$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports" \
-                          "-tag:$(Build.BuildNumber)" "-reportTypes:Cobertura" \
-                          "-filefilters:-**/*Migrations/*.cs"
-
-          - task: PublishCodeCoverageResults@1
-            displayName: 'Publish code coverage report'
-            inputs:
-              codeCoverageTool: 'Cobertura'
-              summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports/**/*.xml'
-              reportDirectory: '$(Build.SourcesDirectory)/TestResults/Coverage/cobertura/Reports'
+          - template: ./steps/dotnet-unittests-ci-steps.yaml
+            parameters:
+              serviceName: ${{ parameters.serviceName }}
+              projectPath: ${{ parameters.projectPath }}
 
 
   # ---------------------------------------------------------------------------
-  # Build and tests service
+  # Build Container image and chart
   # ---------------------------------------------------------------------------
 
   - stage: BuildImages
@@ -108,26 +75,12 @@ stages:
           tag: $(Build.BuildId)
 
         steps:
-
-          - task: Docker@2
-            displayName: Build ${{ parameters.serviceName }}
-            inputs:
-              containerRegistry: 'aksbootstrap'
-              repository:        '${{ parameters.repositoryName }}'
-              command:           'build'
-              Dockerfile:        '${{ parameters.dockerFile }}'
-              buildContext:      '$(Build.SourcesDirectory)/Services'
-              tags: |
-                $(tag)
-
-          - task: Docker@2
-            displayName: Deploy image to mesfcontainerregistry
-            inputs:
-              containerRegistry: 'aksbootstrap'
-              repository:        '${{ parameters.repositoryName }}'
-              command:           'push'
-              tags: |
-                $(tag)
+          - template: ./steps/container-ci-steps.yaml
+            parameters:
+              serviceName:    ${{ parameters.serviceName }}
+              repositoryName: ${{ parameters.repositoryName }}
+              dockerFile:     ${{ parameters.dockerFile }}
+              dockerTags:     $(tag)
 
       - job: HelmBuild
         displayName: Build and publish Helm chart
@@ -138,37 +91,31 @@ stages:
           tag: $(Build.BuildId)
 
         steps:
-          - task: HelmInstaller@0
-            displayName: Install Helm tools
-            inputs:
-              helmVersion: '3.8.0'
-              checkLatestHelmVersion: false
-              installKubectl: true
-              kubectlVersion: '1.26.3'
+          - template: ./steps/chart-ci-steps.yaml
+            parameters:
+              serviceName:  ${{ parameters.serviceName }}
+              chartPath:    ${{ parameters.chartPath }}
+              chartName:    ${{ parameters.chartName }}
+              chartVersion: $(tag)
 
-          - task: HelmDeploy@0
-            displayName: Package helm chart
-            inputs:
-              command:   'package'
-              chartPath: '${{ parameters.chartPath}}/${{ parameters.chartName}}'
+  # ---------------------------------------------------------------------------
+  # Build Databases scripts
+  # ---------------------------------------------------------------------------
+  - stage: BuildDbScripts
+    displayName: Build database scripts
+    dependsOn:
+      - BuildApplication
 
-          - task: AzureCLI@2
-            displayName: Save chart into ACR
-            inputs:
-              azureSubscription: 'Ansible-Automation'
-              scriptType: 'pscore'
-              scriptLocation: 'inlineScript'
-              inlineScript: |
+    jobs:
+      - job: DatabaseBuild
+        displayName: Build database scripts
+        variables:
+          tag: $(Build.BuildId)
 
-                # Init User Name / token password
-                $USER_NAME="00000000-0000-0000-0000-000000000000"
-                $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
-
-                # Push helm chart to registry
-                helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
-                helm push $(Build.ArtifactStagingDirectory)/${{ parameters.chartName}}-0.1.0.tgz oci://aksbootstrap.azurecr.io/helm/dynamic-inventory
-
-              addSpnToEnvironment: true
-              useGlobalConfig: true
-
+        steps:
+          - template: ./steps/databases-ci-steps.yaml
+            parameters:
+              serviceName:               ${{ parameters.serviceName }}
+              projectPath:               ${{ parameters.projectPath }}
+              infrastructureProjectPath: ${{ parameters.infrastructureProjectPath }}
 
