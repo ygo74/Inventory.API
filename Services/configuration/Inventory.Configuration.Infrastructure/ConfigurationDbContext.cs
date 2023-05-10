@@ -48,7 +48,7 @@ namespace Inventory.Configuration.Infrastructure
 
             // Build config
             IConfiguration config = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../Inventory.Configuration.API"))
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../Inventory.Configuration.Api"))
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environment}.json", optional: true)
                 .AddJsonFile("secrets/appsettings.secrets.json", optional: true, reloadOnChange: true)
