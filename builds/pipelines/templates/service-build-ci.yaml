@@ -47,8 +47,9 @@ stages:
         steps:
           - template: ./steps/dotnet-ci-steps.yaml
             parameters:
-              serviceName: ${{ parameters.serviceName }}
-              projectPath: ${{ parameters.projectPath }}
+              serviceName:       ${{ parameters.serviceName }}
+              projectPath:       ${{ parameters.projectPath }}
+              debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
       - job: DotnetUnitTests
         displayName: Tests Service
@@ -58,10 +59,11 @@ stages:
         steps:
           - template: ./steps/dotnet-unittests-ci-steps.yaml
             parameters:
-              serviceName:      ${{ parameters.serviceName }}
-              projectPath:      ${{ parameters.projectPath }}
-              testsProjectPath: ${{ parameters.testsProjectPath }}
-              preTest:          ${{ parameters.preTest }}
+              serviceName:       ${{ parameters.serviceName }}
+              projectPath:       ${{ parameters.projectPath }}
+              testsProjectPath:  ${{ parameters.testsProjectPath }}
+              preTest:           ${{ parameters.preTest }}
+              debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
   # ---------------------------------------------------------------------------
   # Build Container image and chart
@@ -81,10 +83,11 @@ stages:
         steps:
           - template: ./steps/container-ci-steps.yaml
             parameters:
-              serviceName:    ${{ parameters.serviceName }}
-              repositoryName: ${{ parameters.repositoryName }}
-              dockerFile:     ${{ parameters.dockerFile }}
-              dockerTags:     $(tag)
+              serviceName:       ${{ parameters.serviceName }}
+              repositoryName:    ${{ parameters.repositoryName }}
+              dockerFile:        ${{ parameters.dockerFile }}
+              dockerTags:        $(tag)
+              debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
       - job: HelmBuild
         displayName: Build and publish Helm chart
@@ -97,10 +100,11 @@ stages:
         steps:
           - template: ./steps/chart-ci-steps.yaml
             parameters:
-              serviceName:  ${{ parameters.serviceName }}
-              chartPath:    ${{ parameters.chartPath }}
-              chartName:    ${{ parameters.chartName }}
-              chartVersion: $(tag)
+              serviceName:       ${{ parameters.serviceName }}
+              chartPath:         ${{ parameters.chartPath }}
+              chartName:         ${{ parameters.chartName }}
+              chartVersion:      $(tag)
+              debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
   # ---------------------------------------------------------------------------
   # Build Databases scripts
@@ -122,4 +126,5 @@ stages:
               serviceName:               ${{ parameters.serviceName }}
               projectPath:               ${{ parameters.projectPath }}
               infrastructureProjectPath: ${{ parameters.infrastructureProjectPath }}
+              debugPipelineFlow:         ${{ parameters.debugPipelineFlow }}
 

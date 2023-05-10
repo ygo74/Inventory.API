@@ -58,3 +58,4 @@ stages:
       repositoryName:            $(repositoryName)
       dockerFile:                $(dockerFile)
       chartName:                 $(chartName)
+      debugPipelineFlow:         ${{ parameters.debugPipelineFlow }}
