@@ -15,13 +15,13 @@ parameters:
   - name: dockerTags
     type: string
 
-  - name: debugPipelineFlow
-    type: boolean
-    default: false
+  # - name: debugPipelineFlow
+  #   type: boolean
+  #   default: false
 
 steps:
 
-  - ${{ if eq(parameters.debugPipelineFlow, true) }}:
+  - ${{ if eq(variables['System.debug'], 'true') }}:
     - task: Bash@3
       displayName: Display environment variables
       inputs:

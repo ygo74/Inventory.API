@@ -59,4 +59,3 @@ stages:
       dockerFile:                $(dockerFile)
       chartName:                 $(chartName)
       # debugPipelineFlow:         $({{ parameters.debugPipelineFlow }})
-      debugPipelineFlow:         $[ eq(System.Debug,'True') ]
