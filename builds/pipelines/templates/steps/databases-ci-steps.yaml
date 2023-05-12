@@ -61,3 +61,16 @@ steps:
       inputs:
         PathtoPublish: $(Build.ArtifactStagingDirectory)/${{ parameters.serviceName }}.sql
         ArtifactName: SQLScripts
+
+    - task: UniversalPackages@0
+      displayName: 'Publish Artifact: SQLScripts'
+      inputs:
+        command: 'publish'
+        publishDirectory: '$(Build.ArtifactStagingDirectory)'
+        feedsToUsePublish: 'internal'
+        vstsFeedPublish: 'fa79f165-cc7b-4aaa-bb4f-ed39e9bd257c/c29d8a1f-a53c-4040-88b1-1bf15ee2001c'
+        vstsFeedPackagePublish: 'configuration-api-sql'
+        versionOption: 'custom'
+        versionPublish: '1.0.0'
+        verbosity: 'Information'
+        publishedPackageVar: 'upload-sql'

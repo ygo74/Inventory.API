@@ -6,6 +6,8 @@ nav_order: 3
 has_children: false
 ---
 
+https://learn.microsoft.com/en-us/azure/aks/devops-pipeline?pivots=pipelines-yaml
+
 ## Standard deployment into Kubernetes
 
 ### Create deployment file
