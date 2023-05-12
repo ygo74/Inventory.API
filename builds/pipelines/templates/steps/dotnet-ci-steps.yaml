@@ -22,12 +22,10 @@ steps:
         script: |
           export
 
-  - ${{ if eq(parameters.debugPipelineFlow, false) }}:
-
-    - task: DotNetCoreCLI@2
-      displayName: Build ${{ parameters.serviceName }}
-      inputs:
-        command: 'build'
-        projects: '${{ parameters.projectPath }}'
-        versioningScheme: byEnvVar
-        versionEnvVar: 'version.semVer'
+  - task: DotNetCoreCLI@2
+    displayName: Build ${{ parameters.serviceName }}
+    inputs:
+      command: 'build'
+      projects: '${{ parameters.projectPath }}'
+      versioningScheme: byEnvVar
+      versionEnvVar: 'version.semVer'
