@@ -7,3 +7,4 @@ resources:
 
 steps:
 - bash: echo "app-ci runs after security-lib-ci completes"
+- bash: export
