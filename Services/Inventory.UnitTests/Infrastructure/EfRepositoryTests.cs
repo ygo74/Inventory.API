@@ -4,6 +4,7 @@ using Inventory.Domain.Models.ManagedEntities;
 using Inventory.Domain.Specifications;
 using Inventory.Infrastructure.Databases;
 using Inventory.Infrastructure.Databases.Repositories;
+using Environment = Inventory.Domain.Models.Configuration.Environment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
@@ -15,78 +16,77 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Inventory.Domain.Models.Credentials;
+using Inventory.Domain.Models.Configuration;
+using OperatingSystem = Inventory.Domain.Models.Configuration.OperatingSystem;
 
 namespace Inventory.UnitTests
 {
     public class EfRepositoryTests : BaseDbInventoryTests
     {
 
-        //[Test]
-        public async Task GetAllEnvironmentsTest()
+        [Test]
+        public async Task Should_Query_All_Environments()
         {
 
-            var repo = new EfRepository<Inventory.Domain.Models.Configuration.Environment>(this.DbContext);
-            var environments = await repo.ListAsync();
+            var repo = this.GetAsyncRepository<Environment>();
+            var results = await repo.ListAsync();
 
-            Assert.IsTrue(environments.Any());
+            Assert.IsTrue(results.Any());
+        }
+
+        [Test]
+        public async Task Should_Query_All_Credentials()
+        {
+
+            var repo = this.GetAsyncRepository<Credential>();
+            var results = await repo.ListAsync();
+
+            Assert.IsTrue(results.Any());
         }
 
 
-        //[Test]
-        public async Task GetServerByIdAsyncTest()
+        [Test]
+        public async Task Should_Query_All_Locations()
         {
 
-            var repo = new EfRepository<Server>(this.DbContext);
-            var serverRef = this.DbContext.Servers.FirstOrDefault();
+            var repo = this.GetAsyncRepository<Location>();
+            var results = await repo.ListAsync();
 
-            var serverCheck = await repo.GetByIdAsync(serverRef.ServerId);
-
-            Assert.AreEqual(serverRef.ServerId, serverCheck.ServerId);
+            Assert.IsTrue(results.Any());
         }
 
-        //[Test]
-        public async Task GetAllServersTest()
+
+        [Test]
+        public async Task Should_Query_All_DataCenters()
         {
 
-            var repo = new EfRepository<Server>(this.DbContext);
-            var servers = await repo.ListAsync();
+            var repo = this.GetAsyncRepository<DataCenter>();
+            var results = await repo.ListAsync();
 
-            Assert.IsTrue(servers.Any());
+            Assert.IsTrue(results.Any());
         }
 
-        //[Test]
-        public async Task GetAllApplicationsTest()
-        {
-            var repo = new EfRepository<Application>(this.DbContext);
-            var applications = await repo.ListAsync();
-
-            Assert.IsTrue(applications.Any());
-        }
-
-        //[Test]
-        public async Task GetApplicationsByNameTest()
+        [Test]
+        public async Task Should_Query_All_OperatingSystems()
         {
 
-            var appSpec = new ApplicationSpecification();
-            appSpec.Name = "MyApp1";
-            var repo = new EfRepository<Application>(this.DbContext);
-            var applications = await repo.ListAsync(appSpec);
+            var repo = this.GetAsyncRepository<OperatingSystem>();
+            var results = await repo.ListAsync();
 
-            Assert.IsTrue(applications.Any());
+            Assert.IsTrue(results.Any());
         }
 
-        //[Test]
-        public async Task GetApplicationsByNameAndCodeTest()
+        [Test]
+        public async Task Should_Query_All_TrustLevels()
         {
 
-            var appSpec = new ApplicationSpecification();
-            appSpec.Name = "MyApp1";
-            appSpec.Code = "ap1";
-            var repo = new EfRepository<Application>(this.DbContext);
-            var applications = await repo.ListAsync(appSpec);
+            var repo = this.GetAsyncRepository<TrustLevel>();
+            var results = await repo.ListAsync();
 
-            Assert.IsTrue(applications.Any());
+            Assert.IsTrue(results.Any());
         }
+
 
     }
 

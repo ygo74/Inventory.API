@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Inventory.Configuration.Domain.Models.Credential">
+    <Position X="9.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgEAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Credential.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Inventory.Configuration.Domain.Models.Datacenter">
+    <Position X="6.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABgAAAgAAIgAAQEAAAAAAAgAgAEAAAAAAA=</HashCode>
+      <FileName>Models\Datacenter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Inventory.Configuration.Domain.Models.Plugin">
+    <Position X="4.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAIAAAAgAAQAAAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Plugin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Inventory.Common.Domain.Models.ConfigurationEntity" Collapsed="true">
+    <Position X="5.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Inventory.Common.Domain.Models.AuditEntity" Collapsed="true">
+    <Position X="7.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Inventory.Common.Domain.Models.Entity" Collapsed="true">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Inventory.Configuration.Domain.Models.Location">
+    <Position X="1.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAARAAAAAgAAAAAAAABAQAAAAAAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Location.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Inventory.Configuration.Domain.Models.PluginEndpoint">
+    <Position X="11.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAEAAAAAAEAAAAAAAAAAAAAAAAAAIAAAQ=</HashCode>
+      <FileName>Models\PluginEndpoint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="Inventory.Configuration.Domain.Models.DatacenterType" Collapsed="true">
+    <Position X="6.75" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQQAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\DatacenterType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

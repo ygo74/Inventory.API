@@ -1,0 +1,23 @@
+---
+# -----------------------------------------------------------------------------
+# Deployment for inventory.configuration.api
+# -----------------------------------------------------------------------------
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: configuration-api-svc
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-resource-group: rg-aks-bootstrap-networking-hub
+    service.beta.kubernetes.io/azure-load-balancer-ipv4: 20.216.162.156
+    xx.yy: tests
+spec:
+  type: LoadBalancer
+  # type: ClusterIP
+  selector:
+    app: configuration-api
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+

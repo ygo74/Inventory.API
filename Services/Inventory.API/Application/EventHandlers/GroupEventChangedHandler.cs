@@ -9,7 +9,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Inventory.API.Application.EventHandlers
 {
-    public class GroupEventChangedHandler : INotificationHandler<GroupChangedEvent>
+    public class GroupEventChangedHandler //: INotificationHandler<GroupChangedEvent>
     {
 
         private readonly IMemoryCache _cache;

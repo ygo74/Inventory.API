@@ -20,11 +20,11 @@ namespace Inventory.UnitTests.API.Application
 
         }
 
-        [Test]
-        public async Task Should_successfull_create_server_with_valid_values()
-        {
-            Assert.Fail("Not Yet Implemented");
-        }
+        //[Test]
+        //public async Task Should_successfull_create_server_with_valid_values()
+        //{
+        //    Assert.Fail("Not Yet Implemented");
+        //}
 
     }
 }

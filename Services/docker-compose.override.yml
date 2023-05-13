@@ -1,15 +1,63 @@
 version: '3.4'
 
 services:
-  inventory.api:
+  inventory.configuration.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ConnectionStrings__InventoryDatabase=host=postgres_image;port=5432;database=blogdb;username=bloguser;password=bloguser
+      - ConnectionStrings__InventoryDatabase=host=postgres_image;port=5432;database=configurationDB;username=bloguser;password=bloguser
       - InventoryPath=/inventories/{0}/group_vars
+      - EventBusConnection=rabbitmq
+      - EventBusUserName=guest
+      - EventBusPassword=guest
+      - EventBusRetryCount=2
     ports:
       - "32873:80"
       - "32872:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  inventory.devices.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ConnectionStrings__InventoryDatabase=host=postgres_image;port=5432;database=serversDB;username=bloguser;password=bloguser
+      - InventoryPath=/inventories/{0}/group_vars
+      - EventBusConnection=rabbitmq
+      - EventBusUserName=guest
+      - EventBusPassword=guest
+      - EventBusRetryCount=2
+    ports:
+      - "32773:80"
+      - "32772:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  inventory.gateway.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - "32673:80"
+      - "32672:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  inventory.networks.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - "32973:80"
+      - "32972:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+volumes:
+  cachingdata:
+    external: false
+
+

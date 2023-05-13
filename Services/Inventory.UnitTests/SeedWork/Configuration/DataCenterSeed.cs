@@ -13,8 +13,8 @@ namespace Inventory.UnitTests.SeedWork.Configuration
         {
             var datacenters = new List<DataCenter>();
 
-            datacenters.Add(new DataCenter("EMEA-FR-PARIS","France"));
-            datacenters.Add(new DataCenter("EMEA-UK-LDN", "United Kingdom"));
+            datacenters.Add(new DataCenter("EMEA-FR-PARIS","France", Inventory.Domain.Enums.DataCenterType.OnPremise));
+            datacenters.Add(new DataCenter("EMEA-UK-LDN", "United Kingdom", Inventory.Domain.Enums.DataCenterType.OnPremise));
 
             return datacenters;
         }

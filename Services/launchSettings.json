@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "composeLaunchAction": "LaunchBrowser",
+      "composeLaunchServiceName": "inventory.configuration.api",
+      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/graphql",
+      "serviceActions": {
+        "inventory.configuration.api": "StartDebugging",
+        "inventory.devices.api": "StartDebugging"
+      }
+    }
+  }
+}

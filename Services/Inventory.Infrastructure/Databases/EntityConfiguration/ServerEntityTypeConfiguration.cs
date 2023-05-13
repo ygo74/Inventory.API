@@ -37,6 +37,9 @@ namespace Inventory.Infrastructure.Databases.EntityConfiguration
                 .WithMany(l => l.Servers)
                 .HasForeignKey(s => s.LocationId);
 
+            // Application instances
+            builder.OwnsMany(e => e.Applications);
+
             // Ignore server Properties
             //Variables
             //builder.Ignore(s => s.Variables);

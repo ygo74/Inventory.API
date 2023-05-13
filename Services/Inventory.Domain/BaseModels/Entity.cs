@@ -1,9 +1,10 @@
-﻿using MediatR;
+﻿using Inventory.Domain.Events;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Inventory.Domain.BaseModels
+namespace Inventory.Common.DomainModels
 {
     public abstract class Entity
     {
@@ -21,16 +22,16 @@ namespace Inventory.Domain.BaseModels
             }
         }
 
-        private List<INotification> _domainEvents;
-        public IReadOnlyCollection<INotification> DomainEvents => _domainEvents?.AsReadOnly();
+        private List<IInternalNotification> _domainEvents;
+        public IReadOnlyCollection<IInternalNotification> DomainEvents => _domainEvents?.AsReadOnly();
 
-        public void AddDomainEvent(INotification eventItem)
+        public void AddDomainEvent(IInternalNotification eventItem)
         {
-            _domainEvents = _domainEvents ?? new List<INotification>();
+            _domainEvents = _domainEvents ?? new List<IInternalNotification>();
             _domainEvents.Add(eventItem);
         }
 
-        public void RemoveDomainEvent(INotification eventItem)
+        public void RemoveDomainEvent(IInternalNotification eventItem)
         {
             _domainEvents?.Remove(eventItem);
         }

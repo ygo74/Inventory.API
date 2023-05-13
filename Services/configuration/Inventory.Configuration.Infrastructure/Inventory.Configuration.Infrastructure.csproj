@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EFCore.NamingConventions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.11">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.11" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\common\Inventory.Common.Domain\Inventory.Common.Domain.csproj" />
+    <ProjectReference Include="..\..\common\Inventory.Common.Infrastructure\Inventory.Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\Inventory.Configuration.Domain\Inventory.Configuration.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

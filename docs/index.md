@@ -16,3 +16,5 @@ has_children: false
 
 ## Goals
 
+https://learn.microsoft.com/en-us/azure/architecture/microservices/
+https://learn.microsoft.com/en-us/azure/architecture/microservices/model/domain-analysis

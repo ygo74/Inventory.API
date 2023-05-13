@@ -1,4 +1,4 @@
-﻿using Inventory.Domain.BaseModels;
+﻿using Inventory.Common.DomainModels;
 using Inventory.Domain.Models;
 using Inventory.Domain.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;

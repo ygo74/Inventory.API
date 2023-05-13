@@ -7,6 +7,7 @@ using Inventory.Domain.Repositories.Interfaces;
 using Inventory.Infrastructure.Databases;
 using Inventory.Infrastructure.Databases.Repositories;
 using Inventory.UnitTests.SeedWork.Configuration;
+using Inventory.UnitTests.SeedWork.Credentials;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -64,6 +65,7 @@ namespace Inventory.UnitTests
         {
 
             var serviceCollection = new ServiceCollection();
+
             serviceCollection.AddMemoryCache();
             serviceCollection.AddLogging();
 
@@ -87,6 +89,9 @@ namespace Inventory.UnitTests
             // AutoMapper
             serviceCollection.AddAutoMapper(typeof(Inventory.API.Startup));
 
+            // Azure infrastructure
+            //ServicesExtension.RegisterService(serviceCollection);
+            //serviceCollection.UseInfrastructureAzureService();
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
 
@@ -139,7 +144,11 @@ namespace Inventory.UnitTests
 
         public InventoryDbContext DbContext => _serviceProvider.GetService<InventoryDbContext>();
 
+        public T GetService<T>() => _serviceProvider.GetService<T>();
+
         public ILogger<T> GetLogger<T>() => _serviceProvider.GetService<ILogger<T>>();
+
+        public IMapper GetMapper() => _serviceProvider.GetService<IMapper>();
 
         public IMediator GetMediator() => _serviceProvider.GetService<IMediator>();
 
@@ -149,11 +158,17 @@ namespace Inventory.UnitTests
         {
             var dbContext = DbContext;
 
+            // Configuration
             dbContext.TrustLevels.AddRange(TrustLevelSeed.Get());
             dbContext.DataCenters.AddRange(DataCenterSeed.Get());
             dbContext.Locations.AddRange(LocationSeed.Get());
             dbContext.Environments.AddRange(EnvironmentSeed.Get());
             dbContext.OperatingSystems.AddRange(OperatingSystemSeed.Get());
+            DbContext.Applications.AddRange(ApplicationSeed.Get());
+
+            // Credentials
+            DbContext.Credentials.AddRange(CredentialSeed.Get());
+
             dbContext.SaveChanges();
 
         }

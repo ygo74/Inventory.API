@@ -18,7 +18,7 @@ namespace Inventory.API.Graphql.Queries
         public ConfigurationQuery(IDataLoaderContextAccessor accessor, IAsyncRepository<Location> locationRepository,
                                                                        IAsyncRepository<TrustLevel> trustLevelRepository,
                                                                        IAsyncRepository<Inventory.Domain.Models.Configuration.Environment> environmentRepository,
-                                                                       IAsyncRepository<Inventory.Domain.Models.Application> applicationRepository)
+                                                                       IAsyncRepository<Inventory.Domain.Models.Configuration.Application> applicationRepository)
         {
 
             Field<ListGraphType<LocationType>, List<Location>>()
@@ -53,7 +53,7 @@ namespace Inventory.API.Graphql.Queries
             //            }
             //        });
 
-            Field<ListGraphType<ApplicationType>, List<Inventory.Domain.Models.Application>>()
+            Field<ListGraphType<ApplicationType>, List<Inventory.Domain.Models.Configuration.Application>>()
                     .Name("Applications")
                     .Argument<StringGraphType>("name")
                     .Argument<StringGraphType>("code")

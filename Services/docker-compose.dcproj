@@ -3,10 +3,10 @@
   <PropertyGroup Label="Globals">
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
-    <ProjectGuid>ce1deb9a-c2e7-4560-8f9b-c8b7131c374e</ProjectGuid>
+    <ProjectGuid>b03b3418-d1a0-43cf-ae13-2411661264bd</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
-    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/ui/playground</DockerServiceUrl>
-    <DockerServiceName>inventory.api</DockerServiceName>
+    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/graphql</DockerServiceUrl>
+    <DockerServiceName>inventory.configuration.api</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">

@@ -1,0 +1,61 @@
+---
+# -----------------------------------------------------------------------------
+# Configuration API - Continuous Integration pipeline
+# -----------------------------------------------------------------------------
+trigger:
+  batch: true
+  branches:
+    include:
+      # for new release to production: release flow strategy
+      - release/configuration/v*
+      - refs/release/configuration/v*
+      - master
+      - feature/configuration/*
+      - topic/configuration/*
+      - Onion-Architecture
+  paths:
+    include:
+      - /Services/configuration/
+      - builds
+
+# parameters:
+#   - name: debugPipelineFlow
+#     type: boolean
+#     default: false
+
+variables:
+  - group: Azure_Credential
+  - group: inventorydb-deployment
+
+  - name: serviceName
+    value: configuration-api
+
+  - name: projectPath
+    value: ./Services/configuration/Inventory.Configuration.Api/Inventory.Configuration.Api.csproj
+
+  - name: testsProjectPath
+    value: ./Services/configuration/Inventory.Configuration.UnitTests/Inventory.Configuration.UnitTests.csproj
+
+  - name: infrastructureProjectPath
+    value: ./Services/configuration/Inventory.Configuration.Infrastructure/Inventory.Configuration.Infrastructure.csproj
+
+  - name: repositoryName
+    value: DynamicInventory/configuration-api
+
+  - name: dockerFile
+    value: ./Services/configuration/Inventory.Configuration.Api/Dockerfile
+
+  - name: chartName
+    value: configuration-api
+
+stages:
+  - template: ./templates/service-build-ci.yaml
+    parameters:
+      serviceName:               $(serviceName)
+      projectPath:               $(projectPath)
+      testsProjectPath:          $(testsProjectPath)
+      infrastructureProjectPath: $(infrastructureProjectPath)
+      repositoryName:            $(repositoryName)
+      dockerFile:                $(dockerFile)
+      chartName:                 $(chartName)
+      # debugPipelineFlow:         $({{ parameters.debugPipelineFlow }})

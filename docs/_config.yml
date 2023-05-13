@@ -18,12 +18,12 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Dynamic Inventory
+title: Dynamic Inventory API
 email: yannickgobert@yahoo.fr
 description: >- # this means to ignore newlines until "baseurl:"
   Dynamic Inventory for Infrastructure
-baseurl: "/" # the subpath of your site, e.g. /blog
-url: "https://ygo74.github.io/Inventory.API/" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/Inventory.API" # the subpath of your site, e.g. /blog
+url: "https://ygo74.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
 github_username:  ygo74
 
@@ -32,10 +32,13 @@ github_username:  ygo74
 # plugins:
 #   - jekyll-feed
 # remote_theme: pages-themes/hacker@v0.2.0
-remote_theme: pmarsceill/just-the-docs
+# remote_theme: pdmosses/just-the-docs@callouts
+remote_theme: just-the-docs/just-the-docs@v0.4.2
 plugins:
 - jekyll-remote-theme # add this line to the plugins list if you already have one
 - jekyll-menus
+- jemoji
+- jekyll-avatar
 
 
 # Exclude from processing.
@@ -94,6 +97,10 @@ logo: "/assets/images/1024px-Devops-toolchain.svg.png"
 aux_links:
   "View Github repositories":
     - "//github.com/ygo74/Inventory.API"
+  "ygo74 Devops platform ":
+    - "//ygo74.github.io/"
+  "LinkedIn":
+    - "//www.linkedin.com/in/yannickgobert/"
 
 # Makes Aux links open in a new tab. Default is false
 aux_links_new_tab: true
@@ -102,3 +109,41 @@ heading_anchors: true
 
 # color_scheme: dark
 
+callouts:
+  admonition:
+    # title:
+    color: grey-lt
+  attention:
+    title: Attention
+    color: purple
+  caution:
+    title: Caution
+    color: yellow
+  custom:
+    title: Custom
+    color: pink
+    opacity: 0.3
+  danger:
+    title: Danger
+    color: red
+  error:
+    title: Error
+    color: red
+  highlight:
+    color: yellow
+    opacity: 0.5
+  hint:
+    title: Hint
+    color: grey-dk
+  important:
+    title: Important
+    color: green
+  note:
+    title: Note
+    color: blue
+  tip:
+    title: Tip
+    color: grey-dk
+  warning:
+    title: Warning
+    color: red

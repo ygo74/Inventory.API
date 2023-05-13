@@ -1,0 +1,55 @@
+---
+# -----------------------------------------------------------------------------
+# Deployment for inventory.configuration.api
+# -----------------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: configuration-api-deployment
+  labels:
+    app: configuration-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: configuration-api
+  template:
+    metadata:
+      labels:
+        app: configuration-api
+    spec:
+      hostAliases:
+        - ip: "20.199.123.249"
+          hostnames:
+          - "inventory.francecentral.cloudapp.azure.com"
+      containers:
+        - name: configuration-api
+          image: aksbootstrap.azurecr.io/dynamicinventory/inventoryconfigurationapi:809
+          resources:
+            limits:
+              memory: 400Mi
+              cpu: 500m
+          ports:
+            - containerPort: 80
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
+            - name: ASPNETCORE_URLS
+              value: http://+:80
+            - name: ConnectionStrings__InventoryDatabase
+              value:
+        - name: postgres-image
+          image: postgres:latest
+          resources:
+            limits:
+              memory: 400Mi
+              cpu: 500m
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: ""
+            - name: POSTGRES_PASSWORD
+              value: ""
+            - name: POSTGRES_DB
+              value: ""

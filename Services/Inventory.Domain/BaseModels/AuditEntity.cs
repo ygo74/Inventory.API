@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inventory.Domain.BaseModels
+namespace Inventory.Common.DomainModels
 {
     public class AuditEntity : Entity
     {

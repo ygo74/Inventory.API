@@ -1,0 +1,52 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:55680
+      http:
+        endpoint: "0.0.0.0:55690"
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 2000
+  batch:
+
+exporters:
+  logging:
+    loglevel: debug
+  otlp/elastic:
+    endpoint: apm-server:8200
+    headers:
+      Authorization: "ApiKey QmYybHVvSUJBTG5ORlJEeHlvNXo6ZjJYMTNleVNUaVdZUl9tWm1EZ1pxZw=="
+    tls:
+      insecure: true
+  otlphttp/elastic:
+    endpoint: http://apm-server:8200
+    headers:
+      Authorization: "ApiKey QmYybHVvSUJBTG5ORlJEeHlvNXo6ZjJYMTNleVNUaVdZUl9tWm1EZ1pxZw=="
+    tls:
+      insecure: true
+
+extensions:
+  health_check:
+  pprof:
+
+service:
+  telemetry:
+    logs:
+      level: "debug"
+  extensions: [health_check,pprof]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      # processors: [batch]
+      exporters: [logging, otlp/elastic]
+    metrics:
+      receivers: [otlp]
+      # processors: [batch]
+      exporters: [logging, otlp/elastic]
+    logs:
+      receivers: [otlp]
+      # processors: [batch]
+      exporters: [logging, otlp/elastic]
