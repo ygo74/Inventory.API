@@ -174,94 +174,94 @@ stages:
 #             tags: '$(tag)'
 
 
-- stage: DeployApplication
-  # dependsOn:
-  #   - BuildImages
+# - stage: DeployApplication
+#   # dependsOn:
+#   #   - BuildImages
 
-  jobs:
-    - deployment: B1
-      # pool:
-      #   vmImage: 'ubuntu-16.04'
-      environment: env1
-      strategy:
-        runOnce:
-          preDeploy:
-            steps:
+#   jobs:
+#     - deployment: B1
+#       # pool:
+#       #   vmImage: 'ubuntu-16.04'
+#       environment: env1
+#       strategy:
+#         runOnce:
+#           preDeploy:
+#             steps:
 
-              - checkout: self
-                displayName: "Checkout repository"
+              # - checkout: self
+              #   displayName: "Checkout repository"
 
-              - task: AzureCLI@2
-                displayName: "Copy databases script files"
-                inputs:
-                  azureSubscription: 'Ansible-Automation'
-                  scriptType: 'pscore'
-                  scriptLocation: 'inlineScript'
-                  inlineScript: |
+              # - task: AzureCLI@2
+              #   displayName: "Copy databases script files"
+              #   inputs:
+              #     azureSubscription: 'Ansible-Automation'
+              #     scriptType: 'pscore'
+              #     scriptLocation: 'inlineScript'
+              #     inlineScript: |
 
-                    # Get credentials
-                    az aks get-credentials --resource-group rg-aks-bootstrap-networking-spoke --name aksbootstrap --admin
+              #       # Get credentials
+              #       az aks get-credentials --resource-group rg-aks-bootstrap-networking-spoke --name aksbootstrap --admin
 
-                    # Copy files to pods
-                    kubectl cp ./databases/configuration/createUsers.sql  postgresql-0:/tmp/createUsers.sql -c postgresql -n postgresql
-                    kubectl cp ./databases/configuration/configurationDB.sql  postgresql-0:/tmp/configurationDB.sql -c postgresql -n postgresql
-                    kubectl cp ./databases/configuration/grantUsers.sql  postgresql-0:/tmp/grantUsers.sql -c postgresql -n postgresql
+              #       # Copy files to pods
+              #       kubectl cp ./databases/configuration/createUsers.sql  postgresql-0:/tmp/createUsers.sql -c postgresql -n postgresql
+              #       kubectl cp ./databases/configuration/configurationDB.sql  postgresql-0:/tmp/configurationDB.sql -c postgresql -n postgresql
+              #       kubectl cp ./databases/configuration/grantUsers.sql  postgresql-0:/tmp/grantUsers.sql -c postgresql -n postgresql
 
-              - task: Kubernetes@1
-                displayName: "Create User"
-                inputs:
-                  connectionType: 'Azure Resource Manager'
-                  azureSubscriptionEndpoint: 'Ansible-Automation'
-                  azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
-                  kubernetesCluster: 'aksbootstrap'
-                  namespace: 'postgresql'
-                  command: 'exec'
-                  arguments: >-
-                    postgresql-0 -c postgresql -n postgresql
-                    -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
-                    -f /tmp/createUsers.sql
+              # - task: Kubernetes@1
+              #   displayName: "Create User"
+              #   inputs:
+              #     connectionType: 'Azure Resource Manager'
+              #     azureSubscriptionEndpoint: 'Ansible-Automation'
+              #     azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
+              #     kubernetesCluster: 'aksbootstrap'
+              #     namespace: 'postgresql'
+              #     command: 'exec'
+              #     arguments: >-
+              #       postgresql-0 -c postgresql -n postgresql
+              #       -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
+              #       -f /tmp/createUsers.sql
 
-              - task: Kubernetes@1
-                displayName: "Set User password"
-                inputs:
-                  connectionType: 'Azure Resource Manager'
-                  azureSubscriptionEndpoint: 'Ansible-Automation'
-                  azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
-                  kubernetesCluster: 'aksbootstrap'
-                  namespace: 'postgresql'
-                  command: 'exec'
-                  arguments: >-
-                    postgresql-0 -c postgresql -n postgresql
-                    -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
-                    -c "ALTER USER configurationdb_rw WITH PASSWORD '$(configurationdb-rw)'"
+              # - task: Kubernetes@1
+              #   displayName: "Set User password"
+              #   inputs:
+              #     connectionType: 'Azure Resource Manager'
+              #     azureSubscriptionEndpoint: 'Ansible-Automation'
+              #     azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
+              #     kubernetesCluster: 'aksbootstrap'
+              #     namespace: 'postgresql'
+              #     command: 'exec'
+              #     arguments: >-
+              #       postgresql-0 -c postgresql -n postgresql
+              #       -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
+              #       -c "ALTER USER configurationdb_rw WITH PASSWORD '$(configurationdb-rw)'"
 
-              - task: Kubernetes@1
-                displayName: "Create Database objects"
-                inputs:
-                  connectionType: 'Azure Resource Manager'
-                  azureSubscriptionEndpoint: 'Ansible-Automation'
-                  azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
-                  kubernetesCluster: 'aksbootstrap'
-                  namespace: 'postgresql'
-                  command: 'exec'
-                  arguments: >-
-                    postgresql-0 -c postgresql -n postgresql
-                    -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
-                    -f /tmp/configurationDB.sql
+              # - task: Kubernetes@1
+              #   displayName: "Create Database objects"
+              #   inputs:
+              #     connectionType: 'Azure Resource Manager'
+              #     azureSubscriptionEndpoint: 'Ansible-Automation'
+              #     azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
+              #     kubernetesCluster: 'aksbootstrap'
+              #     namespace: 'postgresql'
+              #     command: 'exec'
+              #     arguments: >-
+              #       postgresql-0 -c postgresql -n postgresql
+              #       -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
+              #       -f /tmp/configurationDB.sql
 
-              - task: Kubernetes@1
-                displayName: "Grant users to Database objects"
-                inputs:
-                  connectionType: 'Azure Resource Manager'
-                  azureSubscriptionEndpoint: 'Ansible-Automation'
-                  azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
-                  kubernetesCluster: 'aksbootstrap'
-                  namespace: 'postgresql'
-                  command: 'exec'
-                  arguments: >-
-                    postgresql-0 -c postgresql -n postgresql
-                    -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
-                    -f /tmp/grantUsers.sql
+              # - task: Kubernetes@1
+              #   displayName: "Grant users to Database objects"
+              #   inputs:
+              #     connectionType: 'Azure Resource Manager'
+              #     azureSubscriptionEndpoint: 'Ansible-Automation'
+              #     azureResourceGroup: 'rg-aks-bootstrap-networking-spoke'
+              #     kubernetesCluster: 'aksbootstrap'
+              #     namespace: 'postgresql'
+              #     command: 'exec'
+              #     arguments: >-
+              #       postgresql-0 -c postgresql -n postgresql
+              #       -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/ConfigurationDB
+              #       -f /tmp/grantUsers.sql
 
               # - task: Bash@3
               #   displayName: "Generate secret file"
@@ -288,75 +288,75 @@ stages:
               #     arguments: >-
               #       secret generic --from-file=$(Build.ArtifactStagingDirectory)/appsettings.secrets.json sampleapp-appsettings2
 
-          deploy:
-            steps:
-            - bash: echo $(myOutputVar)
+          # deploy:
+          #   steps:
+            # - bash: echo $(myOutputVar)
 
-            - checkout: self
-              displayName: "Checkout repository"
+            # - checkout: self
+            #   displayName: "Checkout repository"
 
-            - task: HelmInstaller@0
-              displayName: Install Helm tools
-              inputs:
-                helmVersion: '3.8.0'
-                checkLatestHelmVersion: false
-                installKubectl: true
-                kubectlVersion: '1.26.3'
+            # - task: HelmInstaller@0
+            #   displayName: Install Helm tools
+            #   inputs:
+            #     helmVersion: '3.8.0'
+            #     checkLatestHelmVersion: false
+            #     installKubectl: true
+            #     kubectlVersion: '1.26.3'
 
-            - task: HelmDeploy@0
-              displayName: Package helm chart
-              inputs:
-                command: 'package'
-                chartPath: 'builds/kubernetes/charts/configuration-api'
+            # - task: HelmDeploy@0
+            #   displayName: Package helm chart
+            #   inputs:
+            #     command: 'package'
+            #     chartPath: 'builds/kubernetes/charts/configuration-api'
 
-            - task: AzureCLI@2
-              inputs:
-                azureSubscription: 'Ansible-Automation'
-                scriptType: 'pscore'
-                scriptLocation: 'inlineScript'
-                inlineScript: |
+            # - task: AzureCLI@2
+            #   inputs:
+            #     azureSubscription: 'Ansible-Automation'
+            #     scriptType: 'pscore'
+            #     scriptLocation: 'inlineScript'
+            #     inlineScript: |
 
-                  # Init User Name / token password
-                  $USER_NAME="00000000-0000-0000-0000-000000000000"
-                  $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
+            #       # Init User Name / token password
+            #       $USER_NAME="00000000-0000-0000-0000-000000000000"
+            #       $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
 
-                  # Push helm chart to registry
-                  helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
-                  helm push $(Build.ArtifactStagingDirectory)/configuration-api-0.1.0.tgz oci://aksbootstrap.azurecr.io/helm/dynamic-inventory
+            #       # Push helm chart to registry
+            #       helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
+            #       helm push $(Build.ArtifactStagingDirectory)/configuration-api-0.1.0.tgz oci://aksbootstrap.azurecr.io/helm/dynamic-inventory
 
-                addSpnToEnvironment: true
-                useGlobalConfig: true
-              displayName: Save chart into ACR
+            #     addSpnToEnvironment: true
+            #     useGlobalConfig: true
+            #   displayName: Save chart into ACR
 
 
-            - task: AzureCLI@2
-              inputs:
-                azureSubscription: 'Ansible-Automation'
-                scriptType: 'pscore'
-                scriptLocation: 'inlineScript'
-                inlineScript: |
+            # - task: AzureCLI@2
+            #   inputs:
+            #     azureSubscription: 'Ansible-Automation'
+            #     scriptType: 'pscore'
+            #     scriptLocation: 'inlineScript'
+            #     inlineScript: |
 
-                  # Get credentials for the AKS cluster
-                  az aks get-credentials --resource-group rg-aks-bootstrap-networking-spoke --name aksbootstrap
+            #       # Get credentials for the AKS cluster
+            #       az aks get-credentials --resource-group rg-aks-bootstrap-networking-spoke --name aksbootstrap
 
-                  # Init User Name / token password
-                  $USER_NAME="00000000-0000-0000-0000-000000000000"
-                  $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
+            #       # Init User Name / token password
+            #       $USER_NAME="00000000-0000-0000-0000-000000000000"
+            #       $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
 
-                  # install helm chart from registry
-                  helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
-                  helm upgrade inventoryconfigurationapi oci://aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api `
-                      --install `
-                      --namespace dynamic-inventory `
-                      --version 0.1.0 `
-                      --set image.tag=915 `
-                      --set postgres.host=postgresql.postgresql `
-                      --set postgres.database=ConfigurationDB `
-                      --set postgres.user=configurationdb_rw `
-                      --set postgres.password=$env:DB_PASSWORD
+            #       # install helm chart from registry
+            #       helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
+            #       helm upgrade inventoryconfigurationapi oci://aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api `
+            #           --install `
+            #           --namespace dynamic-inventory `
+            #           --version 0.1.0 `
+            #           --set image.tag=915 `
+            #           --set postgres.host=postgresql.postgresql `
+            #           --set postgres.database=ConfigurationDB `
+            #           --set postgres.user=configurationdb_rw `
+            #           --set postgres.password=$env:DB_PASSWORD
 
-                addSpnToEnvironment: true
-                useGlobalConfig: true
-              displayName: Deploy chart to CLuster
-              env:
-                DB_PASSWORD: $(configurationdb-rw)
+            #     addSpnToEnvironment: true
+            #     useGlobalConfig: true
+            #   displayName: Deploy chart to CLuster
+            #   env:
+            #     DB_PASSWORD: $(configurationdb-rw)

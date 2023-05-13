@@ -1,0 +1,22 @@
+---
+
+- stage: deployTests
+  # dependsOn:
+  #   - BuildImages
+
+  jobs:
+    - deployment: deployTests
+      # pool:
+      #   vmImage: 'ubuntu-16.04'
+      environment: Dynamic-Inventory-Tests
+      strategy:
+        runOnce:
+          preDeploy:
+            steps:
+
+              - template: ./steps/databases-cd-steps.yaml
+
+          deploy:
+            steps:
+
+              - template: ./steps/chart-cd-steps.yaml

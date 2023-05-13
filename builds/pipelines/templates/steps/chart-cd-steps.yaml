@@ -1,0 +1,46 @@
+---
+steps:
+
+  - checkout: self
+    displayName: "Checkout repository"
+
+  - task: HelmInstaller@0
+    displayName: Install Helm tools
+    inputs:
+      helmVersion: '3.8.0'
+      checkLatestHelmVersion: false
+      installKubectl: true
+      kubectlVersion: '1.26.3'
+
+
+  - task: AzureCLI@2
+    displayName: Deploy chart to CLuster
+    inputs:
+      azureSubscription: 'Ansible-Automation'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      addSpnToEnvironment: true
+      useGlobalConfig: true
+      inlineScript: |
+
+        # Get credentials for the AKS cluster
+        az aks get-credentials --resource-group rg-aks-bootstrap-networking-spoke --name aksbootstrap
+
+        # Init User Name / token password
+        $USER_NAME="00000000-0000-0000-0000-000000000000"
+        $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
+
+        # install helm chart from registry
+        helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
+        helm upgrade inventoryconfigurationapi oci://aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api `
+            --install `
+            --namespace dynamic-inventory `
+            --version 0.1.0 `
+            --set image.tag=915 `
+            --set postgres.host=postgresql.postgresql `
+            --set postgres.database=ConfigurationDB `
+            --set postgres.user=configurationdb_rw `
+            --set postgres.password=$env:DB_PASSWORD
+
+    env:
+      DB_PASSWORD: $(configurationdb-rw)
