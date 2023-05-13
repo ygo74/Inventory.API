@@ -46,6 +46,8 @@ stages:
 
         steps:
           - template: ./steps/dotnet-ci-steps.yaml
+
+          - template: ./steps/versioning-ci-steps.yaml
             parameters:
               serviceName:       ${{ parameters.serviceName }}
               projectPath:       ${{ parameters.projectPath }}
