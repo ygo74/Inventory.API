@@ -37,7 +37,7 @@ spec:
             - name: ASPNETCORE_URLS
               value: http://+:80
             - name: ConnectionStrings__InventoryDatabase
-              value: host=localhost;port=5432;database=configurationDB;username=bloguser;password=bloguser
+              value:
         - name: postgres-image
           image: postgres:latest
           resources:
@@ -48,8 +48,8 @@ spec:
             - containerPort: 5432
           env:
             - name: POSTGRES_USER
-              value: "bloguser"
+              value: ""
             - name: POSTGRES_PASSWORD
-              value: "bloguser"
+              value: ""
             - name: POSTGRES_DB
-              value: "configurationDB"
+              value: ""
