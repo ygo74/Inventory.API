@@ -1,0 +1,9 @@
+resources:
+  pipelines:
+  - pipeline: configuration-api-ci # Name of the pipeline resource.
+    source: configuration-api-ci # The name of the pipeline referenced by this pipeline resource.
+    project: iac # Required only if the source pipeline is in another project
+    trigger: true # Run app-ci pipeline when any run of security-lib-ci completes
+
+steps:
+- bash: echo "app-ci runs after security-lib-ci completes"
