@@ -39,4 +39,4 @@ steps:
       failOnIssues: true
       projectName: 'Inventory.API'
       organization: 'ygo74'
-      testDirectory: '$(Build.SourcesDirectory)/Services/configuration'
+      testDirectory: '$(Build.SourcesDirectory)/Services/configuration/Inventory.Configuration.Api'
