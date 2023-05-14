@@ -32,9 +32,12 @@ This repository has the following goals:
 
 ## Application status
 
-| Service | Build status | Deployment status |
-|:------- |:------------:|:-----------------:|
-| Configuration | [![Build Status](https://dev.azure.com/ygo74/iac/_apis/build/status%2Fconfiguration-api-ci?branchName=master)](https://dev.azure.com/ygo74/iac/_build/latest?definitionId=34&branchName=master) | [![Build Status](https://dev.azure.com/ygo74/iac/_apis/build/status%2Fconfiguration-api-cd?branchName=master)](https://dev.azure.com/ygo74/iac/_build/latest?definitionId=35&branchName=master) |
+- License : https://img.shields.io/github/license/ygo74/Inventory.API
+- Vulnerabilities : https://img.shields.io/snyk/vulnerabilities/github/ygo74/Inventory.API
+
+| Service | Build status | Tests status | Code coverage | Deployment status |
+|:------- |:------------:|:------------:|:-------------:|:-----------------:|
+| Configuration | [![Build Status](https://dev.azure.com/ygo74/iac/_apis/build/status%2Fconfiguration-api-ci?branchName=master)](https://dev.azure.com/ygo74/iac/_build/latest?definitionId=34&branchName=master) | https://img.shields.io/azure-devops/tests/ygo74/iac/34?compact_message | https://img.shields.io/azure-devops/coverage/ygo74/iac/34 |[![Build Status](https://dev.azure.com/ygo74/iac/_apis/build/status%2Fconfiguration-api-cd?branchName=master)](https://dev.azure.com/ygo74/iac/_build/latest?definitionId=35&branchName=master) |
 
 ## Resources
 
