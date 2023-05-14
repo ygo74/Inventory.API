@@ -45,6 +45,9 @@ stages:
         displayName: Build Service
 
         steps:
+          - checkout: self
+            fetchDepth: 0
+
           - template: ./steps/versioning-ci-steps.yaml
 
           - template: ./steps/dotnet-ci-steps.yaml
