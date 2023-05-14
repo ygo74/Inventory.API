@@ -19,6 +19,6 @@ has_children: false
 
 ![Application Architecture](./../assets/images/application-architecture.png)
 
-## Microservices architecture
+## Sources
 
-![Microservices Architecture](./../assets/images/microservices-architecture.png)
+- <https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures>{:target="_blank"}
