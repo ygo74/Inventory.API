@@ -44,12 +44,12 @@ steps:
     inputs:
       serviceConnectionEndpoint: 'Snyk'
       testType:                  'container'
-      dockerImageName:           '${{ parameters.repositoryName }}'
+      dockerImageName:           'aksbootstrap.azurecr.io/${{ parameters.repositoryName }}'
       dockerfilePath:            '${{ parameters.dockerFile }}'
       severityThreshold:         'high'
       monitorWhen:               'always'
       failOnIssues:              true
-      projectName:               'Inventory.API'
+      projectName:               'configuration-api'
       organization:              'ygo74'
 
   - task: Docker@2
