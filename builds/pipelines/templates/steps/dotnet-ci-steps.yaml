@@ -33,10 +33,10 @@ steps:
   - task: SnykSecurityScan@1
     inputs:
       serviceConnectionEndpoint: 'Snyk'
-      testType: 'app'
-      severityThreshold: 'high'
-      monitorWhen: 'always'
-      failOnIssues: true
-      projectName: 'Inventory.API'
-      organization: 'ygo74'
-      testDirectory: '$(Build.SourcesDirectory)/Services/configuration/Inventory.Configuration.Api'
+      testType:                  'app'
+      severityThreshold:         'high'
+      monitorWhen:               'always'
+      failOnIssues:              true
+      projectName:               'configuration-api'
+      organization:              'ygo74'
+      testDirectory:             '$(Build.SourcesDirectory)/Services/configuration/Inventory.Configuration.Api'
