@@ -29,3 +29,14 @@ steps:
       projects: '${{ parameters.projectPath }}'
       versioningScheme: byEnvVar
       versionEnvVar: 'version.semVer'
+
+  - task: SnykSecurityScan@1
+    inputs:
+      serviceConnectionEndpoint: 'Snyk'
+      testType: 'app'
+      severityThreshold: 'high'
+      monitorWhen: 'always'
+      failOnIssues: true
+      projectName: 'Inventory.API'
+      organization: 'ygo74'
+      testDirectory: '$(Build.SourcesDirectory)/Services/configuration'

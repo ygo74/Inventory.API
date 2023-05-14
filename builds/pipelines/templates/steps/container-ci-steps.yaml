@@ -40,6 +40,18 @@ steps:
       tags: |
         ${{ parameters.dockerTags }}
 
+  - task: SnykSecurityScan@1
+    inputs:
+      serviceConnectionEndpoint: 'Snyk'
+      testType:                  'container'
+      dockerImageName:           '${{ parameters.repositoryName }}'
+      dockerfilePath:            '${{ parameters.dockerFile }}'
+      severityThreshold:         'high'
+      monitorWhen:               'always'
+      failOnIssues:              true
+      projectName:               'Inventory.API'
+      organization:              'ygo74'
+
   - task: Docker@2
     displayName: Deploy image to mesfcontainerregistry
     inputs:

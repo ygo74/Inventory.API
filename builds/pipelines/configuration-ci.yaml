@@ -10,6 +10,7 @@ trigger:
       - release/configuration/v*
       - refs/release/configuration/v*
       - master
+      - feature/*
       - feature/configuration/*
       - topic/configuration/*
       - Onion-Architecture
