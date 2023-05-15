@@ -40,11 +40,18 @@ steps:
       tags: |
         ${{ parameters.dockerTags }}
 
+  - task: Bash@3
+    displayName: Display environment variables
+    inputs:
+      targetType: 'inline'
+      script: |
+        docker images
+
   - task: SnykSecurityScan@1
     inputs:
       serviceConnectionEndpoint: 'Snyk'
       testType:                  'container'
-      dockerImageName:           '${{ parameters.repositoryName }}'
+      dockerImageName:           'aksbootstrap.azurecr.io/${{ parameters.repositoryName }}'
       dockerfilePath:            '${{ parameters.dockerFile }}'
       severityThreshold:         'high'
       monitorWhen:               'always'
