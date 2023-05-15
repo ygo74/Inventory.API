@@ -40,3 +40,4 @@ steps:
       projectName:               'configuration-api'
       organization:              'ygo74'
       testDirectory:             '$(Build.SourcesDirectory)/Services/configuration/Inventory.Configuration.Api'
+      additionalArguments:       '--all-projects'
