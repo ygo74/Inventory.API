@@ -64,7 +64,7 @@ steps:
     inputs:
       serviceConnectionEndpoint: 'Snyk'
       testType:                  'container'
-      dockerImageName:           'aksbootstrap.azurecr.io/${{ parameters.repositoryName }}'
+      dockerImageName:           'aksbootstrap.azurecr.io/${{ parameters.repositoryName }}:${{ parameters.dockerTags }}'
       dockerfilePath:            '${{ parameters.dockerFile }}'
       severityThreshold:         'high'
       monitorWhen:               'always'
