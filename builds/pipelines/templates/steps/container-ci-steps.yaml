@@ -47,6 +47,19 @@ steps:
       script: |
         docker images
 
+  - task: AzureCLI@2
+    displayName: Log to registry
+    inputs:
+      azureSubscription: 'Ansible-Automation'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      addSpnToEnvironment: true
+      useGlobalConfig: true
+      inlineScript: |
+
+        # Log to registry
+        az acr login --name  aksbootstrap
+
   - task: SnykSecurityScan@1
     inputs:
       serviceConnectionEndpoint: 'Snyk'
