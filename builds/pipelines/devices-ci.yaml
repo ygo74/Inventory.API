@@ -7,17 +7,17 @@ trigger:
   branches:
     include:
       # for new release to production: release flow strategy
-      - release/configuration/v*
-      - refs/release/configuration/v*
+      - release/devices/v*
+      - refs/release/devices/v*
       - master
       - feature/*
-      - feature/configuration/*
-      - topic/configuration/*
+      - feature/devices/*
+      - topic/devices/*
       - Onion-Architecture
   paths:
     include:
-      - /Services/configuration/
-      - /builds/configuration*
+      - /Services/devices/
+      - /builds/devices*
       - /builds/templates/
 
 # parameters:
@@ -30,25 +30,25 @@ variables:
   - group: inventorydb-deployment
 
   - name: serviceName
-    value: configuration-api
+    value: devices-api
 
   - name: projectPath
-    value: ./Services/configuration/Inventory.Configuration.Api/Inventory.Configuration.Api.csproj
+    value: ./Services/devices/Inventory.Devices.Api/Inventory.Devices.Api.csproj
 
   - name: testsProjectPath
-    value: ./Services/configuration/Inventory.Configuration.UnitTests/Inventory.Configuration.UnitTests.csproj
+    value: ./Services/devices/Inventory.Devices.UnitTests/Inventory.Devices.UnitTests.csproj
 
   - name: infrastructureProjectPath
-    value: ./Services/configuration/Inventory.Configuration.Infrastructure/Inventory.Configuration.Infrastructure.csproj
+    value: ./Services/devices/Inventory.Devices.Infrastructure/Inventory.Devices.Infrastructure.csproj
 
   - name: repositoryName
-    value: dynamicinventory/configuration-api
+    value: dynamicinventory/devices-api
 
   - name: dockerFile
-    value: ./Services/configuration/Inventory.Configuration.Api/Dockerfile
+    value: ./Services/devices/Inventory.Devices.Api/Dockerfile
 
   - name: chartName
-    value: configuration-api
+    value: devices-api
 
 stages:
   - template: ./templates/service-build-ci.yaml

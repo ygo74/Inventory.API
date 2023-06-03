@@ -56,19 +56,20 @@ stages:
               projectPath:       ${{ parameters.projectPath }}
               # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
-      - job: DotnetUnitTests
-        displayName: Tests Service
-        dependsOn:
-          - DotnetBuild
+      - {{ if parameters.testsProjectPath }}:
+        - job: DotnetUnitTests
+          displayName: Tests Service
+          dependsOn:
+            - DotnetBuild
 
-        steps:
-          - template: ./steps/dotnet-unittests-ci-steps.yaml
-            parameters:
-              serviceName:       ${{ parameters.serviceName }}
-              projectPath:       ${{ parameters.projectPath }}
-              testsProjectPath:  ${{ parameters.testsProjectPath }}
-              preTest:           ${{ parameters.preTest }}
-              # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+          steps:
+            - template: ./steps/dotnet-unittests-ci-steps.yaml
+              parameters:
+                serviceName:       ${{ parameters.serviceName }}
+                projectPath:       ${{ parameters.projectPath }}
+                testsProjectPath:  ${{ parameters.testsProjectPath }}
+                preTest:           ${{ parameters.preTest }}
+                # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
   # ---------------------------------------------------------------------------
   # Build Container image and chart
@@ -114,22 +115,23 @@ stages:
   # ---------------------------------------------------------------------------
   # Build Databases scripts
   # ---------------------------------------------------------------------------
-  - stage: BuildDbScripts
-    displayName: Build database scripts
-    dependsOn:
-      - BuildApplication
+  - {{ if parameters.infrastructureProjectPath }}:
+    - stage: BuildDbScripts
+      displayName: Build database scripts
+      dependsOn:
+        - BuildApplication
 
-    jobs:
-      - job: DatabaseBuild
-        displayName: Build database scripts
-        variables:
-          tag: $(Build.BuildId)
+      jobs:
+        - job: DatabaseBuild
+          displayName: Build database scripts
+          variables:
+            tag: $(Build.BuildId)
 
-        steps:
-          - template: ./steps/databases-ci-steps.yaml
-            parameters:
-              serviceName:               ${{ parameters.serviceName }}
-              projectPath:               ${{ parameters.projectPath }}
-              infrastructureProjectPath: ${{ parameters.infrastructureProjectPath }}
-              # debugPipelineFlow:         ${{ parameters.debugPipelineFlow }}
+          steps:
+            - template: ./steps/databases-ci-steps.yaml
+              parameters:
+                serviceName:               ${{ parameters.serviceName }}
+                projectPath:               ${{ parameters.projectPath }}
+                infrastructureProjectPath: ${{ parameters.infrastructureProjectPath }}
+                # debugPipelineFlow:         ${{ parameters.debugPipelineFlow }}
 
