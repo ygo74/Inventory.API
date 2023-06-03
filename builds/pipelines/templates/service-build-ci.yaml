@@ -8,9 +8,11 @@ parameters:
 
   - name: testsProjectPath
     type: string
+    default: ''
 
   - name: infrastructureProjectPath
     type: string
+    default: ''
 
   - name: 'preTest'
     type: stepList
