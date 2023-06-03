@@ -25,6 +25,12 @@ Delivery an application to its execution environment has also to tackle some con
 - Manage secrets
 - Host services behind a reverse proxy
 
+## Prerequisites
+
+- ✅ [ACR deployed](https://ygo74.github.io/azure/03-acr/00-index.html)
+- ✅ [AKS deployed](https://ygo74.github.io/azure/04-aks/00-index.html)
+- ✅ Azure Devops Services account
+
 ## Sources
 
 - <https://learn.microsoft.com/en-us/azure/architecture/microservices/ci-cd-kubernetes>{:target="_blank"}
