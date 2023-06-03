@@ -56,7 +56,7 @@ stages:
               projectPath:       ${{ parameters.projectPath }}
               # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
-      - {{ if parameters.testsProjectPath }}:
+      - ${{ if parameters.testsProjectPath }}:
         - job: DotnetUnitTests
           displayName: Tests Service
           dependsOn:
@@ -115,7 +115,7 @@ stages:
   # ---------------------------------------------------------------------------
   # Build Databases scripts
   # ---------------------------------------------------------------------------
-  - {{ if parameters.infrastructureProjectPath }}:
+  - ${{ if parameters.infrastructureProjectPath }}:
     - stage: BuildDbScripts
       displayName: Build database scripts
       dependsOn:
