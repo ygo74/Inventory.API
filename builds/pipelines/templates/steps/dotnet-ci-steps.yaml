@@ -28,7 +28,8 @@ steps:
       targetType: 'inline'
       script: |
         # Get project directory path
-        $directoryPath = Get-Item -Path .\Analyse-files.ps1 | Select-Object -ExpandProperty Directory | Resolve-Path | Select-Object -ExpandProperty Path
+        $projectPath = "${{ parameters.projectPath }}"
+        $directoryPath = Get-Item -Path $projectPath | Select-Object -ExpandProperty Directory | Resolve-Path | Select-Object -ExpandProperty Path
         echo "Project directory path : $directoryPath"
         echo "##vso[task.setvariable variable=directoryPath]$directoryPath"
 
