@@ -69,7 +69,7 @@ steps:
       severityThreshold:         'high'
       monitorWhen:               'always'
       failOnIssues:              true
-      projectName:               'configuration-api'
+      projectName:               '${{ parameters.repositoryName }}'
       organization:              'ygo74'
 
   - task: Docker@2
