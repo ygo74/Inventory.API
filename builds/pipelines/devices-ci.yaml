@@ -16,9 +16,9 @@ trigger:
       - Onion-Architecture
   paths:
     include:
-      - /Services/devices/
+      - /Services/devices/*
       - /builds/devices*
-      - /builds/templates/
+      - /builds/templates/*
 
 # parameters:
 #   - name: debugPipelineFlow
