@@ -22,6 +22,19 @@ steps:
         script: |
           export
 
+  - task: PowerShell@2
+    displayName: Set project directory path
+    inputs:
+      targetType: 'inline'
+      script: |
+        # Get project directory path
+        $directoryPath = Get-Item -Path .\Analyse-files.ps1 | Select-Object -ExpandProperty Directory | Resolve-Path | Select-Object -ExpandProperty Path
+        echo "Project directory path : $directoryPath"
+        echo "##vso[task.setvariable variable=directoryPath]$directoryPath"
+
+      failOnStderr: true
+      pwsh: true
+
   - task: DotNetCoreCLI@2
     displayName: Build ${{ parameters.serviceName }}
     inputs:
@@ -37,6 +50,6 @@ steps:
       severityThreshold:         'high'
       monitorWhen:               'always'
       failOnIssues:              true
-      projectName:               'configuration-api'
+      projectName:               '${{ parameters.serviceName }}'
       organization:              'ygo74'
-      testDirectory:             '$(Build.SourcesDirectory)/Services/configuration/Inventory.Configuration.Api'
+      testDirectory:             '$(directoryPath)'
