@@ -54,15 +54,18 @@ namespace Inventory.Devices.Infrastructure
                 .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../Inventory.Devices.Api"))
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environment}.json", optional: true)
+                .AddJsonFile("secrets/appsettings.secrets.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
-            // Get connection string
-            var optionsBuilder = new DbContextOptionsBuilder<ServerDbContext>();
-            var connectionString = config.GetConnectionString("InventoryDatabase");
-            optionsBuilder.UseNpgsql(connectionString);
-
             IServiceCollection services = new ServiceCollection();
+
+            // Get connection string
+            services.AddDbContext<ServerDbContext>((serviceProvider, options) =>
+            {
+                var connectionString = config.GetConnectionString("InventoryDatabase");
+                options.UseNpgsql(connectionString);
+            });
 
             //services.AddMediatR(typeof(ServerDbContext));
             services.AddScoped<IMediator, NoMediator>();

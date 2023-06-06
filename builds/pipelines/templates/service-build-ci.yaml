@@ -75,44 +75,51 @@ stages:
 
   # ---------------------------------------------------------------------------
   # Build Container image and chart
+  # - Build when Pull request to Master or branch != feature/, topic/, hotfix/
   # ---------------------------------------------------------------------------
 
-  - stage: BuildImages
-    displayName: Build image and chart
-    dependsOn:
-      - BuildApplication
+  - ${{ if or(
+              and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/master')),
+              not(contains(variables['System.PullRequest.TargetBranch'],'refs/heads/feature/')),
+              not(contains(variables['System.PullRequest.TargetBranch'],'refs/heads/topic/')),
+              not(contains(variables['System.PullRequest.TargetBranch'],'refs/heads/hotfix/'))
+              )}}
+    - stage: BuildImages
+      displayName: Build image and chart
+      dependsOn:
+        - BuildApplication
 
-    jobs:
-      - job: DockerBuild
-        displayName: Build and publish docker images
-        variables:
-          tag: $(Build.BuildId)
+      jobs:
+        - job: DockerBuild
+          displayName: Build and publish docker images
+          variables:
+            tag: $(Build.BuildId)
 
-        steps:
-          - template: ./steps/container-ci-steps.yaml
-            parameters:
-              serviceName:       ${{ parameters.serviceName }}
-              repositoryName:    ${{ parameters.repositoryName }}
-              dockerFile:        ${{ parameters.dockerFile }}
-              dockerTags:        $(tag)
-              # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+          steps:
+            - template: ./steps/container-ci-steps.yaml
+              parameters:
+                serviceName:       ${{ parameters.serviceName }}
+                repositoryName:    ${{ parameters.repositoryName }}
+                dockerFile:        ${{ parameters.dockerFile }}
+                dockerTags:        $(tag)
+                # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
-      - job: HelmBuild
-        displayName: Build and publish Helm chart
-        dependsOn:
-          - DockerBuild
+        - job: HelmBuild
+          displayName: Build and publish Helm chart
+          dependsOn:
+            - DockerBuild
 
-        variables:
-          tag: $(Build.BuildId)
+          variables:
+            tag: $(Build.BuildId)
 
-        steps:
-          - template: ./steps/chart-ci-steps.yaml
-            parameters:
-              serviceName:       ${{ parameters.serviceName }}
-              chartPath:         ${{ parameters.chartPath }}
-              chartName:         ${{ parameters.chartName }}
-              chartVersion:      $(tag)
-              # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+          steps:
+            - template: ./steps/chart-ci-steps.yaml
+              parameters:
+                serviceName:       ${{ parameters.serviceName }}
+                chartPath:         ${{ parameters.chartPath }}
+                chartName:         ${{ parameters.chartName }}
+                chartVersion:      $(tag)
+                # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
   # ---------------------------------------------------------------------------
   # Build Databases scripts
