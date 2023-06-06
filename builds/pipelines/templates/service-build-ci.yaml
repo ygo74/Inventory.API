@@ -78,12 +78,13 @@ stages:
   # - Build when Pull request to Master or branch != feature/, topic/, hotfix/
   # ---------------------------------------------------------------------------
 
-  - ${{ if or(
-              and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/master')),
-              not(contains(variables['System.PullRequest.TargetBranch'],'refs/heads/feature/')),
-              not(contains(variables['System.PullRequest.TargetBranch'],'refs/heads/topic/')),
-              not(contains(variables['System.PullRequest.TargetBranch'],'refs/heads/hotfix/'))
-              )}}
+  # - ${{ if or(
+  #             and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/master')),
+  #             not(contains(variables['System.PullRequest.TargetBranch'],'refs/heads/feature/')),
+  #             not(contains(variables['System.PullRequest.TargetBranch'],'refs/heads/topic/')),
+  #             not(contains(variables['System.PullRequest.TargetBranch'],'refs/heads/hotfix/'))
+  #             )}}
+  - ${{ if not(contains(variables['System.PullRequest.TargetBranch'], 'refs/heads/feature/')) }}
     - stage: BuildImages
       displayName: Build image and chart
       dependsOn:
