@@ -51,7 +51,7 @@ namespace Inventory.Devices.Infrastructure
 
             // Build config
             IConfiguration config = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../Inventory.Devices.API"))
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../Inventory.Devices.Api"))
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environment}.json", optional: true)
                 .AddEnvironmentVariables()
