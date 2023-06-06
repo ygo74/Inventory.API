@@ -9,12 +9,12 @@ parameters:
   - name: projectPath
     type: string
 
-  # - name: debugPipelineFlow
-  #   type: boolean
-  #   default: false
+  - name: debugPipelineFlow
+    type: boolean
+    default: true
 
 steps:
-  - ${{ if eq(variables['System.debug'], 'true') }}:
+  - ${{ if parameters.debugPipelineFlow }}:
     - task: Bash@3
       displayName: Display environment variables
       inputs:
