@@ -17,8 +17,8 @@ trigger:
   paths:
     include:
       - /Services/devices/*
-      - /builds/devices*
-      - /builds/templates/*
+      - /builds/pipelines/devices*
+      - /builds/pipelines/templates/*
 
 # parameters:
 #   - name: debugPipelineFlow
