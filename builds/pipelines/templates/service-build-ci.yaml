@@ -79,7 +79,7 @@ stages:
   # ---------------------------------------------------------------------------
 
   # - ${{ if or(and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/master')), not(contains(variables['Build.SourceBranch'],'refs/heads/feature/')), not(contains(variables['Build.SourceBranch'],'refs/heads/topic/')), not(contains(variables['Build.SourceBranch'],'refs/heads/hotfix/'))) }}:
-  - ${{ if not(or(startsWith(variables['Build.SourceBranch'],'refs/heads/feature/'), startsWith(variables['Build.SourceBranch'],'refs/heads/topic/'))) }}:
+  - ${{ if not(or(startsWith(variables['Build.SourceBranch'],'refs/heads/feature/'), startsWith(variables['Build.SourceBranch'],'refs/heads/topic/'), startsWith(variables['Build.SourceBranch'],'refs/heads/hotfix/'))) }}:
     - stage: BuildImages
       displayName: Build image and chart
       dependsOn:
