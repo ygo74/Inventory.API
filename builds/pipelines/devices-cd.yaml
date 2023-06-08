@@ -11,18 +11,19 @@ variables:
     value: aksbootstrap
 
   - name: serviceName
-    value: configuration-api
+    value: devices-api
 
   - name: databaseName
-    value: configurationDB
+    value: devicesDB
 
   - name: databaseUserName
-    value: configurationdb_rw
+    value: devicesdb_rw
+
 
 resources:
   pipelines:
-  - pipeline: configuration-api-ci # Name of the pipeline resource.
-    source: configuration-api-ci # The name of the pipeline referenced by this pipeline resource.
+  - pipeline: devices-api-ci # Name of the pipeline resource.
+    source: devices-api-ci # The name of the pipeline referenced by this pipeline resource.
     project: iac # Required only if the source pipeline is in another project
     trigger: true # Run app-ci pipeline when any run of security-lib-ci completes
 

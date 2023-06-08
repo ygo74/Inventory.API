@@ -1,4 +1,29 @@
 ---
+parameters:
+  - name: aksResourceGroup
+    type: string
+
+  - name: aksName
+    type: string
+
+  - name: serviceName
+    type: string
+
+  - name: hasDatabase
+    type: boolean
+    default: true
+
+  - name: databaseName
+    type: string
+    default: ''
+
+  - name: databaseUserName
+    type: string
+    default: ''
+
+  - name: databaseUserPassword
+    type: string
+    default: ''
 
 stages:
 
@@ -13,10 +38,18 @@ stages:
         environment: Dynamic-Inventory-Tests
         strategy:
           runOnce:
-            preDeploy:
-              steps:
+            ${{ if parameters.hasDatabase }}:
+              preDeploy:
+                steps:
 
-                - template: ./steps/databases-cd-steps.yaml
+                  - template: ./steps/databases-cd-steps.yaml
+                    parameters:
+                      aksResourceGroup:     ${{ parameters.aksResourceGroup }}
+                      aksName:              ${{ parameters.aksName }}
+                      serviceName:          ${{ parameters.serviceName }}
+                      databaseName:         ${{ parameters.databaseName }}
+                      databaseUserName:     ${{ parameters.databaseUserName }}
+                      databaseUserPassword: ${{ parameters.databaseUserPassword }}
 
             deploy:
               steps:
