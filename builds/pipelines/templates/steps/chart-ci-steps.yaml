@@ -43,20 +43,21 @@ steps:
       command:   'package'
       chartPath: '${{ parameters.chartPath}}/${{ parameters.chartName}}'
 
-  - task: AzureCLI@2
-    displayName: Save chart into ACR
-    inputs:
-      azureSubscription: 'Ansible-Automation'
-      scriptType:        'pscore'
-      scriptLocation:    'inlineScript'
-      inlineScript: |
-        # Init User Name / token password
-        $USER_NAME="00000000-0000-0000-0000-000000000000"
-        $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
+  - ${{ if or(and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/master')), startsWith(variables['Build.SourceBranch'],'refs/heads/master'), startsWith(variables['Build.SourceBranch'],'refs/heads/release/')) }}:
+    - task: AzureCLI@2
+      displayName: Save chart into ACR
+      inputs:
+        azureSubscription: 'Ansible-Automation'
+        scriptType:        'pscore'
+        scriptLocation:    'inlineScript'
+        inlineScript: |
+          # Init User Name / token password
+          $USER_NAME="00000000-0000-0000-0000-000000000000"
+          $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
 
-        # Push helm chart to registry
-        helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
-        helm push $(Build.ArtifactStagingDirectory)/${{ parameters.chartName }}-0.1.0.tgz oci://aksbootstrap.azurecr.io/helm/dynamic-inventory
+          # Push helm chart to registry
+          helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
+          helm push $(Build.ArtifactStagingDirectory)/${{ parameters.chartName }}-0.1.0.tgz oci://aksbootstrap.azurecr.io/helm/dynamic-inventory
 
-      addSpnToEnvironment: true
-      useGlobalConfig: true
+        addSpnToEnvironment: true
+        useGlobalConfig: true
