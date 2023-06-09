@@ -36,11 +36,6 @@ resources:
           - feature/configuration/*
           - topic/configuration/*
           - Onion-Architecture
-      paths:
-        include:
-          - /Services/configuration/
-          - /builds/configuration*
-          - /builds/templates/
 
 stages:
   - template: ./templates/service-deploy-cd.yaml
