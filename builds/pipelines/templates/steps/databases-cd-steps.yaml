@@ -119,7 +119,7 @@ steps:
         postgresql-0 -c postgresql -n postgresql
         -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/${{ parameters.databaseName }}
         -f /tmp/grantUsers.sql
-    condition: and(
-      succeeded(),
-      eq(variables['hasGrantUsers'], 'True')
-    )
+    # condition: and(
+    #   succeeded(),
+    #   eq(variables['hasGrantUsers'], 'True')
+    # )
