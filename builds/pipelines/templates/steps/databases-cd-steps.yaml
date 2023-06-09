@@ -74,10 +74,7 @@ steps:
         postgresql-0 -c postgresql -n postgresql
         -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/${{ parameters.databaseName }}
         -f /tmp/createUsers.sql
-    condition: and(
-      succeeded(),
-      eq(variables['hasCreateUsers'], 'True')
-    )
+    # condition: and( succeeded(), eq(variables[ 'hasCreateUsers' ], 'True') )
 
   - task: Kubernetes@1
     displayName: "Set User password"
@@ -124,5 +121,5 @@ steps:
         -f /tmp/grantUsers.sql
     condition: and(
       succeeded(),
-      eq(variables['hasCreateUsers'], 'True')
+      eq(variables['hasGrantUsers'], 'True')
     )
