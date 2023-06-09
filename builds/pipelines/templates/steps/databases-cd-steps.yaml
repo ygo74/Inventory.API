@@ -108,6 +108,7 @@ steps:
 
   - task: Kubernetes@1
     displayName: "Grant users to Database objects"
+    condition: eq( variables[ 'hasGrantUsers' ], 'True')
     inputs:
       connectionType: 'Azure Resource Manager'
       azureSubscriptionEndpoint: 'Ansible-Automation'
@@ -119,7 +120,3 @@ steps:
         postgresql-0 -c postgresql -n postgresql
         -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/${{ parameters.databaseName }}
         -f /tmp/grantUsers.sql
-    # condition: and(
-    #   succeeded(),
-    #   eq(variables['hasGrantUsers'], 'True')
-    # )
