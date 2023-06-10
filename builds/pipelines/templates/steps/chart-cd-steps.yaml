@@ -1,5 +1,20 @@
 ---
+parameters:
+
+  - name: debugPipelineFlow
+    type: boolean
+    default: true
+
+
 steps:
+
+  - ${{ if parameters.debugPipelineFlow }}:
+    - task: Bash@3
+      displayName: Display environment variables
+      inputs:
+        targetType: 'inline'
+        script: |
+          export
 
   - checkout: self
     displayName: "Checkout repository"
