@@ -56,7 +56,7 @@ steps:
             --set postgres.host=postgresql.postgresql `
             --set postgres.database=ConfigurationDB `
             --set postgres.user=configurationdb_rw `
-            --set postgres.password=$env:DB_PASSWORD
+            --set postgres.password=$(configurationdb-rw)
 
     env:
       DB_PASSWORD: $(configurationdb-rw)
