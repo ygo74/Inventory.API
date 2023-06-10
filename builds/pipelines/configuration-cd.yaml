@@ -15,7 +15,7 @@ variables:
     value: configuration-api
 
   - name: databaseName
-    value: configurationDB
+    value: ConfigurationDB
 
   - name: databaseUserName
     value: configurationdb_rw
