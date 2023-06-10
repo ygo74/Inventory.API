@@ -1,5 +1,20 @@
 ---
+parameters:
+
+  - name: debugPipelineFlow
+    type: boolean
+    default: true
+
+
 steps:
+
+  - ${{ if parameters.debugPipelineFlow }}:
+    - task: Bash@3
+      displayName: Display environment variables
+      inputs:
+        targetType: 'inline'
+        script: |
+          export
 
   - checkout: self
     displayName: "Checkout repository"
@@ -17,7 +32,7 @@ steps:
     displayName: Deploy chart to CLuster
     inputs:
       azureSubscription: 'Ansible-Automation'
-      scriptType: 'pscore'
+      scriptType: 'bash'
       scriptLocation: 'inlineScript'
       addSpnToEnvironment: true
       useGlobalConfig: true
@@ -27,20 +42,21 @@ steps:
         az aks get-credentials --resource-group rg-aks-bootstrap-networking-spoke --name aksbootstrap
 
         # Init User Name / token password
-        $USER_NAME="00000000-0000-0000-0000-000000000000"
-        $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
+        USER_NAME="00000000-0000-0000-0000-000000000000"
+        password=$(az acr login -n aksbootstrap --expose-token --output tsv --query accessToken)
 
         # install helm chart from registry
         helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
-        helm upgrade inventoryconfigurationapi oci://aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api `
-            --install `
-            --namespace dynamic-inventory `
-            --version 0.1.0 `
-            --set image.tag=915 `
-            --set postgres.host=postgresql.postgresql `
-            --set postgres.database=ConfigurationDB `
-            --set postgres.user=configurationdb_rw `
-            --set postgres.password=$env:DB_PASSWORD
+        helm upgrade inventoryconfigurationapi oci://aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api \
+            --create-namespace \
+            --install \
+            --namespace dynamic-inventory \
+            --version $(resources.pipeline.configuration-api-ci.runName) \
+            --set image.tag=$(resources.pipeline.configuration-api-ci.runName) \
+            --set postgres.host=postgresql.postgresql \
+            --set postgres.database=ConfigurationDB \
+            --set postgres.user=configurationdb_rw \
+            --set postgres.password=$DB_PASSWORD
 
     env:
       DB_PASSWORD: $(configurationdb-rw)

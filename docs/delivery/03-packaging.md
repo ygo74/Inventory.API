@@ -15,6 +15,27 @@ has_children: false
 {:toc}
 </details>
 
+## Container Image
+
+## Helm chart
+
+1. Create Helm chart
+
+    ``` powershell
+    helm create devices-api
+
+    ```
+
+1. Define repository
+
+    set repository value into images dictionary in values.yaml
+
+    ``` yaml
+    image:
+      repository: aksbootstrap.azurecr.io/dynamicinventory/devices-api
+
+    ```
+
 kubectl create namespace dynamic-inventory
 # kubectl label namespace dynamic-inventory cert-manager.io/disable-validation=true
 

@@ -1,0 +1,63 @@
+---
+# -----------------------------------------------------------------------------
+# Gateway GraphQL API - Continuous Integration pipeline
+# -----------------------------------------------------------------------------
+trigger:
+  batch: true
+  branches:
+    include:
+      # for new release to production: release flow strategy
+      - release/gateway/v*
+      - refs/release/gateway/v*
+      - master
+      - feature/*
+      - feature/gateway/*
+      - topic/gateway/*
+      - Onion-Architecture
+  paths:
+    include:
+      - /Services/gateway/
+      - /builds/gateway*
+      - /builds/templates/
+
+# parameters:
+#   - name: debugPipelineFlow
+#     type: boolean
+#     default: false
+
+variables:
+  - group: Azure_Credential
+  - group: inventorydb-deployment
+
+  - name: serviceName
+    value: gateway-api
+
+  - name: projectPath
+    value: ./Services/gateway/Inventory.Gateway.Api/Inventory.Gateway.Api.csproj
+
+  # - name: testsProjectPath
+  #   value: ./Services/gateway/Inventory.Gateway.UnitTests/Inventory.Gateway.UnitTests.csproj
+
+  # - name: infrastructureProjectPath
+  #   value: ./Services/gateway/Inventory.Gateway.Infrastructure/Inventory.Gateway.Infrastructure.csproj
+
+  - name: repositoryName
+    value: dynamicinventory/gateway-api
+
+  - name: dockerFile
+    value: ./Services/gateway/Inventory.Gateway.Api/Dockerfile
+
+  - name: chartName
+    value: gateway-api
+
+stages:
+  - template: ./templates/service-build-ci.yaml
+    parameters:
+      serviceName:               $(serviceName)
+      projectPath:               $(projectPath)
+      # testsProjectPath:          $(testsProjectPath)
+      # infrastructureProjectPath: $(infrastructureProjectPath)
+      repositoryName:            $(repositoryName)
+      dockerFile:                $(dockerFile)
+      chartName:                 $(chartName)
+      # debugPipelineFlow:         $({{ parameters.debugPipelineFlow }})

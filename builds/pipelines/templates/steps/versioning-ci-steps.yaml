@@ -14,7 +14,7 @@ steps:
     inputs:
       useConfigFile: true
       configFilePath: 'GitVersion.yml'
-      additionalArguments: '/showConfig'
+      # additionalArguments: '/showConfig'
 
   - task: Bash@3
     displayName: Display GitVersion outputs (step output)

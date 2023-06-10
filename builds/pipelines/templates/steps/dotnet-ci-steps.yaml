@@ -9,18 +9,32 @@ parameters:
   - name: projectPath
     type: string
 
-  # - name: debugPipelineFlow
-  #   type: boolean
-  #   default: false
+  - name: debugPipelineFlow
+    type: boolean
+    default: true
 
 steps:
-  - ${{ if eq(variables['System.debug'], 'true') }}:
+  - ${{ if parameters.debugPipelineFlow }}:
     - task: Bash@3
       displayName: Display environment variables
       inputs:
         targetType: 'inline'
         script: |
           export
+
+  - task: PowerShell@2
+    displayName: Set project directory path
+    inputs:
+      targetType: 'inline'
+      script: |
+        # Get project directory path
+        $projectPath = "${{ parameters.projectPath }}"
+        $directoryPath = Get-Item -Path $projectPath | Select-Object -ExpandProperty Directory | Resolve-Path | Select-Object -ExpandProperty Path
+        echo "Project directory path : $directoryPath"
+        echo "##vso[task.setvariable variable=directoryPath]$directoryPath"
+
+      failOnStderr: true
+      pwsh: true
 
   - task: DotNetCoreCLI@2
     displayName: Build ${{ parameters.serviceName }}
@@ -29,3 +43,14 @@ steps:
       projects: '${{ parameters.projectPath }}'
       versioningScheme: byEnvVar
       versionEnvVar: 'version.semVer'
+
+  - task: SnykSecurityScan@1
+    inputs:
+      serviceConnectionEndpoint: 'Snyk'
+      testType:                  'app'
+      severityThreshold:         'high'
+      monitorWhen:               'always'
+      failOnIssues:              true
+      projectName:               '${{ parameters.serviceName }}'
+      organization:              'ygo74'
+      testDirectory:             '$(directoryPath)'

@@ -1,6 +1,50 @@
-mode: ContinuousDelivery
-branches: {}
+assembly-informational-format: '{FullSemVer}'
+mode: Mainline
+branches:
+  master:
+    tag: ''
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    regex: master|releases?[/-]
+    tracks-release-branches: false
+    is-release-branch: false
+  feature:
+    mode: ContinuousDelivery
+    tag: useBranchName
+    increment: Inherit
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
+    regex: features?[/-]
+    tracks-release-branches: false
+    is-release-branch: false
+  pull-request:
+    mode: ContinuousDelivery
+    tag: PullRequest
+    increment: None
+    prevent-increment-of-merged-branch-version: false
+    tag-number-pattern: '[/-](?<number>\d+)[-/]'
+    track-merge-target: false
+    regex: (pull|pull\-requests|pr|[0-9]+)[/-]
+    tracks-release-branches: false
+    is-release-branch: false
+  hotfix:
+    mode: ContinuousDelivery
+    tag: beta
+    increment: Patch
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
+    regex: hotfix(es)?[/-]
+    tracks-release-branches: false
+    is-release-branch: false
+  develop:
+    mode: ContinuousDeployment
+    tag: unstable
+    increment: Patch
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: true
+    regex: dev(elop)?(ment)?$
+    tracks-release-branches: true
+    is-release-branch: false
 ignore:
   sha: []
-merge-message-formats: {}
-update-build-number: true

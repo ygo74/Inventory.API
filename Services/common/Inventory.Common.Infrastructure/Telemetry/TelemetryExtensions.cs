@@ -34,7 +34,8 @@ namespace Inventory.Common.Infrastructure.Telemetry
 
             serviceCollection.AddSingleton<ITelemetry, Telemetry>();
 
-            serviceCollection.AddOpenTelemetryTracing(tracerProviderBuilder =>
+            serviceCollection.AddOpenTelemetry()
+                .WithTracing(tracerProviderBuilder =>
             {
                 tracerProviderBuilder
                     .AddSource("test")

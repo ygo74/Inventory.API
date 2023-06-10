@@ -8,9 +8,11 @@ parameters:
 
   - name: testsProjectPath
     type: string
+    default: ''
 
   - name: infrastructureProjectPath
     type: string
+    default: ''
 
   - name: 'preTest'
     type: stepList
@@ -29,6 +31,14 @@ parameters:
   - name: chartName
     type: string
 
+  - name: containerRegistry
+    type: string
+    default: 'aksbootstrap'
+
+  - name: containerRegistryFqdn
+    type: string
+    default: 'aksbootstrap.azurecr.io'
+
   # - name: debugPipelineFlow
   #   type: boolean
   #   default: false
@@ -45,6 +55,9 @@ stages:
         displayName: Build Service
 
         steps:
+          - checkout: self
+            fetchDepth: 0
+
           - template: ./steps/versioning-ci-steps.yaml
 
           - template: ./steps/dotnet-ci-steps.yaml
@@ -53,80 +66,88 @@ stages:
               projectPath:       ${{ parameters.projectPath }}
               # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
-      - job: DotnetUnitTests
-        displayName: Tests Service
-        dependsOn:
-          - DotnetBuild
+      - ${{ if parameters.testsProjectPath }}:
+        - job: DotnetUnitTests
+          displayName: Tests Service
+          dependsOn:
+            - DotnetBuild
 
-        steps:
-          - template: ./steps/dotnet-unittests-ci-steps.yaml
-            parameters:
-              serviceName:       ${{ parameters.serviceName }}
-              projectPath:       ${{ parameters.projectPath }}
-              testsProjectPath:  ${{ parameters.testsProjectPath }}
-              preTest:           ${{ parameters.preTest }}
-              # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+          steps:
+            - template: ./steps/dotnet-unittests-ci-steps.yaml
+              parameters:
+                serviceName:       ${{ parameters.serviceName }}
+                projectPath:       ${{ parameters.projectPath }}
+                testsProjectPath:  ${{ parameters.testsProjectPath }}
+                preTest:           ${{ parameters.preTest }}
+                # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
   # ---------------------------------------------------------------------------
   # Build Container image and chart
+  # - Build when Pull request to Master or branch != feature/, topic/, hotfix/
   # ---------------------------------------------------------------------------
 
-  - stage: BuildImages
-    displayName: Build image and chart
-    dependsOn:
-      - BuildApplication
+  - ${{ if or(not(or(startsWith(variables['Build.SourceBranch'],'refs/heads/feature/'), startsWith(variables['Build.SourceBranch'],'refs/heads/topic/'), startsWith(variables['Build.SourceBranch'],'refs/heads/hotfix/'))), and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master'))) }}:
+    - stage: BuildImages
+      displayName: Build image and chart
+      dependsOn:
+        - BuildApplication
 
-    jobs:
-      - job: DockerBuild
-        displayName: Build and publish docker images
-        variables:
-          tag: $(Build.BuildId)
+      jobs:
+        - job: DockerBuild
+          displayName: Build and publish docker images
+          variables:
+            tag: $(Build.BuildNumber)
 
-        steps:
-          - template: ./steps/container-ci-steps.yaml
-            parameters:
-              serviceName:       ${{ parameters.serviceName }}
-              repositoryName:    ${{ parameters.repositoryName }}
-              dockerFile:        ${{ parameters.dockerFile }}
-              dockerTags:        $(tag)
-              # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+          steps:
+            - template: ./steps/container-ci-steps.yaml
+              parameters:
+                serviceName:           ${{ parameters.serviceName }}
+                repositoryName:        ${{ parameters.repositoryName }}
+                dockerFile:            ${{ parameters.dockerFile }}
+                dockerTags:            $(tag)
+                containerRegistry:     ${{ parameters.containerRegistry }}
+                containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
+                # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
-      - job: HelmBuild
-        displayName: Build and publish Helm chart
-        dependsOn:
-          - DockerBuild
+        - job: HelmBuild
+          displayName: Build and publish Helm chart
+          dependsOn:
+            - DockerBuild
 
-        variables:
-          tag: $(Build.BuildId)
+          variables:
+            tag: $(Build.BuildId)
 
-        steps:
-          - template: ./steps/chart-ci-steps.yaml
-            parameters:
-              serviceName:       ${{ parameters.serviceName }}
-              chartPath:         ${{ parameters.chartPath }}
-              chartName:         ${{ parameters.chartName }}
-              chartVersion:      $(tag)
-              # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+          steps:
+            - template: ./steps/chart-ci-steps.yaml
+              parameters:
+                serviceName:           ${{ parameters.serviceName }}
+                chartPath:             ${{ parameters.chartPath }}
+                chartName:             ${{ parameters.chartName }}
+                chartVersion:          $(tag)
+                containerRegistry:     ${{ parameters.containerRegistry }}
+                containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
+                # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
   # ---------------------------------------------------------------------------
   # Build Databases scripts
   # ---------------------------------------------------------------------------
-  - stage: BuildDbScripts
-    displayName: Build database scripts
-    dependsOn:
-      - BuildApplication
+  - ${{ if parameters.infrastructureProjectPath }}:
+    - stage: BuildDbScripts
+      displayName: Build database scripts
+      dependsOn:
+        - BuildApplication
 
-    jobs:
-      - job: DatabaseBuild
-        displayName: Build database scripts
-        variables:
-          tag: $(Build.BuildId)
+      jobs:
+        - job: DatabaseBuild
+          displayName: Build database scripts
+          variables:
+            tag: $(Build.BuildId)
 
-        steps:
-          - template: ./steps/databases-ci-steps.yaml
-            parameters:
-              serviceName:               ${{ parameters.serviceName }}
-              projectPath:               ${{ parameters.projectPath }}
-              infrastructureProjectPath: ${{ parameters.infrastructureProjectPath }}
-              # debugPipelineFlow:         ${{ parameters.debugPipelineFlow }}
+          steps:
+            - template: ./steps/databases-ci-steps.yaml
+              parameters:
+                serviceName:               ${{ parameters.serviceName }}
+                projectPath:               ${{ parameters.projectPath }}
+                infrastructureProjectPath: ${{ parameters.infrastructureProjectPath }}
+                # debugPipelineFlow:         ${{ parameters.debugPipelineFlow }}
 
