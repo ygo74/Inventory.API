@@ -46,8 +46,9 @@ steps:
   - task: HelmDeploy@0
     displayName: Package helm chart
     inputs:
-      command:   'package'
-      chartPath: '${{ parameters.chartPath}}/${{ parameters.chartName}}'
+      command:      'package'
+      chartPath:    '${{ parameters.chartPath}}/${{ parameters.chartName}}'
+      chartVersion: '$(Build.BuildNumber)'
 
   - ${{ if or(eq(variables['Build.Reason'],'PullRequest'), startsWith(variables['Build.SourceBranch'],'refs/heads/master'), startsWith(variables['Build.SourceBranch'],'refs/heads/release/')) }}:
     - task: AzureCLI@2
