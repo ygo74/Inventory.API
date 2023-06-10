@@ -80,10 +80,16 @@ steps:
       projectName:               '${{ parameters.repositoryName }}'
       organization:              'ygo74'
 
-  # - ${{ if or(and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master')), startsWith(variables['Build.SourceBranch'],'refs/heads/master'), startsWith(variables['Build.SourceBranch'],'refs/heads/release/')) }}:
-  - ${{ if and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master')) }}:
+  - ${{ if or(eq(variables['Build.Reason'],'PullRequest'), startsWith(variables['Build.SourceBranch'],'refs/heads/master'), startsWith(variables['Build.SourceBranch'],'refs/heads/release/')) }}:
     - task: Docker@2
       displayName: Deploy image to ${{ parameters.containerRegistry }}
+      condition: and(
+                  or(
+                    and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master')),
+                    startsWith(variables['Build.SourceBranch'],'refs/heads/master'),
+                    startsWith(variables['Build.SourceBranch'],'refs/heads/release/')
+                  )
+                 )
       inputs:
         containerRegistry: '${{ parameters.containerRegistry }}'
         repository:        '${{ parameters.repositoryName }}'
