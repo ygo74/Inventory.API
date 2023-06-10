@@ -38,6 +38,17 @@ steps:
   - checkout: self
     displayName: "Checkout repository"
 
+  - task: DownloadPipelineArtifact@2
+    inputs:
+      buildType: 'specific'
+      project: 'fa79f165-cc7b-4aaa-bb4f-ed39e9bd257c'
+      definition: '34'
+      specificBuildWithTriggering: true
+      buildVersionToDownload: 'latest'
+      allowPartiallySucceededBuilds: true
+      artifactName: 'SQLScripts'
+      targetPath: '$(Pipeline.Workspace)'
+
   - task: AzureCLI@2
     displayName: "Copy databases script files"
     inputs:

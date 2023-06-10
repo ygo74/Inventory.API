@@ -37,6 +37,7 @@ Delivery an application to its execution environment has also to tackle some con
 - <https://learn.microsoft.com/en-us/azure/architecture/solution-ideas/articles/dev-test-microservice>{:target="_blank"}
 
 
+https://learn.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#system-variables-devops-services
 
 https://andrewlock.net/deploying-asp-net-core-applications-to-kubernetes-part-8-running-database-migrations-using-jobs-and-init-containers/
 
