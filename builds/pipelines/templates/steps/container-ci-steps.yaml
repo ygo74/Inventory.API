@@ -15,13 +15,21 @@ parameters:
   - name: dockerTags
     type: string
 
-  # - name: debugPipelineFlow
-  #   type: boolean
-  #   default: false
+  - name: containerRegistry
+    type: string
+    default: 'aksbootstrap'
+
+  - name: containerRegistryFqdn
+    type: string
+    default: 'aksbootstrap.azurecr.io'
+
+  - name: debugPipelineFlow
+    type: boolean
+    default: true
 
 steps:
 
-  - ${{ if eq(variables['System.debug'], 'true') }}:
+  - ${{ if parameters.debugPipelineFlow }}:
     - task: Bash@3
       displayName: Display environment variables
       inputs:
@@ -32,7 +40,7 @@ steps:
   - task: Docker@2
     displayName: Build ${{ parameters.serviceName }}
     inputs:
-      containerRegistry: 'aksbootstrap'
+      containerRegistry: '${{ parameters.containerRegistry }}'
       repository:        '${{ parameters.repositoryName }}'
       command:           'build'
       Dockerfile:        '${{ parameters.dockerFile }}'
@@ -48,7 +56,7 @@ steps:
         docker images
 
   - task: AzureCLI@2
-    displayName: Log to registry
+    displayName: Log to registry ${{ parameters.containerRegistry }}
     inputs:
       azureSubscription: 'Ansible-Automation'
       scriptType: 'pscore'
@@ -58,13 +66,13 @@ steps:
       inlineScript: |
 
         # Log to registry
-        az acr login --name  aksbootstrap
+        az acr login --name  ${{ parameters.containerRegistry }}
 
   - task: SnykSecurityScan@1
     inputs:
       serviceConnectionEndpoint: 'Snyk'
       testType:                  'container'
-      dockerImageName:           'aksbootstrap.azurecr.io/${{ parameters.repositoryName }}:${{ parameters.dockerTags }}'
+      dockerImageName:           '${{ parameters.containerRegistryFqdn }}/${{ parameters.repositoryName }}:${{ parameters.dockerTags }}'
       dockerfilePath:            '${{ parameters.dockerFile }}'
       severityThreshold:         'high'
       monitorWhen:               'always'
@@ -72,11 +80,12 @@ steps:
       projectName:               '${{ parameters.repositoryName }}'
       organization:              'ygo74'
 
-  - ${{ if or(and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/master')), startsWith(variables['Build.SourceBranch'],'refs/heads/master'), startsWith(variables['Build.SourceBranch'],'refs/heads/release/')) }}:
+  # - ${{ if or(and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master')), startsWith(variables['Build.SourceBranch'],'refs/heads/master'), startsWith(variables['Build.SourceBranch'],'refs/heads/release/')) }}:
+  - ${{ if and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master')) }}:
     - task: Docker@2
-      displayName: Deploy image to mesfcontainerregistry
+      displayName: Deploy image to ${{ parameters.containerRegistry }}
       inputs:
-        containerRegistry: 'aksbootstrap'
+        containerRegistry: '${{ parameters.containerRegistry }}'
         repository:        '${{ parameters.repositoryName }}'
         command:           'push'
         tags: |
