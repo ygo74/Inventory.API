@@ -51,8 +51,8 @@ steps:
             --create-namespace `
             --install `
             --namespace dynamic-inventory `
-            --version $(Build.BuildNumber) `
-            --set image.tag=$(Build.BuildNumber) `
+            --version $(resources.pipeline.configuration-api-ci.runName) `
+            --set image.tag=$(resources.pipeline.configuration-api-ci.runName) `
             --set postgres.host=postgresql.postgresql `
             --set postgres.database=ConfigurationDB `
             --set postgres.user=configurationdb_rw `
