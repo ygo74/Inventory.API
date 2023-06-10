@@ -126,7 +126,7 @@ steps:
       arguments: >-
         postgresql-0 -c postgresql -n postgresql
         -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/${{ parameters.databaseName }}
-        -c "ALTER USER ${{ parameters.databaseUserName }} WITH PASSWORD '$USER_PASSWORD'"
+        -c "ALTER USER ${{ parameters.databaseUserName }} WITH PASSWORD '${{ parameters.databaseUserPassword }}'"
     env:
       USER_PASSWORD: '${{ parameters.databaseUserPassword }}'
 
