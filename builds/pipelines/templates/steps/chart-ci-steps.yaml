@@ -43,7 +43,7 @@ steps:
       command:   'package'
       chartPath: '${{ parameters.chartPath}}/${{ parameters.chartName}}'
 
-  - ${{ if or(and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/master')), startsWith(variables['Build.SourceBranch'],'refs/heads/master'), startsWith(variables['Build.SourceBranch'],'refs/heads/release/')) }}:
+  - ${{ if or(and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master')), startsWith(variables['Build.SourceBranch'],'refs/heads/master'), startsWith(variables['Build.SourceBranch'],'refs/heads/release/')) }}:
     - task: AzureCLI@2
       displayName: Save chart into ACR
       inputs:
