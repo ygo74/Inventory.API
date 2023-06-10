@@ -32,7 +32,7 @@ steps:
     displayName: Deploy chart to CLuster
     inputs:
       azureSubscription: 'Ansible-Automation'
-      scriptType: 'pscore'
+      scriptType: 'bash'
       scriptLocation: 'inlineScript'
       addSpnToEnvironment: true
       useGlobalConfig: true
@@ -43,20 +43,20 @@ steps:
 
         # Init User Name / token password
         $USER_NAME="00000000-0000-0000-0000-000000000000"
-        $password=az acr login -n aksbootstrap --expose-token --output tsv --query accessToken
+        $password=$(az acr login -n aksbootstrap --expose-token --output tsv --query accessToken)
 
         # install helm chart from registry
         helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
-        helm upgrade inventoryconfigurationapi oci://aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api `
-            --create-namespace `
-            --install `
-            --namespace dynamic-inventory `
-            --version $(resources.pipeline.configuration-api-ci.runName) `
-            --set image.tag=$(resources.pipeline.configuration-api-ci.runName) `
-            --set postgres.host=postgresql.postgresql `
-            --set postgres.database=ConfigurationDB `
-            --set postgres.user=configurationdb_rw `
-            --set postgres.password=$(configurationdb-rw)
+        helm upgrade inventoryconfigurationapi oci://aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api \
+            --create-namespace \
+            --install \
+            --namespace dynamic-inventory \
+            --version $(resources.pipeline.configuration-api-ci.runName) \
+            --set image.tag=$(resources.pipeline.configuration-api-ci.runName) \
+            --set postgres.host=postgresql.postgresql \
+            --set postgres.database=ConfigurationDB \
+            --set postgres.user=configurationdb_rw \
+            --set postgres.password=$DB_PASSWORD
 
     env:
       DB_PASSWORD: $(configurationdb-rw)
