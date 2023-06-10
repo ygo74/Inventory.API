@@ -89,7 +89,7 @@ stages:
         - job: DockerBuild
           displayName: Build and publish docker images
           variables:
-            tag: $(Build.BuildId)
+            tag: $(Build.BuildNumber)
 
           steps:
             - template: ./steps/container-ci-steps.yaml

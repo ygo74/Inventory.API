@@ -36,7 +36,7 @@ steps:
             --install `
             --namespace dynamic-inventory `
             --version 0.1.0 `
-            --set image.tag=915 `
+            --set image.tag=$(Build.BuildNumber) `
             --set postgres.host=postgresql.postgresql `
             --set postgres.database=ConfigurationDB `
             --set postgres.user=configurationdb_rw `

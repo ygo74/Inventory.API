@@ -57,7 +57,7 @@ steps:
 
           # Push helm chart to registry
           helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
-          helm push $(Build.ArtifactStagingDirectory)/${{ parameters.chartName }}-0.1.0.tgz oci://aksbootstrap.azurecr.io/helm/dynamic-inventory
+          helm push $(Build.ArtifactStagingDirectory)/${{ parameters.chartName }}-$(Build.BuildNumber).tgz oci://aksbootstrap.azurecr.io/helm/dynamic-inventory
 
         addSpnToEnvironment: true
         useGlobalConfig: true
