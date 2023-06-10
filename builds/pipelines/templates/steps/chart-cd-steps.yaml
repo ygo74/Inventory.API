@@ -42,8 +42,8 @@ steps:
         az aks get-credentials --resource-group rg-aks-bootstrap-networking-spoke --name aksbootstrap
 
         # Init User Name / token password
-        $USER_NAME="00000000-0000-0000-0000-000000000000"
-        $password=$(az acr login -n aksbootstrap --expose-token --output tsv --query accessToken)
+        USER_NAME="00000000-0000-0000-0000-000000000000"
+        password=$(az acr login -n aksbootstrap --expose-token --output tsv --query accessToken)
 
         # install helm chart from registry
         helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
@@ -56,7 +56,7 @@ steps:
             --set postgres.host=postgresql.postgresql \
             --set postgres.database=ConfigurationDB \
             --set postgres.user=configurationdb_rw \
-            --set postgres.password=$(configurationdb-rw)
+            --set postgres.password=$DB_PASSWORD
 
     env:
       DB_PASSWORD: $(configurationdb-rw)
