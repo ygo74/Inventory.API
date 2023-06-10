@@ -33,9 +33,10 @@ steps:
         # install helm chart from registry
         helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
         helm upgrade inventoryconfigurationapi oci://aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api `
+            --create-namespace `
             --install `
             --namespace dynamic-inventory `
-            --version 0.1.0 `
+            --version $(Build.BuildNumber) `
             --set image.tag=$(Build.BuildNumber) `
             --set postgres.host=postgresql.postgresql `
             --set postgres.database=ConfigurationDB `
