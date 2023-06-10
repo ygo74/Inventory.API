@@ -17,11 +17,9 @@ parameters:
 
   - name: containerRegistry
     type: string
-    default: 'aksbootstrap'
 
   - name: containerRegistryFqdn
     type: string
-    default: 'aksbootstrap.azurecr.io'
 
   - name: debugPipelineFlow
     type: boolean

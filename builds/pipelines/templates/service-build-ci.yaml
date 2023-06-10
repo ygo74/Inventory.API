@@ -31,6 +31,14 @@ parameters:
   - name: chartName
     type: string
 
+  - name: containerRegistry
+    type: string
+    default: 'aksbootstrap'
+
+  - name: containerRegistryFqdn
+    type: string
+    default: 'aksbootstrap.azurecr.io'
+
   # - name: debugPipelineFlow
   #   type: boolean
   #   default: false
@@ -93,10 +101,12 @@ stages:
           steps:
             - template: ./steps/container-ci-steps.yaml
               parameters:
-                serviceName:       ${{ parameters.serviceName }}
-                repositoryName:    ${{ parameters.repositoryName }}
-                dockerFile:        ${{ parameters.dockerFile }}
-                dockerTags:        $(tag)
+                serviceName:           ${{ parameters.serviceName }}
+                repositoryName:        ${{ parameters.repositoryName }}
+                dockerFile:            ${{ parameters.dockerFile }}
+                dockerTags:            $(tag)
+                containerRegistry:     ${{ parameters.containerRegistry }}
+                containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
                 # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
         - job: HelmBuild
@@ -110,10 +120,12 @@ stages:
           steps:
             - template: ./steps/chart-ci-steps.yaml
               parameters:
-                serviceName:       ${{ parameters.serviceName }}
-                chartPath:         ${{ parameters.chartPath }}
-                chartName:         ${{ parameters.chartName }}
-                chartVersion:      $(tag)
+                serviceName:           ${{ parameters.serviceName }}
+                chartPath:             ${{ parameters.chartPath }}
+                chartName:             ${{ parameters.chartName }}
+                chartVersion:          $(tag)
+                containerRegistry:     ${{ parameters.containerRegistry }}
+                containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
                 # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
   # ---------------------------------------------------------------------------
