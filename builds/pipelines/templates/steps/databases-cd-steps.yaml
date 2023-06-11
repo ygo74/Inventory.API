@@ -44,15 +44,15 @@ steps:
       inputs:
         targetType: 'inline'
         script: |
-          echo $(resources.pipeline.configuration-api-ci.pipelineID)
-          echo $(resources.pipeline.configuration-api-ci.runName)
-          echo $(resources.pipeline.configuration-api-ci.runID)
-          echo $(resources.pipeline.configuration-api-ci.runURI)
-          echo $(resources.pipeline.configuration-api-ci.sourceBranch)
-          echo $(resources.pipeline.configuration-api-ci.sourceCommit)
-          echo $(resources.pipeline.configuration-api-ci.sourceProvider)
-          echo $(resources.pipeline.configuration-api-ci.requestedFor)
-          echo $(resources.pipeline.configuration-api-ci.requestedForID)
+          echo $(resources.pipeline.devices-api-ci.pipelineID)
+          echo $(resources.pipeline.devices-api-ci.runName)
+          echo $(resources.pipeline.devices-api-ci.runID)
+          echo $(resources.pipeline.devices-api-ci.runURI)
+          echo $(resources.pipeline.devices-api-ci.sourceBranch)
+          echo $(resources.pipeline.devices-api-ci.sourceCommit)
+          echo $(resources.pipeline.devices-api-ci.sourceProvider)
+          echo $(resources.pipeline.devices-api-ci.requestedFor)
+          echo $(resources.pipeline.devices-api-ci.requestedForID)
 
   - checkout: self
     displayName: "Checkout repository"

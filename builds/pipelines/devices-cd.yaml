@@ -47,4 +47,4 @@ stages:
       databaseName:         $(databaseName)
       databaseUserName:     $(databaseUserName)
       databaseUserPassword: $(configurationdb-rw)
-      resourcePipelineId:   $[ variables['resources.pipeline.devices-api-ci.pipelineID'] ]
+      resourcePipelineId:   $(resources.pipeline.devices-api-ci.pipelineID)
