@@ -1,3 +1,4 @@
+---
 trigger:  none
 pr: none
 
@@ -36,7 +37,6 @@ resources:
           - feature/*
           - feature/configuration/*
           - topic/configuration/*
-          - Onion-Architecture
 
 stages:
   - template: ./templates/service-deploy-cd.yaml
