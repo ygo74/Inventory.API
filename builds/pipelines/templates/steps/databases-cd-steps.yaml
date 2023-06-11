@@ -22,7 +22,7 @@ parameters:
     type: string
 
   - name: resourcePipelineId
-    type: int
+    type: number
     default: 0
 
   - name: debugPipelineFlow

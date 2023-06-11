@@ -26,7 +26,7 @@ parameters:
     default: ''
 
   - name: resourcePipelineId
-    type: int
+    type: number
     default: 0
 
 stages:
