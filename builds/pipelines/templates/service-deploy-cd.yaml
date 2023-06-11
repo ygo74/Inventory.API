@@ -25,6 +25,10 @@ parameters:
     type: string
     default: ''
 
+  - name: resourcePipelineId
+    type: int
+    default: 0
+
 stages:
 
   - stage: deployTests
@@ -50,6 +54,7 @@ stages:
                       databaseName:         ${{ parameters.databaseName }}
                       databaseUserName:     ${{ parameters.databaseUserName }}
                       databaseUserPassword: ${{ parameters.databaseUserPassword }}
+                      resourcePipelineId:   ${{ parameters.resourcePipelineId }}
 
             deploy:
               steps:
