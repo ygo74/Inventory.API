@@ -22,8 +22,8 @@ parameters:
     type: string
 
   - name: resourcePipelineId
-    type: number
-    default: 0
+    type: string
+    default: ''
 
   - name: debugPipelineFlow
     type: boolean
