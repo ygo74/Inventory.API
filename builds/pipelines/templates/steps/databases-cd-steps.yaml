@@ -21,6 +21,9 @@ parameters:
   - name: databaseUserPassword
     type: string
 
+  - name: resourcePipelineId
+    type: string
+
   - name: debugPipelineFlow
     type: boolean
     default: true
@@ -58,7 +61,7 @@ steps:
       buildType: 'specific'
       # project: 'fa79f165-cc7b-4aaa-bb4f-ed39e9bd257c'
       project: '$(System.TeamProjectId)'
-      definition: '$(resources.pipeline.configuration-api-ci.pipelineID)'
+      definition: '${{ parameters.resourcePipelineId }}'
       specificBuildWithTriggering: true
       buildVersionToDownload: 'latest'
       allowPartiallySucceededBuilds: true

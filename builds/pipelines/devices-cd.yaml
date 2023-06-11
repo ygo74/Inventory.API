@@ -47,3 +47,4 @@ stages:
       databaseName:         $(databaseName)
       databaseUserName:     $(databaseUserName)
       databaseUserPassword: $(configurationdb-rw)
+      resourcePipelineId:   $(resources.pipeline.devices-api-ci.pipelineID)
