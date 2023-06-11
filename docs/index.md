@@ -32,6 +32,7 @@ This repository has the following goals:
 
 ## Application status
 
+- [Application url](https://inventory.francecentral.cloudapp.azure.com/configuration/graphql)
 - ![License](https://img.shields.io/github/license/ygo74/Inventory.API)
 - [![Known Vulnerabilities](https://snyk.io/test/github/ygo74/Inventory.API/badge.svg)](https://snyk.io/test/github/ygo74/Inventory.API)
 

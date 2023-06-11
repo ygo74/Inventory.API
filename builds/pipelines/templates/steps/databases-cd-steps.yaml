@@ -56,8 +56,9 @@ steps:
   - task: DownloadPipelineArtifact@2
     inputs:
       buildType: 'specific'
-      project: 'fa79f165-cc7b-4aaa-bb4f-ed39e9bd257c'
-      definition: '34'
+      # project: 'fa79f165-cc7b-4aaa-bb4f-ed39e9bd257c'
+      project: '$(System.TeamProjectId)'
+      definition: '$(resources.pipeline.configuration-api-ci.pipelineID)'
       specificBuildWithTriggering: true
       buildVersionToDownload: 'latest'
       allowPartiallySucceededBuilds: true
@@ -82,12 +83,12 @@ steps:
           echo "##vso[task.setvariable variable=hasCreateUsers]$true"
         }
 
-        if (-not(Test-Path -Path "./databases/${{ parameters.serviceName }}/configurationDB.sql" -PathType Leaf))
+        if (-not(Test-Path -Path "$(Pipeline.Workspace)/${{ parameters.serviceName }}.sql" -PathType Leaf))
         {
           echo "##[error]Database ${{ parameters.serviceName }} has no sql script"
           exit 1
         }
-        kubectl cp ./databases/${{ parameters.serviceName }}/configurationDB.sql  postgresql-0:/tmp/configurationDB.sql -c postgresql -n postgresql
+        kubectl cp $(Pipeline.Workspace)/${{ parameters.serviceName }}.sql  postgresql-0:/tmp/${{ parameters.serviceName }}.sql -c postgresql -n postgresql
 
 
         if (Test-Path -Path "./databases/${{ parameters.serviceName }}/grantUsers.sql" -PathType Leaf)
@@ -142,7 +143,7 @@ steps:
       arguments: >-
         postgresql-0 -c postgresql -n postgresql
         -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/${{ parameters.databaseName }}
-        -f /tmp/configurationDB.sql
+        -f /tmp/${{ parameters.serviceName }}.sql
 
   - task: Kubernetes@1
     displayName: "Grant users to Database objects"
