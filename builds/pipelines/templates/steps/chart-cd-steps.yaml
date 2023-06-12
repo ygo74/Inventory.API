@@ -1,5 +1,33 @@
 ---
 parameters:
+  - name: aksResourceGroup
+    type: string
+
+  - name: aksName
+    type: string
+
+  - name: serviceName
+    type: string
+
+  - name: databaseName
+    type: string
+
+  - name: databaseUserName
+    type: string
+
+  - name: databaseUserPassword
+    type: string
+
+  - name: containerRegistry
+    type: string
+    default: 'aksbootstrap'
+
+  - name: containerRegistryFqdn
+    type: string
+    default: 'aksbootstrap.azurecr.io'
+
+  - name: artifactVersionNumber
+    type: string
 
   - name: debugPipelineFlow
     type: boolean
@@ -39,24 +67,24 @@ steps:
       inlineScript: |
 
         # Get credentials for the AKS cluster
-        az aks get-credentials --resource-group rg-aks-bootstrap-networking-spoke --name aksbootstrap
+        az aks get-credentials --resource-group ${{ parameters.aksResourceGroup }} --name ${{ parameters.aksName }}
 
         # Init User Name / token password
         USER_NAME="00000000-0000-0000-0000-000000000000"
-        password=$(az acr login -n aksbootstrap --expose-token --output tsv --query accessToken)
+        password=$(az acr login -n ${{ parameters.containerRegistry }} --expose-token --output tsv --query accessToken)
 
         # install helm chart from registry
-        helm registry login aksbootstrap.azurecr.io --username $USER_NAME --password $password
-        helm upgrade inventoryconfigurationapi oci://aksbootstrap.azurecr.io/helm/dynamic-inventory/configuration-api \
+        helm registry login ${{ parameters.containerRegistryFqdn }} --username $USER_NAME --password $password
+        helm upgrade ${{ parameters.serviceName }} oci://${{ parameters.containerRegistryFqdn }}/helm/dynamic-inventory/${{ parameters.chartName }} \
             --create-namespace \
             --install \
             --namespace dynamic-inventory \
-            --version $(resources.pipeline.configuration-api-ci.runName) \
-            --set image.tag=$(resources.pipeline.configuration-api-ci.runName) \
+            --version ${{ parameters.artifactVersionNumber }} \
+            --set image.tag=${{ parameters.artifactVersionNumber }} \
             --set postgres.host=postgresql.postgresql \
-            --set postgres.database=ConfigurationDB \
-            --set postgres.user=configurationdb_rw \
+            --set postgres.database=${{ parameters.databaseName }} \
+            --set postgres.user=${{ parameters.databaseUserName }} \
             --set postgres.password=$DB_PASSWORD
 
     env:
-      DB_PASSWORD: $(configurationdb-rw)
+      DB_PASSWORD: ${{ parameters.databaseUserPassword }}

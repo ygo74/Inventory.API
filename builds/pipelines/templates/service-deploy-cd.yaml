@@ -25,9 +25,23 @@ parameters:
     type: string
     default: ''
 
+  - name: chartName
+    type: string
+
+  - name: containerRegistry
+    type: string
+    default: 'aksbootstrap'
+
+  - name: containerRegistryFqdn
+    type: string
+    default: 'aksbootstrap.azurecr.io'
+
   - name: resourcePipelineId
     type: string
     default: ''
+
+  - name: artifactVersionNumber
+    type: string
 
 stages:
 
@@ -60,3 +74,14 @@ stages:
               steps:
 
                 - template: ./steps/chart-cd-steps.yaml
+                  parameters:
+                    aksResourceGroup:      ${{ parameters.aksResourceGroup }}
+                    aksName:               ${{ parameters.aksName }}
+                    serviceName:           ${{ parameters.serviceName }}
+                    chartName:             ${{ parameters.chartName }}
+                    containerRegistry:     ${{ parameters.containerRegistry }}
+                    containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
+                    artifactVersionNumber: ${{ parameters.artifactVersionNumber }}
+                    databaseName:          ${{ parameters.databaseName }}
+                    databaseUserName:      ${{ parameters.databaseUserName }}
+                    databaseUserPassword:  ${{ parameters.databaseUserPassword }}

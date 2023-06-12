@@ -15,6 +15,9 @@ variables:
   - name: serviceName
     value: configuration-api
 
+  - name: chartName
+    value: configuration-api
+
   - name: databaseName
     value: ConfigurationDB
 
@@ -41,10 +44,12 @@ resources:
 stages:
   - template: ./templates/service-deploy-cd.yaml
     parameters:
-      aksResourceGroup:     $(aksResourceGroup)
-      aksName:              $(aksName)
-      serviceName:          $(serviceName)
-      databaseName:         $(databaseName)
-      databaseUserName:     $(databaseUserName)
-      databaseUserPassword: $(configurationdb-rw)
-      resourcePipelineId:   $(resources.pipeline.configuration-api-ci.pipelineID)
+      aksResourceGroup:      $(aksResourceGroup)
+      aksName:               $(aksName)
+      serviceName:           $(serviceName)
+      chartName:             $(chartName)
+      databaseName:          $(databaseName)
+      databaseUserName:      $(databaseUserName)
+      databaseUserPassword:  $(configurationdb-rw)
+      resourcePipelineId:    $(resources.pipeline.configuration-api-ci.pipelineID)
+      artifactVersionNumber: $(resources.pipeline.configuration-api-ci.runName)
