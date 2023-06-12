@@ -57,10 +57,10 @@ steps:
   - checkout: self
     displayName: "Checkout repository"
 
+  # Download SQL script produced by the continuous integration pipeline
   - task: DownloadPipelineArtifact@2
     inputs:
       buildType: 'specific'
-      # project: 'fa79f165-cc7b-4aaa-bb4f-ed39e9bd257c'
       project: '$(System.TeamProjectId)'
       definition: '${{ parameters.resourcePipelineId }}'
       specificBuildWithTriggering: true
