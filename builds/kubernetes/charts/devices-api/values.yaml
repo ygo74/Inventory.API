@@ -11,12 +11,12 @@ image:
   tag: ""
 
 imagePullSecrets: []
-nameOverride: "inventorydevicesapi"
-fullnameOverride: "inventorydevicesapi"
+nameOverride: "devices-api"
+fullnameOverride: "devices-api"
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
@@ -41,16 +41,22 @@ service:
   port: 80
 
 ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
   hosts:
-    - host: chart-example.local
+    - host: inventory.francecentral.cloudapp.azure.com
       paths:
-        - path: /
-          pathType: ImplementationSpecific
+        - path: /devices(/|$)(.*)
+          pathType: Prefix
+          backend:
+            service:
+              name: devices-api
+              port:
+                number: 80
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
