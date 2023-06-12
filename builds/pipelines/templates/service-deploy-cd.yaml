@@ -9,6 +9,20 @@ parameters:
   - name: serviceName
     type: string
 
+  - name: chartName
+    type: string
+
+  - name: artifactVersionNumber
+    type: string
+
+  - name: containerRegistry
+    type: string
+    default: 'aksbootstrap'
+
+  - name: containerRegistryFqdn
+    type: string
+    default: 'aksbootstrap.azurecr.io'
+
   - name: hasDatabase
     type: boolean
     default: true
@@ -25,23 +39,9 @@ parameters:
     type: string
     default: ''
 
-  - name: chartName
-    type: string
-
-  - name: containerRegistry
-    type: string
-    default: 'aksbootstrap'
-
-  - name: containerRegistryFqdn
-    type: string
-    default: 'aksbootstrap.azurecr.io'
-
   - name: resourcePipelineId
     type: string
     default: ''
-
-  - name: artifactVersionNumber
-    type: string
 
 stages:
 

@@ -9,13 +9,10 @@ parameters:
   - name: serviceName
     type: string
 
-  - name: databaseName
+  - name: chartName
     type: string
 
-  - name: databaseUserName
-    type: string
-
-  - name: databaseUserPassword
+  - name: artifactVersionNumber
     type: string
 
   - name: containerRegistry
@@ -26,7 +23,13 @@ parameters:
     type: string
     default: 'aksbootstrap.azurecr.io'
 
-  - name: artifactVersionNumber
+  - name: databaseName
+    type: string
+
+  - name: databaseUserName
+    type: string
+
+  - name: databaseUserPassword
     type: string
 
   - name: debugPipelineFlow
