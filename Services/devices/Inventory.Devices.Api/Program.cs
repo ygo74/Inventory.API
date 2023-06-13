@@ -77,6 +77,14 @@ namespace Inventory.Devices.Api
         public static IHostBuilder CreateHostBuilder(IConfiguration configuration, string[] args)
         {
             return Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration(builder =>
+                {
+                    builder
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .AddJsonFile("secrets/appsettings.secrets.json", optional: true, reloadOnChange: true)
+                    .AddEnvironmentVariables();
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
@@ -84,6 +92,7 @@ namespace Inventory.Devices.Api
                         .UseStartup<Startup>()
                         .UseConfiguration(configuration);
                 });
+
         }
 
 
@@ -93,6 +102,7 @@ namespace Inventory.Devices.Api
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("secrets/appsettings.secrets.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
 
             return builder.Build();

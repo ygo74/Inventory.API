@@ -86,3 +86,10 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# Postgres database definition
+postgres:
+  host:
+  database:
+  user:
+  password:

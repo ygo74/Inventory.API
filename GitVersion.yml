@@ -6,9 +6,16 @@ branches:
     increment: Patch
     prevent-increment-of-merged-branch-version: true
     track-merge-target: false
-    regex: master|release?[/v]
-    tracks-release-branches: false
+    regex: master
+    tracks-release-branches: true
     is-release-branch: false
+  release:
+    tag: ''
+    increment: None
+    regex: release/(.*)/?[/v]
+    is-release-branch: true
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
   feature:
     mode: ContinuousDelivery
     tag: useBranchName
