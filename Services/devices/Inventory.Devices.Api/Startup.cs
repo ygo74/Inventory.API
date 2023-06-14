@@ -5,6 +5,7 @@ using Inventory.Common.Application.Users;
 using Inventory.Common.Domain.Repository;
 using Inventory.Common.Infrastructure.Events;
 using Inventory.Common.Infrastructure.Events.RabbitMQ;
+using Inventory.Common.Infrastructure.Http;
 using Inventory.Common.Infrastructure.Telemetry;
 using Inventory.Devices.Api.Configuration;
 using Inventory.Devices.Api.IntegrationEvents;
@@ -67,6 +68,8 @@ namespace Inventory.Devices.Api
             string sourceName = null;
             services.AddTelemetryService(Configuration, out sourceName);
 
+            // Http hosting
+            services.UseHttpHostingConfigurationServices(Configuration);
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -85,6 +88,7 @@ namespace Inventory.Devices.Api
             }
 
             app.UseHttpsRedirection();
+            app.UseHttpHostingConfiguration(Configuration);
 
             app.UseRouting();
 

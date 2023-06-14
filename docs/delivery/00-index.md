@@ -49,3 +49,5 @@ dotnet tool install --global GitVersion.Tool --version 5.*
 
 https://github.com/gbaeke/go-template/tree/main/azdo
 
+
+https://github.com/twendt/release-flow-version
