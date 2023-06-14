@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Inventory.Common.Domain.Interfaces;
 
 namespace Inventory.Configuration.Infrastructure
 {
@@ -65,6 +66,7 @@ namespace Inventory.Configuration.Infrastructure
             });
 
             services.AddScoped<IMediator, NoMediator>();
+            services.AddScoped<ICurrentUser, NoCurrentUser>();
             var serviceProvider = services.BuildServiceProvider();
 
             return serviceProvider.GetService<ConfigurationDbContext>();

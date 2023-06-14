@@ -16,6 +16,7 @@ using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
 using System.Threading;
+using Inventory.Common.Domain.Interfaces;
 
 namespace Inventory.Devices.Infrastructure
 {
@@ -69,6 +70,7 @@ namespace Inventory.Devices.Infrastructure
 
             //services.AddMediatR(typeof(ServerDbContext));
             services.AddScoped<IMediator, NoMediator>();
+            services.AddScoped<ICurrentUser, NoCurrentUser>();
             var serviceProvider = services.BuildServiceProvider();
 
 

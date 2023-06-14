@@ -21,6 +21,7 @@ using Microsoft.Extensions.Hosting;
 using HotChocolate;
 using HotChocolate.Execution;
 using System.Threading.Tasks;
+using Inventory.Common.Domain.Interfaces;
 
 namespace Inventory.Devices.UnitTests
 {

@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inventory.Common.Application.Users
+namespace Inventory.Common.Domain.Interfaces
 {
     /// <summary>
     /// Current user provider

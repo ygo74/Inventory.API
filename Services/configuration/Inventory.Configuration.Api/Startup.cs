@@ -30,6 +30,7 @@ using Inventory.Common.Application.Plugins;
 using Inventory.Configuration.Api.Application.Locations;
 using Inventory.Configuration.Api.Application.Credentials;
 using Inventory.Common.Infrastructure.Http;
+using Inventory.Common.Domain.Interfaces;
 
 namespace Inventory.Configuration.Api
 {

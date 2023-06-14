@@ -4,6 +4,7 @@ using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Exceptions;
 using Inventory.Common.Application.Users;
+using Inventory.Common.Domain.Interfaces;
 using Inventory.Common.Infrastructure.Telemetry;
 using MediatR;
 using Microsoft.Extensions.Logging;

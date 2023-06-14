@@ -1,4 +1,4 @@
-﻿using Inventory.Common.Application.Users;
+﻿using Inventory.Common.Domain.Interfaces;
 using System;
 using System.Security.Claims;
 

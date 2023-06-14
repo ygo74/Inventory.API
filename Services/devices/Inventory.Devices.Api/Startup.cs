@@ -2,6 +2,7 @@ using AutoMapper;
 using FluentValidation;
 using Inventory.Common.Application.Behaviors;
 using Inventory.Common.Application.Users;
+using Inventory.Common.Domain.Interfaces;
 using Inventory.Common.Domain.Repository;
 using Inventory.Common.Infrastructure.Events;
 using Inventory.Common.Infrastructure.Events.RabbitMQ;
