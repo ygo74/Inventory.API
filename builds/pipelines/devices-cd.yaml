@@ -1,4 +1,6 @@
+---
 trigger:  none
+pr: none
 
 variables:
   - group: Azure_Credential
@@ -13,26 +15,41 @@ variables:
   - name: serviceName
     value: devices-api
 
+  - name: chartName
+    value: devices-api
+
   - name: databaseName
     value: devicesDB
 
   - name: databaseUserName
     value: devicesdb_rw
 
-
 resources:
   pipelines:
   - pipeline: devices-api-ci # Name of the pipeline resource.
     source: devices-api-ci # The name of the pipeline referenced by this pipeline resource.
     project: iac # Required only if the source pipeline is in another project
-    trigger: true # Run app-ci pipeline when any run of security-lib-ci completes
+    # trigger: true # Run app-ci pipeline when any run of security-lib-ci completes
+    trigger:
+      branches:
+        include:
+          # for new release to production: release flow strategy
+          - release/devices/v*
+          - refs/release/devices/v*
+          - master
+          - feature/*
+          - feature/devices/*
+          - topic/devices/*
 
 stages:
   - template: ./templates/service-deploy-cd.yaml
     parameters:
-      aksResourceGroup:     $(aksResourceGroup)
-      aksName:              $(aksName)
-      serviceName:          $(serviceName)
-      databaseName:         $(databaseName)
-      databaseUserName:     $(databaseUserName)
-      databaseUserPassword: $(configurationdb-rw)
+      aksResourceGroup:      $(aksResourceGroup)
+      aksName:               $(aksName)
+      serviceName:           $(serviceName)
+      chartName:             $(chartName)
+      databaseName:          $(databaseName)
+      databaseUserName:      $(databaseUserName)
+      databaseUserPassword:  $(configurationdb-rw)
+      resourcePipelineId:    $(resources.pipeline.devices-api-ci.pipelineID)
+      artifactVersionNumber: $(resources.pipeline.devices-api-ci.runName)

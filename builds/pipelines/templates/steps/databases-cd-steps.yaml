@@ -21,6 +21,10 @@ parameters:
   - name: databaseUserPassword
     type: string
 
+  - name: resourcePipelineId
+    type: string
+    default: ''
+
   - name: debugPipelineFlow
     type: boolean
     default: true
@@ -40,24 +44,25 @@ steps:
       inputs:
         targetType: 'inline'
         script: |
-          echo $(resources.pipeline.configuration-api-ci.pipelineID)
-          echo $(resources.pipeline.configuration-api-ci.runName)
-          echo $(resources.pipeline.configuration-api-ci.runID)
-          echo $(resources.pipeline.configuration-api-ci.runURI)
-          echo $(resources.pipeline.configuration-api-ci.sourceBranch)
-          echo $(resources.pipeline.configuration-api-ci.sourceCommit)
-          echo $(resources.pipeline.configuration-api-ci.sourceProvider)
-          echo $(resources.pipeline.configuration-api-ci.requestedFor)
-          echo $(resources.pipeline.configuration-api-ci.requestedForID)
+          echo $(resources.pipeline.devices-api-ci.pipelineID)
+          echo $(resources.pipeline.devices-api-ci.runName)
+          echo $(resources.pipeline.devices-api-ci.runID)
+          echo $(resources.pipeline.devices-api-ci.runURI)
+          echo $(resources.pipeline.devices-api-ci.sourceBranch)
+          echo $(resources.pipeline.devices-api-ci.sourceCommit)
+          echo $(resources.pipeline.devices-api-ci.sourceProvider)
+          echo $(resources.pipeline.devices-api-ci.requestedFor)
+          echo $(resources.pipeline.devices-api-ci.requestedForID)
 
   - checkout: self
     displayName: "Checkout repository"
 
+  # Download SQL script produced by the continuous integration pipeline
   - task: DownloadPipelineArtifact@2
     inputs:
       buildType: 'specific'
-      project: 'fa79f165-cc7b-4aaa-bb4f-ed39e9bd257c'
-      definition: '34'
+      project: '$(System.TeamProjectId)'
+      definition: '${{ parameters.resourcePipelineId }}'
       specificBuildWithTriggering: true
       buildVersionToDownload: 'latest'
       allowPartiallySucceededBuilds: true
@@ -82,12 +87,12 @@ steps:
           echo "##vso[task.setvariable variable=hasCreateUsers]$true"
         }
 
-        if (-not(Test-Path -Path "./databases/${{ parameters.serviceName }}/configurationDB.sql" -PathType Leaf))
+        if (-not(Test-Path -Path "$(Pipeline.Workspace)/${{ parameters.serviceName }}.sql" -PathType Leaf))
         {
           echo "##[error]Database ${{ parameters.serviceName }} has no sql script"
           exit 1
         }
-        kubectl cp ./databases/${{ parameters.serviceName }}/configurationDB.sql  postgresql-0:/tmp/configurationDB.sql -c postgresql -n postgresql
+        kubectl cp $(Pipeline.Workspace)/${{ parameters.serviceName }}.sql  postgresql-0:/tmp/${{ parameters.serviceName }}.sql -c postgresql -n postgresql
 
 
         if (Test-Path -Path "./databases/${{ parameters.serviceName }}/grantUsers.sql" -PathType Leaf)
@@ -142,7 +147,7 @@ steps:
       arguments: >-
         postgresql-0 -c postgresql -n postgresql
         -- psql postgresql://inventorydb-admin:$(inventorydb-admin)@postgresql/${{ parameters.databaseName }}
-        -f /tmp/configurationDB.sql
+        -f /tmp/${{ parameters.serviceName }}.sql
 
   - task: Kubernetes@1
     displayName: "Grant users to Database objects"

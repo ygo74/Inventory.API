@@ -45,8 +45,32 @@ spec:
             httpGet:
               path: /
               port: http
+          env:
+            - name: Serilog__MinimumLevel__Override__Microsoft
+              value: Information
+            - name: Serilog__MinimumLevel__Override__Inventory.Configuration.Api
+              value: Information
+            - name: HttpHostingConfiguration__UseReverseProxy
+              value: "true"
+            - name: HttpHostingConfiguration__ProxyBasePath
+              value: "/devices"
+            - name: HttpHostingConfiguration__EnableHttpHeadersLogging
+              value: "false"
+            - name: ASPNETCORE_URLS
+              value: http://+:80
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: secrets
+              mountPath: /app/secrets
+              readOnly: true
+      volumes:
+        - name: secrets
+          secret:
+            secretName: secret-{{ template "devices-api.fullname" . }}
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

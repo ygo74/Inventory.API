@@ -9,6 +9,20 @@ parameters:
   - name: serviceName
     type: string
 
+  - name: chartName
+    type: string
+
+  - name: artifactVersionNumber
+    type: string
+
+  - name: containerRegistry
+    type: string
+    default: 'aksbootstrap'
+
+  - name: containerRegistryFqdn
+    type: string
+    default: 'aksbootstrap.azurecr.io'
+
   - name: hasDatabase
     type: boolean
     default: true
@@ -22,6 +36,10 @@ parameters:
     default: ''
 
   - name: databaseUserPassword
+    type: string
+    default: ''
+
+  - name: resourcePipelineId
     type: string
     default: ''
 
@@ -50,8 +68,20 @@ stages:
                       databaseName:         ${{ parameters.databaseName }}
                       databaseUserName:     ${{ parameters.databaseUserName }}
                       databaseUserPassword: ${{ parameters.databaseUserPassword }}
+                      resourcePipelineId:   ${{ parameters.resourcePipelineId }}
 
             deploy:
               steps:
 
                 - template: ./steps/chart-cd-steps.yaml
+                  parameters:
+                    aksResourceGroup:      ${{ parameters.aksResourceGroup }}
+                    aksName:               ${{ parameters.aksName }}
+                    serviceName:           ${{ parameters.serviceName }}
+                    chartName:             ${{ parameters.chartName }}
+                    containerRegistry:     ${{ parameters.containerRegistry }}
+                    containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
+                    artifactVersionNumber: ${{ parameters.artifactVersionNumber }}
+                    databaseName:          ${{ parameters.databaseName }}
+                    databaseUserName:      ${{ parameters.databaseUserName }}
+                    databaseUserPassword:  ${{ parameters.databaseUserPassword }}

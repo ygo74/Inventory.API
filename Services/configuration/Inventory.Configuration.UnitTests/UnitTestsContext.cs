@@ -31,6 +31,7 @@ using Inventory.Configuration.Api.Application.Credentials;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using MR.AspNetCore.Pagination;
+using Inventory.Common.Domain.Interfaces;
 
 namespace Inventory.Configuration.UnitTests
 {

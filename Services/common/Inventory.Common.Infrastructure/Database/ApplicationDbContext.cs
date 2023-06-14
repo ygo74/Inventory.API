@@ -1,4 +1,5 @@
-﻿using Inventory.Common.Domain.Repository;
+﻿using Inventory.Common.Domain.Interfaces;
+using Inventory.Common.Domain.Repository;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -14,9 +15,10 @@ using System.Transactions;
 
 namespace Inventory.Common.Infrastructure.Database
 {
-    public abstract class ApplicationDbContext : DbContext, IUnitOfWork 
+    public abstract class ApplicationDbContext : DbContext, IUnitOfWork
     {
         private readonly IMediator _mediator;
+        private readonly ICurrentUser _currentUser;
 
 
         protected ApplicationDbContext() : base() { }
@@ -24,6 +26,7 @@ namespace Inventory.Common.Infrastructure.Database
         protected ApplicationDbContext(DbContextOptions options) : base(options)
         {
             _mediator = this.GetService<IMediator>();
+            _currentUser = this.GetService<ICurrentUser>();
         }
 
 

@@ -1,3 +1,4 @@
+---
 trigger:  none
 pr: none
 
@@ -12,6 +13,9 @@ variables:
     value: aksbootstrap
 
   - name: serviceName
+    value: configuration-api
+
+  - name: chartName
     value: configuration-api
 
   - name: databaseName
@@ -36,14 +40,16 @@ resources:
           - feature/*
           - feature/configuration/*
           - topic/configuration/*
-          - Onion-Architecture
 
 stages:
   - template: ./templates/service-deploy-cd.yaml
     parameters:
-      aksResourceGroup:     $(aksResourceGroup)
-      aksName:              $(aksName)
-      serviceName:          $(serviceName)
-      databaseName:         $(databaseName)
-      databaseUserName:     $(databaseUserName)
-      databaseUserPassword: $(configurationdb-rw)
+      aksResourceGroup:      $(aksResourceGroup)
+      aksName:               $(aksName)
+      serviceName:           $(serviceName)
+      chartName:             $(chartName)
+      databaseName:          $(databaseName)
+      databaseUserName:      $(databaseUserName)
+      databaseUserPassword:  $(configurationdb-rw)
+      resourcePipelineId:    $(resources.pipeline.configuration-api-ci.pipelineID)
+      artifactVersionNumber: $(resources.pipeline.configuration-api-ci.runName)

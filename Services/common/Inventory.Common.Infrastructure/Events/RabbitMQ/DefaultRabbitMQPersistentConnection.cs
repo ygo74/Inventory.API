@@ -58,7 +58,8 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
 
             try
             {
-                _connection.Dispose();
+                if (_connection != null) 
+                    _connection.Dispose();
             }
             catch (IOException ex)
             {

@@ -11,8 +11,8 @@ image:
   tag: ""
 
 imagePullSecrets: []
-nameOverride: "inventoryconfigurationapi"
-fullnameOverride: "inventoryconfigurationapi"
+nameOverride: "configuration-api"
+fullnameOverride: "configuration-api"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -54,7 +54,7 @@ ingress:
           pathType: Prefix
           backend:
             service:
-              name: inventoryconfigurationapi
+              name: configuration-api
               port:
                 number: 80
   tls: []

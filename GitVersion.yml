@@ -2,13 +2,20 @@ assembly-informational-format: '{FullSemVer}'
 mode: Mainline
 branches:
   master:
-    tag: ''
-    increment: Patch
+    tag: 'beta'
+    increment: Minor
     prevent-increment-of-merged-branch-version: true
     track-merge-target: false
-    regex: master|releases?[/-]
-    tracks-release-branches: false
+    regex: master
+    tracks-release-branches: true
     is-release-branch: false
+  release:
+    tag: ''
+    increment: Patch
+    regex: release(s)?/(.*)/?[/v]
+    is-release-branch: true
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
   feature:
     mode: ContinuousDelivery
     tag: useBranchName
