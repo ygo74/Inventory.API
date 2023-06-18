@@ -54,9 +54,6 @@ stages:
       - job: DotnetBuild
         displayName: Build Service
 
-        variables:
-
-
         steps:
           - checkout: self
             fetchDepth: 0
