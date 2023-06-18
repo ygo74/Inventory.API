@@ -4,6 +4,13 @@
 # -----------------------------------------------------------------------------
 steps:
 
+  - task: Bash@3
+    displayName: Display environment variables
+    inputs:
+      targetType: 'inline'
+      script: |
+        export
+
   - task: CalculateNextVersionTest@1
     name: CalculateNextVersion
     displayName: Determine Version
