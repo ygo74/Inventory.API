@@ -5,8 +5,8 @@ configuration:
     sourceVersionMode: branch
     sourceVersionBranchPattern: release
     patternMap:
-      - '^main$'
-      - '^master$'
+      - '^.*/main$'
+      - '^.*/master$'
     versionIncrement: minor
     versionLabel: beta
 
@@ -15,7 +15,7 @@ configuration:
     sourceVersionMode: branch
     sourceVersionBranchPattern: release
     patternMap:
-      - '^feature(s)?/.*$'
+      - '^.*/feature(s)?/.*$'
     versionIncrement: minor
     versionLabel: beta
 
