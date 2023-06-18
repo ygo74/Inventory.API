@@ -8,11 +8,11 @@ namespace Inventory.Common.Domain.Models
 {
     public abstract class AuditEntity : Entity
     {
-        public DateTime Created { get; protected set; }
-        public string CreatedBy { get; protected set; }
+        public DateTime Created { get; set; }
+        public string CreatedBy { get; set; }
 
-        public DateTime? LastModified { get; protected set; }
-        public string LastModifiedBy { get; protected set; }
+        public DateTime? LastModified { get; set; }
+        public string LastModifiedBy { get; set; }
 
     }
 }
