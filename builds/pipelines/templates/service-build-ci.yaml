@@ -54,11 +54,20 @@ stages:
       - job: DotnetBuild
         displayName: Build Service
 
+        variables:
+
+
         steps:
           - checkout: self
             fetchDepth: 0
 
           - template: ./steps/versioning-ci-steps.yaml
+
+          - script: |
+              echo "##vso[build.updatebuildnumber]$MY_BUILD+$BUILD_COUNTER"
+            env:
+              BUILD_COUNTER: $[counter(variables['CalculateNextVersion.version'], 1)]
+              MY_BUILD: $[ variables['CalculateNextVersion.version'] ]
 
           - template: ./steps/dotnet-ci-steps.yaml
             parameters:
