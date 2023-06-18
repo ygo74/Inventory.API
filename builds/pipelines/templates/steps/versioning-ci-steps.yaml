@@ -3,53 +3,60 @@
 # Identify version
 # -----------------------------------------------------------------------------
 steps:
-  - task: gitversion/setup@0
-    displayName: Install GitVersion
-    inputs:
-      versionSpec: '5.x'
 
-  - task: gitversion/execute@0
+  - task: CalculateNextVersionTest@1
+    name: CalculateNextVersion
     displayName: Determine Version
-    name: version
     inputs:
-      useConfigFile: true
-      configFilePath: 'GitVersion.yml'
-      # additionalArguments: '/showConfig'
+      configurationLocation: 'configurationPath'
+      configurationPath: './VersionManagement.yml'
+  # - task: gitversion/setup@0
+  #   displayName: Install GitVersion
+  #   inputs:
+  #     versionSpec: '5.x'
 
-  - task: Bash@3
-    displayName: Display GitVersion outputs (step output)
-    inputs:
-      targetType: 'inline'
-      script: |
-        echo "Major: $(version.major)"
-        echo "Minor: $(version.minor)"
-        echo "Patch: $(version.patch)"
-        echo "PreReleaseTag: $(version.preReleaseTag)"
-        echo "PreReleaseTagWithDash: $(version.preReleaseTagWithDash)"
-        echo "PreReleaseLabel: $(version.preReleaseLabel)"
-        echo "PreReleaseNumber: $(version.preReleaseNumber)"
-        echo "WeightedPreReleaseNumber: $(version.weightedPreReleaseNumber)"
-        echo "BuildMetaData: $(version.buildMetaData)"
-        echo "BuildMetaDataPadded: $(version.buildMetaDataPadded)"
-        echo "FullBuildMetaData: $(version.fullBuildMetaData)"
-        echo "MajorMinorPatch: $(version.majorMinorPatch)"
-        echo "SemVer: $(version.semVer)"
-        echo "LegacySemVer: $(version.legacySemVer)"
-        echo "LegacySemVerPadded: $(version.legacySemVerPadded)"
-        echo "AssemblySemVer: $(version.assemblySemVer)"
-        echo "AssemblySemFileVer: $(version.assemblySemFileVer)"
-        echo "FullSemVer: $(version.fullSemVer)"
-        echo "InformationalVersion: $(version.informationalVersion)"
-        echo "BranchName: $(version.branchName)"
-        echo "EscapedBranchName: $(version.escapedBranchName)"
-        echo "Sha: $(version.sha)"
-        echo "ShortSha: $(version.shortSha)"
-        echo "NuGetVersionV2: $(version.nuGetVersionV2)"
-        echo "NuGetVersion: $(version.nuGetVersion)"
-        echo "NuGetPreReleaseTagV2: $(version.nuGetPreReleaseTagV2)"
-        echo "NuGetPreReleaseTag: $(version.nuGetPreReleaseTag)"
-        echo "VersionSourceSha: $(version.versionSourceSha)"
-        echo "CommitsSinceVersionSource: $(version.commitsSinceVersionSource)"
-        echo "CommitsSinceVersionSourcePadded: $(version.commitsSinceVersionSourcePadded)"
-        echo "UncommittedChanges: $(version.uncommittedChanges)"
-        echo "CommitDate: $(version.commitDate)"
+  # - task: gitversion/execute@0
+  #   displayName: Determine Version
+  #   name: version
+  #   inputs:
+  #     useConfigFile: true
+  #     configFilePath: 'GitVersion.yml'
+  #     # additionalArguments: '/showConfig'
+
+  # - task: Bash@3
+  #   displayName: Display GitVersion outputs (step output)
+  #   inputs:
+  #     targetType: 'inline'
+  #     script: |
+  #       echo "Major: $(version.major)"
+  #       echo "Minor: $(version.minor)"
+  #       echo "Patch: $(version.patch)"
+  #       echo "PreReleaseTag: $(version.preReleaseTag)"
+  #       echo "PreReleaseTagWithDash: $(version.preReleaseTagWithDash)"
+  #       echo "PreReleaseLabel: $(version.preReleaseLabel)"
+  #       echo "PreReleaseNumber: $(version.preReleaseNumber)"
+  #       echo "WeightedPreReleaseNumber: $(version.weightedPreReleaseNumber)"
+  #       echo "BuildMetaData: $(version.buildMetaData)"
+  #       echo "BuildMetaDataPadded: $(version.buildMetaDataPadded)"
+  #       echo "FullBuildMetaData: $(version.fullBuildMetaData)"
+  #       echo "MajorMinorPatch: $(version.majorMinorPatch)"
+  #       echo "SemVer: $(version.semVer)"
+  #       echo "LegacySemVer: $(version.legacySemVer)"
+  #       echo "LegacySemVerPadded: $(version.legacySemVerPadded)"
+  #       echo "AssemblySemVer: $(version.assemblySemVer)"
+  #       echo "AssemblySemFileVer: $(version.assemblySemFileVer)"
+  #       echo "FullSemVer: $(version.fullSemVer)"
+  #       echo "InformationalVersion: $(version.informationalVersion)"
+  #       echo "BranchName: $(version.branchName)"
+  #       echo "EscapedBranchName: $(version.escapedBranchName)"
+  #       echo "Sha: $(version.sha)"
+  #       echo "ShortSha: $(version.shortSha)"
+  #       echo "NuGetVersionV2: $(version.nuGetVersionV2)"
+  #       echo "NuGetVersion: $(version.nuGetVersion)"
+  #       echo "NuGetPreReleaseTagV2: $(version.nuGetPreReleaseTagV2)"
+  #       echo "NuGetPreReleaseTag: $(version.nuGetPreReleaseTag)"
+  #       echo "VersionSourceSha: $(version.versionSourceSha)"
+  #       echo "CommitsSinceVersionSource: $(version.commitsSinceVersionSource)"
+  #       echo "CommitsSinceVersionSourcePadded: $(version.commitsSinceVersionSourcePadded)"
+  #       echo "UncommittedChanges: $(version.uncommittedChanges)"
+  #       echo "CommitDate: $(version.commitDate)"

@@ -1,0 +1,26 @@
+---
+configuration:
+  main:
+    sourceVersion: git
+    sourceVersionMode: branch
+    sourceVersionBranchPattern: release
+    patternMap:
+      - '^main$'
+      - '^master$'
+    versionIncrement: minor
+    versionLabel: beta
+
+  feature:
+    sourceVersion: git
+    sourceVersionMode: branch
+    sourceVersionBranchPattern: release
+    patternMap:
+      - '^feature(s)?/.*$'
+    versionIncrement: minor
+    versionLabel: beta
+
+  release:
+    sourceVersion: git
+    sourceVersionMode: current
+    patternMap:
+      - '^release/\\d+\\.\\d+\\.\\d+$'
