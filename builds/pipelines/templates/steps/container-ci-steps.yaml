@@ -37,6 +37,7 @@ steps:
 
   - task: Bash@3
     displayName: 'Clean version for docker tag'
+    name: CleanVersionForDocker
     inputs:
       targetType: 'inline'
       script: |
@@ -61,7 +62,7 @@ steps:
       Dockerfile:        '${{ parameters.dockerFile }}'
       buildContext:      '$(Build.SourcesDirectory)/Services'
       tags: |
-        $(CleanedVersion)
+        $(CleanVersionForDocker.CleanedVersion)
       # tags: |
       #   ${{ parameters.dockerTags }}
 
@@ -112,6 +113,6 @@ steps:
         repository:        '${{ parameters.repositoryName }}'
         command:           'push'
         tags: |
-          $(CleanedVersion)
+          $(CleanVersionForDocker.CleanedVersion)
         # tags: |
         #   ${{ parameters.dockerTags }}
