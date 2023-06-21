@@ -44,7 +44,7 @@ steps:
       Dockerfile:        '${{ parameters.dockerFile }}'
       buildContext:      '$(Build.SourcesDirectory)/Services'
       tags: |
-        ${{ parameters.dockerTags }}
+        ${{ replace(parameters.dockerTags, "+", "-") }}
 
   - task: Bash@3
     displayName: Display environment variables
@@ -93,4 +93,4 @@ steps:
         repository:        '${{ parameters.repositoryName }}'
         command:           'push'
         tags: |
-          ${{ parameters.dockerTags }}
+          ${{ replace(parameters.dockerTags, "+", "-") }}
