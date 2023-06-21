@@ -15,7 +15,7 @@ configuration:
     sourceVersionMode: branch
     sourceVersionBranchPattern: release
     patternMap:
-      - '^.*/feature(s)?/.*$'
+      - '^(.*/)?feature(s)?/.*$'
     versionIncrement: minor
     versionLabel: beta
 
