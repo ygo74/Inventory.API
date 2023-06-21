@@ -90,7 +90,8 @@ steps:
     inputs:
       serviceConnectionEndpoint: 'Snyk'
       testType:                  'container'
-      dockerImageName:           '${{ parameters.containerRegistryFqdn }}/${{ parameters.repositoryName }}:${{ parameters.dockerTags }}'
+      # dockerImageName:           '${{ parameters.containerRegistryFqdn }}/${{ parameters.repositoryName }}:${{ parameters.dockerTags }}'
+      dockerImageName:           '${{ parameters.containerRegistryFqdn }}/${{ parameters.repositoryName }}:$(CleanVersionForDocker.CleanedVersion)'
       dockerfilePath:            '${{ parameters.dockerFile }}'
       severityThreshold:         'high'
       monitorWhen:               'always'
