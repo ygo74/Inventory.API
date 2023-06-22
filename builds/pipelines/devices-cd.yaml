@@ -34,8 +34,9 @@ resources:
       branches:
         include:
           # for new release to production: release flow strategy
-          - release[s]?/devices/v*
-          - refs/release[s]?/devices/v*
+          - refs/release?/*
+          - refs/heads/release?/*
+          - release?/*
           - master
           - feature/*
           - feature/devices/*
