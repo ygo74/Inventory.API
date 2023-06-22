@@ -24,4 +24,4 @@ configuration:
     sourceVersion: git
     sourceVersionMode: current
     patternMap:
-      - '^release/\\d+\\.\\d+\\.\\d+$'
+      - '^(.*/)?release(s)?/\\d+\\.\\d+\\.\\d+$'
