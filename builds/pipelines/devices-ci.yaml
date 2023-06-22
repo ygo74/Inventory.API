@@ -10,8 +10,6 @@ trigger:
       - refs/release?/*
       - refs/heads/release?/*
       - release?/*
-      - release[s]?/devices/*
-      - refs/release[s]?/devices/*
       - master
       - feature/*
       - feature/devices/*
