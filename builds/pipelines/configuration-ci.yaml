@@ -42,7 +42,7 @@ variables:
     value: ./Services/configuration/Inventory.Configuration.Infrastructure/Inventory.Configuration.Infrastructure.csproj
 
   - name: repositoryName
-    value: dynamicinventory/configuration-api
+    value: dynamic-inventory/configuration-api
 
   - name: dockerFile
     value: ./Services/configuration/Inventory.Configuration.Api/Dockerfile
