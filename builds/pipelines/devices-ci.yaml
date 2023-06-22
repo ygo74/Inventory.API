@@ -7,9 +7,9 @@ trigger:
   branches:
     include:
       # for new release to production: release flow strategy
-      - refs/release[s]?/.*
-      - refs/heads/release[s]?/.*
-      - release[s]?/.*
+      - refs/release?/*
+      - refs/heads/release?/*
+      - release?/*
       - release[s]?/devices/*
       - refs/release[s]?/devices/*
       - master
