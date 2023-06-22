@@ -82,7 +82,7 @@ stages:
 
         variables:
           NextVersion: $[ dependencies.IdentifyContext.outputs['CalculateNextVersion.version'] ]
-          BuildCounter: $[counter(variables['NextVersion'], 1)]
+          BuildCounter: $[counter(variables['NextVersion'], 0)]
 
         steps:
           - checkout: self
