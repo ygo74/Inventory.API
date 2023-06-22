@@ -25,3 +25,4 @@ configuration:
     sourceVersionMode: current
     patternMap:
       - '^(.*/)?release(s)?/\\d+\\.\\d+\\.\\d+$'
+      - '^(.*/)?release(s)?/.*$'
