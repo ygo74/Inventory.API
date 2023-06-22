@@ -56,19 +56,26 @@ stages:
         environment: Dynamic-Inventory-Tests
         strategy:
           runOnce:
-            ${{ if parameters.hasDatabase }}:
               preDeploy:
                 steps:
 
-                  - template: ./steps/databases-cd-steps.yaml
-                    parameters:
-                      aksResourceGroup:     ${{ parameters.aksResourceGroup }}
-                      aksName:              ${{ parameters.aksName }}
-                      serviceName:          ${{ parameters.serviceName }}
-                      databaseName:         ${{ parameters.databaseName }}
-                      databaseUserName:     ${{ parameters.databaseUserName }}
-                      databaseUserPassword: ${{ parameters.databaseUserPassword }}
-                      resourcePipelineId:   ${{ parameters.resourcePipelineId }}
+                  - task: PublishBuildNumber@0
+                    name: PublishBuildNumber
+                    displayName: Publish build numbers
+                    inputs:
+                      semanticVersioning: '${{ parameters.artifactVersionNumber }}'
+                      uniqueCounter: ''
+
+                  ${{ if parameters.hasDatabase }}:
+                    - template: ./steps/databases-cd-steps.yaml
+                      parameters:
+                        aksResourceGroup:     ${{ parameters.aksResourceGroup }}
+                        aksName:              ${{ parameters.aksName }}
+                        serviceName:          ${{ parameters.serviceName }}
+                        databaseName:         ${{ parameters.databaseName }}
+                        databaseUserName:     ${{ parameters.databaseUserName }}
+                        databaseUserPassword: ${{ parameters.databaseUserPassword }}
+                        resourcePipelineId:   ${{ parameters.resourcePipelineId }}
 
             deploy:
               steps:

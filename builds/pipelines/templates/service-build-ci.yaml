@@ -51,14 +51,49 @@ stages:
   - stage: BuildApplication
     displayName: Build Service
     jobs:
-      - job: DotnetBuild
-        displayName: Build Service
+      # ---------------------------------------------------------------------------
+      # Identify Build context
+      # - Calcul the next artefact / docker image version
+      # ---------------------------------------------------------------------------
+      - job: IdentifyContext
+        displayName: Identify build context
 
         steps:
           - checkout: self
             fetchDepth: 0
 
-          - template: ./steps/versioning-ci-steps.yaml
+          - task: CalculateNextVersionTest@1
+            name: CalculateNextVersion
+            displayName: Determine Version
+            inputs:
+              configurationLocation: 'configurationPath'
+              configurationPath: './VersionManagement.yml'
+
+
+      # ---------------------------------------------------------------------------
+      # Build dotnet applications
+      # - Update build number with next version and unique counter
+      # - Build application
+      # ---------------------------------------------------------------------------
+      - job: DotnetBuild
+        displayName: Build Service
+        dependsOn:
+          - IdentifyContext
+
+        variables:
+          NextVersion: $[ dependencies.IdentifyContext.outputs['CalculateNextVersion.version'] ]
+          BuildCounter: $[counter(variables['NextVersion'], 1)]
+
+        steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - task: PublishBuildNumber@0
+            name: PublishBuildNumber
+            displayName: Publish build numbers
+            inputs:
+              semanticVersioning: '$(NextVersion)'
+              uniqueCounter: '$(BuildCounter)'
 
           - template: ./steps/dotnet-ci-steps.yaml
             parameters:
@@ -67,6 +102,9 @@ stages:
               # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
       - ${{ if parameters.testsProjectPath }}:
+        # ---------------------------------------------------------------------------
+        # Execute unit tests
+        # ---------------------------------------------------------------------------
         - job: DotnetUnitTests
           displayName: Tests Service
           dependsOn:
@@ -85,7 +123,6 @@ stages:
   # Build Container image and chart
   # - Build when Pull request to Master or branch != feature/, topic/, hotfix/
   # ---------------------------------------------------------------------------
-
   - ${{ if or(not(or(startsWith(variables['Build.SourceBranch'],'refs/heads/feature/'), startsWith(variables['Build.SourceBranch'],'refs/heads/topic/'), startsWith(variables['Build.SourceBranch'],'refs/heads/hotfix/'))), and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master'))) }}:
     - stage: BuildImages
       displayName: Build image and chart
@@ -93,10 +130,13 @@ stages:
         - BuildApplication
 
       jobs:
+        # ---------------------------------------------------------------------------
+        # Build and publish container image
+        # ---------------------------------------------------------------------------
         - job: DockerBuild
           displayName: Build and publish docker images
           variables:
-            tag: $(Build.BuildNumber)
+            tag: $[ stageDependencies.BuildApplication.DotnetBuild.outputs['PublishBuildNumber.CleanedVersion'] ]
 
           steps:
             - template: ./steps/container-ci-steps.yaml
@@ -109,13 +149,16 @@ stages:
                 containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
                 # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
+        # ---------------------------------------------------------------------------
+        # Build an dpublish helm chart
+        # ---------------------------------------------------------------------------
         - job: HelmBuild
           displayName: Build and publish Helm chart
           dependsOn:
             - DockerBuild
 
           variables:
-            tag: $(Build.BuildId)
+            tag: $[ stageDependencies.BuildApplication.DotnetBuild.outputs['PublishBuildNumber.SemanticVersion'] ]
 
           steps:
             - template: ./steps/chart-ci-steps.yaml

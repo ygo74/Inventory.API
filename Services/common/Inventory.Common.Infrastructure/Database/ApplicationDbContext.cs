@@ -1,5 +1,6 @@
 ﻿using Inventory.Common.Domain.Interfaces;
 using Inventory.Common.Domain.Repository;
+using Inventory.Common.Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -115,6 +116,21 @@ namespace Inventory.Common.Infrastructure.Database
 
         public async override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
+            foreach (var entry in ChangeTracker.Entries<AuditEntity>())
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entry.Entity.CreatedBy = _currentUser.UserId.ToString();
+                        entry.Entity.Created = DateTime.UtcNow;
+                        break;
+                    case EntityState.Modified:
+                        entry.Entity.LastModifiedBy = _currentUser.UserId.ToString();
+                        entry.Entity.LastModified = DateTime.UtcNow;
+                        break;
+                }
+            }
+        
             // Dispatch Domain Events collection. 
             // Choices:
             // A) Right BEFORE committing data (EF SaveChanges) into the DB will make a single transaction including  

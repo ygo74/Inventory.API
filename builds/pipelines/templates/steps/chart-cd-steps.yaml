@@ -50,6 +50,12 @@ steps:
   - checkout: self
     displayName: "Checkout repository"
 
+  - task: CleanSemanticVersionForDockerTag@0
+    displayName: Clean semantic Version for docker
+    name: CleanSemanticVersionForDockerTag
+    inputs:
+      semanticVersioning: '${{ parameters.artifactVersionNumber }}'
+
   - task: HelmInstaller@0
     displayName: Install Helm tools
     inputs:
@@ -82,8 +88,8 @@ steps:
             --create-namespace \
             --install \
             --namespace dynamic-inventory \
-            --version ${{ parameters.artifactVersionNumber }} \
-            --set image.tag=${{ parameters.artifactVersionNumber }} \
+            --version $(CleanSemanticVersionForDockerTag.CleanedVersion) \
+            --set image.tag=$(CleanSemanticVersionForDockerTag.CleanedVersion) \
             --set postgres.host=postgresql.postgresql \
             --set postgres.database=${{ parameters.databaseName }} \
             --set postgres.user=${{ parameters.databaseUserName }} \
