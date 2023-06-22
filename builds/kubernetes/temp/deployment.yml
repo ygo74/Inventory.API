@@ -24,7 +24,7 @@ spec:
           - "inventory.francecentral.cloudapp.azure.com"
       containers:
         - name: configuration-api
-          image: aksbootstrap.azurecr.io/dynamicinventory/inventoryconfigurationapi:809
+          image: aksbootstrap.azurecr.io/dynamic-inventory/inventoryconfigurationapi:809
           resources:
             limits:
               memory: 400Mi

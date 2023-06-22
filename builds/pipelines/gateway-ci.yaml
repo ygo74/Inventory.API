@@ -42,7 +42,7 @@ variables:
   #   value: ./Services/gateway/Inventory.Gateway.Infrastructure/Inventory.Gateway.Infrastructure.csproj
 
   - name: repositoryName
-    value: dynamicinventory/gateway-api
+    value: dynamic-inventory/gateway-api
 
   - name: dockerFile
     value: ./Services/gateway/Inventory.Gateway.Api/Dockerfile

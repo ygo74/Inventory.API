@@ -32,7 +32,7 @@ has_children: false
 
     ``` yaml
     image:
-      repository: aksbootstrap.azurecr.io/dynamicinventory/devices-api
+      repository: aksbootstrap.azurecr.io/dynamic-inventory/devices-api
 
     ```
 

@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: aksbootstrap.azurecr.io/dynamicinventory/devices-api
+  repository: aksbootstrap.azurecr.io/dynamic-inventory/devices-api
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
