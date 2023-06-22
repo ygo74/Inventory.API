@@ -58,7 +58,13 @@ stages:
           - checkout: self
             fetchDepth: 0
 
-          - template: ./steps/versioning-ci-steps.yaml
+          - task: CalculateNextVersionTest@1
+            name: CalculateNextVersion
+            displayName: Determine Version
+            inputs:
+              configurationLocation: 'configurationPath'
+              configurationPath: './VersionManagement.yml'
+
 
       - job: DotnetBuild
         displayName: Build Service
@@ -70,13 +76,14 @@ stages:
           BuildCounter: $[counter(variables['NextVersion'], 1)]
 
         steps:
-          - checkout: self
-            fetchDepth: 0
+          - checkout: none
 
-          - template: ./steps/versioning-ci-steps.yaml
-
-          - script: |
-              echo "##vso[build.updatebuildnumber]$(NextVersion)+$(BuildCounter)"
+          - task: PublishBuildNumber@0
+            name: PublishBuildNumber
+            displayName: Publish build numbers
+            inputs:
+              semanticVersioning: '$(NextVersion)'
+              uniqueCounter: '$(BuildCounter)'
 
           - template: ./steps/dotnet-ci-steps.yaml
             parameters:
@@ -114,7 +121,7 @@ stages:
         - job: DockerBuild
           displayName: Build and publish docker images
           variables:
-            tag: $(Build.BuildNumber)
+            tag: $[ stageDependencies.BuildApplication.DotnetBuild.outputs['PublishBuildNumber.CleanedVersion'] ]
 
           steps:
             - template: ./steps/container-ci-steps.yaml
@@ -133,7 +140,7 @@ stages:
             - DockerBuild
 
           variables:
-            tag: $(Build.BuildId)
+            tag: $[ stageDependencies.BuildApplication.DotnetBuild.outputs['PublishBuildNumber.CleanedVersion'] ]
 
           steps:
             - template: ./steps/chart-ci-steps.yaml

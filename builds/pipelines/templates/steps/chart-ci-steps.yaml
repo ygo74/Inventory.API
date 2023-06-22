@@ -48,7 +48,7 @@ steps:
     inputs:
       command:      'package'
       chartPath:    '${{ parameters.chartPath}}/${{ parameters.chartName}}'
-      chartVersion: '$(Build.BuildNumber)'
+      chartVersion: '${{ parameters.chartVersion }}'
 
   - ${{ if or(eq(variables['Build.Reason'],'PullRequest'), startsWith(variables['Build.SourceBranch'],'refs/heads/master'), startsWith(variables['Build.SourceBranch'],'refs/heads/release/')) }}:
     - task: AzureCLI@2
@@ -71,7 +71,7 @@ steps:
 
           # Push helm chart to registry
           helm registry login ${{ parameters.containerRegistryFqdn }} --username $USER_NAME --password $password
-          helm push $(Build.ArtifactStagingDirectory)/${{ parameters.chartName }}-$(Build.BuildNumber).tgz oci://${{ parameters.containerRegistryFqdn }}/helm/dynamic-inventory
+          helm push $(Build.ArtifactStagingDirectory)/${{ parameters.chartName }}-${{ parameters.chartVersion }}.tgz oci://${{ parameters.containerRegistryFqdn }}/helm/dynamic-inventory
 
         addSpnToEnvironment: true
         useGlobalConfig: true

@@ -63,3 +63,17 @@ https://dotnetthoughts.net/run-ef-core-migrations-in-azure-devops/
 https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli
 
 dotnet ef migrations script --output ..\databases\configuration\configurationDB.sql --idempotent -s .\configuration\Inventory.Configuration.Api\ -p .\configuration\Inventory.Configuration.Infrastructure\
+
+## Known issues
+
+1. Semantic version for docker
+
+2. Semantic version for helm
+
+    ``` bash
+    OCI artifact references (e.g. tags) do not support the plus sign (+). To support
+    storing semantic versions, Helm adopts the convention of changing plus (+) to
+    an underscore (_) in chart version tags when pushing to a registry and back to
+    a plus (+) when pulling from a registry.
+
+    ```

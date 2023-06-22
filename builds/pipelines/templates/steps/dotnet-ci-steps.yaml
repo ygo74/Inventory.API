@@ -42,7 +42,7 @@ steps:
       command: 'build'
       projects: '${{ parameters.projectPath }}'
       versioningScheme: byEnvVar
-      versionEnvVar: 'version.semVer'
+      versionEnvVar: 'CalculateNextVersion.version'
 
   - task: SnykSecurityScan@1
     inputs:
