@@ -18,6 +18,7 @@ configuration:
       - '^(.*/)?feature(s)?/.*$'
     versionIncrement: minor
     versionLabel: beta
+    addBranchName: true
 
   release:
     sourceVersion: git
