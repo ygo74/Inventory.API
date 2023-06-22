@@ -68,6 +68,8 @@ dotnet ef migrations script --output ..\databases\configuration\configurationDB.
 
 1. Semantic version for docker
 
+    Doesn't support +
+
 2. Semantic version for helm
 
     ``` bash
