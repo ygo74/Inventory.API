@@ -3,7 +3,7 @@ configuration:
   main:
     sourceVersion: git
     sourceVersionMode: branch
-    sourceVersionBranchPattern: releases
+    sourceVersionBranchPattern: '^(.*/)?release(s)?/\d+\.\d+\.\d+$'
     patternMap:
       - '^.*/main$'
       - '^.*/master$'
@@ -13,7 +13,7 @@ configuration:
   feature:
     sourceVersion: git
     sourceVersionMode: branch
-    sourceVersionBranchPattern: releases
+    sourceVersionBranchPattern: '^(.*/)?release(s)?/\d+\.\d+\.\d+$'
     patternMap:
       - '^(.*/)?feature(s)?/.*$'
     versionIncrement: minor
