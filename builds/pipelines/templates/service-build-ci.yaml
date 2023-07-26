@@ -150,7 +150,7 @@ stages:
                 # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
         # ---------------------------------------------------------------------------
-        # Build an dpublish helm chart
+        # Build and publish helm chart
         # ---------------------------------------------------------------------------
         - job: HelmBuild
           displayName: Build and publish Helm chart
