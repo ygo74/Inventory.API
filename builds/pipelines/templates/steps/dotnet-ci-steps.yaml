@@ -55,20 +55,21 @@ steps:
       organization:              'ygo74'
       testDirectory:             '$(directoryPath)'
 
-  - task: DotNetCoreCLI@2
-    displayName: Publish ${{ parameters.serviceName }}
-    inputs:
-      command: 'publish'
-      projects: '${{ parameters.projectPath }}'
-      publishWebProjects: false
-      versioningScheme: byEnvVar
-      versionEnvVar: 'CalculateNextVersion.version'
-      arguments: '-o $(Build.ArtifactStagingDirectory)/services/${{ parameters.serviceName }}'
-      zipAfterPublish: true
-      modifyOutputPath: true
+  - ${{ if or(not(or(startsWith(variables['Build.SourceBranch'],'refs/heads/feature/'), startsWith(variables['Build.SourceBranch'],'refs/heads/topic/'), startsWith(variables['Build.SourceBranch'],'refs/heads/hotfix/'))), and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master'))) }}:
+    - task: DotNetCoreCLI@2
+      displayName: Publish ${{ parameters.serviceName }}
+      inputs:
+        command: 'publish'
+        projects: '${{ parameters.projectPath }}'
+        publishWebProjects: false
+        versioningScheme: byEnvVar
+        versionEnvVar: 'CalculateNextVersion.version'
+        arguments: '-o $(Build.ArtifactStagingDirectory)/services/${{ parameters.serviceName }}'
+        zipAfterPublish: true
+        modifyOutputPath: true
 
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: ${{ parameters.serviceName }}'
-    inputs:
-      PathtoPublish: $(Build.ArtifactStagingDirectory)/services/${{ parameters.serviceName }}
-      ArtifactName: Service
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: ${{ parameters.serviceName }}'
+      inputs:
+        PathtoPublish: $(Build.ArtifactStagingDirectory)/services/${{ parameters.serviceName }}
+        ArtifactName: Service
