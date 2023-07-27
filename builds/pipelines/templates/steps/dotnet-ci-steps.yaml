@@ -59,7 +59,7 @@ steps:
     displayName: Publish ${{ parameters.serviceName }}
     inputs:
       command: 'publish'
-      projects: '${{ parameters.projectPath }}'
+      projects: '$(directoryPath)/*.csproj'
       versioningScheme: byEnvVar
       versionEnvVar: 'CalculateNextVersion.version'
       arguments: '-o $(Build.ArtifactStagingDirectory)/services/${{ parameters.serviceName }}'
