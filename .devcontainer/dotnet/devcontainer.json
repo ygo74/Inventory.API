@@ -7,13 +7,25 @@
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"features": {
 		"ghcr.io/devcontainers/features/dotnet:1": {}
-	}
+	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
 	// Configure tool-specific properties.
-	// "customizations": {},
+	"customizations": {
+		"vscode": {
+            //extensions
+			"extensions": [
+				"ms-dotnettools.csdevkit",
+				"davidanson.vscode-markdownlint",
+				"ms-azure-devops.azure-pipelines"
+			],
+            "settings": {
+                "files.trimTrailingWhitespace": false
+            }
+		}
+	}
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [5000, 5001, 5432],
