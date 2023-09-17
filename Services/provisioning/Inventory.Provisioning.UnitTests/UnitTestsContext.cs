@@ -1,33 +1,25 @@
-﻿using Inventory.Configuration.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
-using MediatR;
-using Inventory.Common.Domain.Repository;
-using Inventory.Common.UnitTests;
-using Inventory.Common.Infrastructure.Telemetry;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
+﻿using Inventory.Common.Domain.Interfaces;
 using Inventory.Common.Infrastructure.Events;
+using Inventory.Common.Infrastructure.Telemetry;
+using Inventory.Common.UnitTests;
 using Inventory.Common.UnitTests.Events;
-using Inventory.Common.Application.Plugins;
-using Inventory.Configuration.Api.Application.Plugin;
-using Inventory.Configuration.Api.Application.Locations;
-using Inventory.Configuration.Api.Application.Credentials;
+using Inventory.Provisioning.Infrastructure;
+using MediatR;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Inventory.Common.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Inventory.Configuration.UnitTests
+namespace Inventory.Provisioning.UnitTests
 {
-    public class UnitTestsContext : TestExecutionContext<Inventory.Configuration.Api.Startup>
+    public class UnitTestsContext : TestExecutionContext<Inventory.Provisioning.Api.Applications.LabelNames.GetLabelNameById>
     {
-
         private static readonly UnitTestsContext _context = new UnitTestsContext();
         protected UnitTestsContext() : base()
         {
 
         }
-
 
         public override void Configure(ServiceCollection services, IWebHostEnvironment Environment)
         {
@@ -41,12 +33,11 @@ namespace Inventory.Configuration.UnitTests
             services.AddTelemetryService(Configuration, out sourceName);
 
             // Database
-            services.AddScoped(typeof(IAsyncRepository<>), typeof(ConfigurationRepository<>));
-            services.AddEntityFrameworkInMemoryDatabase().AddDbContext<ConfigurationDbContext>((sp, options) =>
+            services.AddEntityFrameworkInMemoryDatabase().AddDbContext<ProvisioningDbContext>((sp, options) =>
             {
                 options.UseInMemoryDatabase("in-memory").UseInternalServiceProvider(sp);
             });
-            services.AddEntityFrameworkInMemoryDatabase().AddPooledDbContextFactory<ConfigurationDbContext>((sp, options) =>
+            services.AddEntityFrameworkInMemoryDatabase().AddPooledDbContextFactory<ProvisioningDbContext>((sp, options) =>
             {
                 options.UseInMemoryDatabase("in-memory").UseInternalServiceProvider(sp);
                 options.EnableDetailedErrors(true);
@@ -62,10 +53,6 @@ namespace Inventory.Configuration.UnitTests
             services.AddPagination();
 
             // Applications
-            services.AddSingleton<PluginResolver>();
-            services.AddScoped<PluginService>();
-            services.AddScoped<LocationService>();
-            services.AddScoped<CredentialService>();
 
 
             // Unit tests specific configuration
@@ -82,8 +69,6 @@ namespace Inventory.Configuration.UnitTests
         }
 
         public IMediator GetMediator() => GetService<IMediator>();
-        public ConfigurationDbContext DbContext => GetService<ConfigurationDbContext>();
-        public IAsyncRepository<T> GetAsyncRepository<T>() where T : class => GetService<IAsyncRepository<T>>();
-
+        public ProvisioningDbContext DbContext => GetService<ProvisioningDbContext>();
     }
 }

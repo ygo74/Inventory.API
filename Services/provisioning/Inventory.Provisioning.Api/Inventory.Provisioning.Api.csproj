@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>30e41607-9d16-43ca-b4c0-285f0397e42b</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..\..</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\common\Inventory.Common.Application\Inventory.Common.Application.csproj" />
+    <ProjectReference Include="..\Inventory.Provisioning.Domain\Inventory.Provisioning.Domain.csproj" />
+    <ProjectReference Include="..\Inventory.Provisioning.Infrastructure\Inventory.Provisioning.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Graphql\Mutations\" />
+    <Folder Include="Graphql\Types\" />
+    <Folder Include="Graphql\Queries\" />
+  </ItemGroup>
+
+</Project>

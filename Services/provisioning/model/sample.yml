@@ -1,0 +1,171 @@
+---
+apiVersion: apps/v1
+kind: deployment_model
+name: register_new_ip_for_device
+metadata:
+  labels:
+    os_family: linux
+    os: redhat
+spec:
+  register_ip:
+    interface_type: aap_job
+    arguments:
+      name: '{Environment}_NetworksTeam_Register_ipAddress'
+    expected_variables:
+      - name: targeted_servers
+        type: list
+    depends: []
+  firewall_provisioning:
+    interface_type: aap_job
+    arguments:
+      name: '{Environment}_NetworksTeam_Provisioning_firewall_objects'
+    expected_variables:
+      - name: targeted_servers
+        type: list
+    depends:
+      - register_ip
+  provisioning_status:
+    interface_type: aap_job
+    arguments:
+      name: '{Environment}_IasTeam_Update_provisoning_status'
+    expected_variables:
+      - name: targeted_servers
+        type: list
+    depends:
+      - firewall_provisioning
+      - register_ip
+    variables:
+      - name: provisioning_status
+        type: String
+        value: IP_REGISTERED
+      - name: revert_provisioning_status
+        type: String
+        value: IP_NEEDED
+      - name: allowed_current_provisioning_status
+        type: list
+        value:
+          - IP_NEEDED
+          - IP_REGISTER_IN_PROGRESS
+
+---
+apiVersion: apps/v1
+kind: deployment_model
+name: create_vm
+metadata:
+  labels:
+    os_family: linux
+    os: redhat
+spec:
+  create_vm:
+    interface_type: aap_workflow
+    arguments:
+      name: '{Environment}_VirtualizationTeam_Create_VM'
+    expected_variables:
+      - name: targeted_servers
+        type: list
+  provisioning_status:
+    interface_type: aap_job
+    arguments:
+      name: '{Environment}_IasTeam_Update_provisoning_status'
+    expected_variables:
+      - name: targeted_servers
+        type: list
+    depends:
+      - create_vm
+    variables:
+      - name: provisioning_status
+        type: String
+        value: VM_CREATED
+      - name: revert_provisioning_status
+        type: String
+        value: IP_REGISTERED
+
+---
+apiVersion: apps/v1
+kind: deployment_model
+name: new_linux_redhat_vm
+metadata:
+  labels:
+    os_family: linux
+    os: redhat
+spec:
+  get_new_ip:
+    interface_type: deployment_model
+    arguments:
+      name: 'register_new_ip_for_device'
+    expected_variables:
+      - name: targeted_servers
+        type: list
+    depends: []
+  create_vm:
+    interface_type: deployment_model
+    arguments:
+      name: 'create_vm'
+    expected_variables:
+      - name: targeted_servers
+        type: list
+    depends:
+      - get_new_ip
+  bootstrap_vm:
+    interface_type: aap_workflow
+    arguments:
+      name: '{Environment}_LinuxTeam_Bootstrap_VM'
+    expected_variables:
+      - name: targeted_servers
+        type: list
+      - name: update_server
+        type: boolean
+        mandatory: false
+        default: true
+      - name: reboot_server
+        type: boolean
+        mandatory: false
+        default: true
+    depends:
+      - get_new_ip
+      - create_vm
+
+---
+apiVersion: apps/v1
+kind: deployment_model
+name: new_windows_vm
+metadata:
+  labels:
+    os_family: windows
+    os: windows
+spec:
+  get_new_ip:
+    interface_type: deployment_model
+    arguments:
+      name: 'register_new_ip_for_device'
+    expected_variables:
+      - name: targeted_servers
+        type: list
+    depends: []
+  create_vm:
+    interface_type: deployment_model
+    arguments:
+      name: 'create_vm'
+    expected_variables:
+      - name: targeted_servers
+        type: list
+    depends:
+      - get_new_ip
+  bootstrap_vm:
+    interface_type: aap_workflow
+    arguments:
+      name: '{Environment}_MicrosoftTeam_Bootstrap_VM'
+    expected_variables:
+      - name: targeted_servers
+        type: list
+      - name: update_server
+        type: boolean
+        mandatory: false
+        default: true
+      - name: reboot_server
+        type: boolean
+        mandatory: false
+        default: true
+    depends:
+      - get_new_ip
+      - create_vm
