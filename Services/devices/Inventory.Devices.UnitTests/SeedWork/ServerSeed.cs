@@ -1,4 +1,5 @@
-﻿using Inventory.Devices.Domain;
+﻿using Elasticsearch.Net.Specification.IndicesApi;
+using Inventory.Devices.Domain;
 using Inventory.Devices.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,14 @@ namespace Inventory.Devices.UnitTests.SeedWork
 {
     public class ServerSeed
     {
-        public static List<Device> Get()
+        public static List<Server> Get()
         {
-            var srv1 = new VirtualServer(hostname: "test", dnsDomain: "test.fr", subnetIP: "10.20.1.0/24");
 
-            return new List<Device>()
+            var srv1 = new VirtualServer(hostname: "test", dnsDomain: "test.fr", subnetIP: "10.20.1.0/24");
+            var os = OperatingSystemSeed.Get().First();
+            srv1.SetOperatingSystem(os);
+
+            return new List<Server>()
             {
                 srv1
             };
