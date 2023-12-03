@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Validators;
 
-namespace Inventory.Configuration.Api.Application.Datacenter
+namespace Inventory.Configuration.Api.Application.Datacenters
 {
     public class CreateDatacenterRequest : CreateConfigurationEntityRequest<DatacenterDto>
     {

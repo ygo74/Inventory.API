@@ -1,5 +1,5 @@
 ﻿using FluentValidation.TestHelper;
-using Inventory.Configuration.Api.Application.Datacenter;
+using Inventory.Configuration.Api.Application.Datacenters;
 using Inventory.Configuration.UnitTests.TestCases;
 using MediatR;
 using NUnit.Framework;

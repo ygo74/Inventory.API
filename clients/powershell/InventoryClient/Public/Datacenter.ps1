@@ -1,4 +1,4 @@
-function New-InventoryLocation
+function New-InventoryDatacenter
 {
     [CmdletBinding(DefaultParameterSetName="Default")]
     param(
@@ -12,23 +12,11 @@ function New-InventoryLocation
 
         [Parameter(ParameterSetName="Default", Position=1, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
-        $RegionCode,
-
-        [Parameter(ParameterSetName="Default", Position=2, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [String]
-        $CountryCode,
-
-        [Parameter(ParameterSetName="Default", Position=3, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [String]
-        $CityCode,
+        $Code,
 
         [Parameter(ParameterSetName="Default", Position=4, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $InventoryCode,
-
-        [Parameter(ParameterSetName="Default", Position=5, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [String]
-        $Description = "",
 
         [Parameter(ParameterSetName="Default", Position=6, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [bool]
@@ -60,11 +48,8 @@ function New-InventoryLocation
         if ($PsCmdlet.ParameterSetName -eq "Pipeline")
         {
             $Name          = $InputObject.Name
-            $RegionCode    = $InputObject.RegionCode
-            $CountryCode   = $InputObject.CountryCode
-            $CityCode      = $InputObject.CityCode
+            $Code          = $InputObject.Code
             $InventoryCode = $InputObject.InventoryCode
-            $Description   = $InputObject.Description
             $Deprecated    = $InputObject.Deprecated
             if ($null -ne $InputObject.ValidFrom) { $ValidFrom = $InputObject.ValidFrom }
             if ($null -ne $InputObject.ValidTo)   { $ValidTo   = $InputObject.ValidTo }
@@ -72,33 +57,25 @@ function New-InventoryLocation
         }
 
         # Display input properties
-        Trace-Message -Message ("Location Name : '{0}'" -f $Name) -CommandName $MyInvocation.MyCommand.Name
-        Trace-Message -Message ("Location RegionCode : '{0}'" -f $RegionCode) -CommandName $MyInvocation.MyCommand.Name
-        Trace-Message -Message ("Location CountryCode : '{0}'" -f $CountryCode) -CommandName $MyInvocation.MyCommand.Name
-        Trace-Message -Message ("Location CityCode : '{0}'" -f $CityCode) -CommandName $MyInvocation.MyCommand.Name
-        Trace-Message -Message ("Location InventoryCode : '{0}'" -f $InventoryCode) -CommandName $MyInvocation.MyCommand.Name
-        Trace-Message -Message ("Location Description : '{0}'" -f $Description) -CommandName $MyInvocation.MyCommand.Name
-        Trace-Message -Message ("Location Deprecated : '{0}'" -f $Deprecated) -CommandName $MyInvocation.MyCommand.Name
-        Trace-Message -Message ("Location ValidFrom : '{0}'" -f $ValidFrom) -CommandName $MyInvocation.MyCommand.Name
-        Trace-Message -Message ("Location ValidTo : '{0}'" -f $ValidTo) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Datacenter Name : '{0}'" -f $Name) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Datacenter Code : '{0}'" -f $Code) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Datacenter InventoryCode : '{0}'" -f $InventoryCode) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Datacenter Deprecated : '{0}'" -f $Deprecated) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Datacenter ValidFrom : '{0}'" -f $ValidFrom) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Datacenter ValidTo : '{0}'" -f $ValidTo) -CommandName $MyInvocation.MyCommand.Name
 
         # Assert Mandatory variables
         if ([string]::IsNullOrWhiteSpace($Name)) {throw "Name is mandatory"}
-        if ([string]::IsNullOrWhiteSpace($RegionCode)) {throw "RegionCode is mandatory"}
-        if ([string]::IsNullOrWhiteSpace($CountryCode)) {throw "CountryCode is mandatory"}
-        if ([string]::IsNullOrWhiteSpace($CityCode)) {throw "CityCode is mandatory"}
+        if ([string]::IsNullOrWhiteSpace($Code)) {throw "Code is mandatory"}
         if ([string]::IsNullOrWhiteSpace($InventoryCode)) {throw "InventoryCode is mandatory"}
 
         # Create payload input
         $graphqlInput = @{
             name = $Name
-            regionCode = $RegionCode
-            cityCode = $CityCode
-            countryCode = $CountryCode
+            code = $Code
             inventoryCode = $InventoryCode
 
         }
-        if (![string]::IsNullOrWhiteSpace($Description)) {$graphqlInput[ "description"] = $Description}
         if ($null -ne $Deprecated ) {$graphqlInput[ "deprecated"] = $Deprecated}
         if ($null -ne $ValidFrom ) {$graphqlInput[ "validFrom"] = $ValidFrom}
         if ($null -ne $ValidTo ) {$graphqlInput[ "ValidTo"] = $ValidTo}
@@ -107,20 +84,20 @@ function New-InventoryLocation
             input = $graphqlInput
         }
 
-        $command = $script:CreateLocationMutation + $script:LocationDtoFragment + $script:ErrorsFragment
+        $command = $script:CreateDatacenterMutation + $script:DatacenterDtoFragment + $script:ErrorsFragment
 
         $result = Invoke-InternalGraphql -Query $command -Variables $Variables -uri $global:ConfigurationUri
 
-        if ($result.createLocation.errors.Count -gt 0)
+        if ($result.createDatacenter.errors.Count -gt 0)
         {
-            throw (ConvertFrom-InternalGraphqlErrors -Errors $result.createLocation.errors)
+            throw (ConvertFrom-InternalGraphqlErrors -Errors $result.createDatacenter.errors)
         }
-        $result.createLocation.data
+        $result.createDatacenter.data
 
     }
 }
 
-function Update-InventoryLocation
+function Update-InventoryDatacenter
 {
     [CmdletBinding(DefaultParameterSetName="Default")]
     param(
@@ -210,69 +187,21 @@ function Update-InventoryLocation
             input = $graphqlInput
         }
 
-        $command = $script:UpdateLocationMutation + $script:LocationDtoFragment + $script:ErrorsFragment
+        $command = $script:UpdateDatacenterMutation + $script:DatacenterDtoFragment + $script:ErrorsFragment
 
         $result = Invoke-InternalGraphql -Query $command -Variables $Variables -uri $global:ConfigurationUri
 
-        if ($result.updateLocation.errors.Count -gt 0)
+        if ($result.updateDatacenter.errors.Count -gt 0)
         {
-            throw (ConvertFrom-InternalGraphqlErrors -Errors $result.updateLocation.errors)
+            throw (ConvertFrom-InternalGraphqlErrors -Errors $result.updateDatacenter.errors)
         }
-        $result.updateLocation.data
-
-    }
-}
-
-function Remove-InventoryLocation
-{
-    [CmdletBinding(DefaultParameterSetName="Default")]
-    param(
-        [Parameter(ParameterSetName="Default", Position=0, Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$false)]
-        [int]
-        $Id
-   )
-
-    Begin
-    {
-        $startFunction = Get-Date
-        Trace-StartFunction -CommandName $MyInvocation.MyCommand.Name
-    }
-    End
-    {
-        $endFunction = Get-Date
-        Trace-EndFunction -CommandName $MyInvocation.MyCommand.Name -Duration ($endFunction -$startFunction)
-
-    }
-    Process
-    {
-
-        Trace-Message -Message ("Location Id            : '{0}'" -f $Id) -CommandName $MyInvocation.MyCommand.Name
-        if ($null -eq $Id) {throw "Id is mandatory"}
-
-        # Create payload input
-        $graphqlInput = @{
-            id = $Id
-        }
-        $Variables = @{
-            input = $graphqlInput
-        }
-
-        $command = $script:RemoveLocationMutation + $script:LocationDtoFragment + $script:ErrorsFragment
-
-        $result = Invoke-InternalGraphql -Query $command -Variables $Variables -uri $global:ConfigurationUri
-
-        if ($result.removeLocation.errors.Count -gt 0)
-        {
-            throw (ConvertFrom-InternalGraphqlErrors -Errors $result.removeLocation.errors)
-        }
-        $result.removeLocation.data
-
+        $result.updateDatacenter.data
 
     }
 }
 
 
-function Get-InventoryLocation
+function Get-InventoryDatacenter
 {
     [CmdletBinding(DefaultParameterSetName="Default")]
     param(
@@ -302,33 +231,33 @@ function Get-InventoryLocation
         $Variables = @{}
         if ($PsCmdlet.ParameterSetName -eq "ById")
         {
-            Trace-Message -Message ("Get Location By Id : '{0}'" -f $Id) -CommandName $MyInvocation.MyCommand.Name
+            Trace-Message -Message ("Get Datacenter By Id : '{0}'" -f $Id) -CommandName $MyInvocation.MyCommand.Name
             $Variables[ "id" ] = $Id
-            $command = $script:GetLocationByIdQuery + $script:LocationDtoFragment
+            $command = $script:GetDatacenterByIdQuery + $script:DatacenterDtoFragment + $script:ErrorsFragment
 
             $result = Invoke-InternalGraphql -Query $command -Variables $Variables -uri $global:ConfigurationUri
 
-            if ($result.location.errors.Count -gt 0)
+            if ($result.datacenter.errors.Count -gt 0)
             {
-                throw (ConvertFrom-InternalGraphqlErrors -Errors $result.location.errors)
+                throw (ConvertFrom-InternalGraphqlErrors -Errors $result.datacenter.errors)
             }
-            $result.location.data
+            $result.datacenter.data
 
         }
         else
         {
-            Trace-Message -Message ("Get Location By Name : '{0}'" -f $Name) -CommandName $MyInvocation.MyCommand.Name
+            Trace-Message -Message ("Get Datacenter By Name : '{0}'" -f $Name) -CommandName $MyInvocation.MyCommand.Name
             $Variables[ "name" ] = $Name
 
-            $command = $script:GetLocationByNameQuery + $script:LocationDtoFragment
+            $command = $script:GetDatacenterByNameQuery + $script:DatacenterDtoFragment + $script:ErrorsFragment
 
             $result = Invoke-InternalGraphql -Query $command -Variables $Variables -uri $global:ConfigurationUri
 
-            if ($result.locationByName.errors.Count -gt 0)
+            if ($result.datacenterByName.errors.Count -gt 0)
             {
-                throw (ConvertFrom-InternalGraphqlErrors -Errors $result.locationByName.errors)
+                throw (ConvertFrom-InternalGraphqlErrors -Errors $result.datacenterByName.errors)
             }
-            $result.locationByName.data
+            $result.datacenterByName.data
 
         }
 
@@ -336,21 +265,13 @@ function Get-InventoryLocation
     }
 }
 
-function Find-InventoryLocation
+function Find-InventoryDatacenter
 {
     [CmdletBinding(DefaultParameterSetName="Default")]
     param(
         [Parameter(Position=0, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
         [String]
-        $RegionCode,
-
-        [Parameter(Position=1, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
-        [String]
-        $CountryCode,
-
-        [Parameter(Position=2, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
-        [String]
-        $CityCode,
+        $InventoryCode,
 
         [Parameter(Position=3, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
         [DateTime]
@@ -379,7 +300,6 @@ function Find-InventoryLocation
         [Parameter(ParameterSetName="previous", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
         [string]
         $Before
-
     )
 
     Begin
@@ -396,15 +316,13 @@ function Find-InventoryLocation
     Process
     {
 
-        Trace-Message -Message ("Location Region code        : {0}" -f $RegionCode) -CommandName $MyInvocation.MyCommand.Name
-        Trace-Message -Message ("Location Country code       : {0}" -f $CountryCode) -CommandName $MyInvocation.MyCommand.Name
-        Trace-Message -Message ("Location City code          : {0}" -f $CityCode) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Datacenter Inventory code   : {0}" -f $InventoryCode) -CommandName $MyInvocation.MyCommand.Name
         Trace-Message -Message ("Location ValidFrom          : {0}" -f $ValidFrom) -CommandName $MyInvocation.MyCommand.Name
         Trace-Message -Message ("Location ValidTo            : {0}" -f $ValidTo) -CommandName $MyInvocation.MyCommand.Name
         Trace-Message -Message ("Location Include deprecated : {0}" -f $IncludeDeprecated) -CommandName $MyInvocation.MyCommand.Name
         Trace-Message -Message ("Location Include All        : {0}" -f $IncludeAllEntities) -CommandName $MyInvocation.MyCommand.Name
 
-        # Query
+        # Filter
         $query = @{}
         if (![string]::IsNullOrWhiteSpace($RegionCode)) {$query[ "regionCode"] = $RegionCode}
         if (![string]::IsNullOrWhiteSpace($CountryCode)) {$query[ "countryCode"] = $CountryCode}
@@ -441,13 +359,13 @@ function Find-InventoryLocation
         }
 
 
-        $Query = $script:FindLocationQuery + $script:PaginationInfo +$script:LocationDtoFragment
+        $Query = $script:FindDatacenterQuery + $script:PaginationInfo +$script:DatacenterDtoFragment
         # $Query = $script:PluginQuery + $script:pluginDtoFragment
         $result = Invoke-InternalGraphql -Query $Query -Variables $Variables -uri $global:ConfigurationUri
 
-        $pageInfo = $result.locations.pageInfo
-        $pageInfo | Add-Member -MemberType NoteProperty -Name totalCount -Value $result.locations.totalCount
-        return $pageInfo, $result.locations.edges
+        $pageInfo = $result.datacenters.pageInfo
+        $pageInfo | Add-Member -MemberType NoteProperty -Name totalCount -Value $result.datacenters.totalCount
+        return $pageInfo, $result.datacenters.edges
 
     }
 }

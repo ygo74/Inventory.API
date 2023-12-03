@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Inventory.Configuration.Api.Application.Datacenter
+namespace Inventory.Configuration.Api.Application.Datacenters
 {
     public class DatacenterEventHandler : INotificationHandler<Event<Domain.Models.Datacenter>>
     {

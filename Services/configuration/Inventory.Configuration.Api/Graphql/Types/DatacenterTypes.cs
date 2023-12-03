@@ -1,6 +1,6 @@
 ﻿using HotChocolate.Types;
 using Inventory.Common.Application.Core;
-using Inventory.Configuration.Api.Application.Datacenter;
+using Inventory.Configuration.Api.Application.Datacenters;
 using System;
 using System.Collections.Generic;
 using System.Linq;

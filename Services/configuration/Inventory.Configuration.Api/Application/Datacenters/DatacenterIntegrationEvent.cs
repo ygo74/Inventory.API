@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Inventory.Configuration.Api.Application.Datacenter
+namespace Inventory.Configuration.Api.Application.Datacenters
 {
     public class DatacenterIntegrationEvent : IntegrationEvent
     {

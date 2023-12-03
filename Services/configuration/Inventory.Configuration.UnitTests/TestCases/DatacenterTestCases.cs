@@ -1,4 +1,4 @@
-﻿using Inventory.Configuration.Api.Application.Datacenter;
+﻿using Inventory.Configuration.Api.Application.Datacenters;
 using System;
 using System.Collections;
 using System.Collections.Generic;

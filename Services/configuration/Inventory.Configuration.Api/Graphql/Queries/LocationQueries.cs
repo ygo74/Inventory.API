@@ -65,6 +65,14 @@ namespace Inventory.Configuration.Api.Graphql.Queries
 
 //# nullable disable
 
+        /// <summary>
+        /// Get location by ID
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="ctx"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<Payload<LocationDto>> GetLocation([Service] IMediator mediator,
             CancellationToken cancellationToken, IResolverContext ctx,
             int id)
@@ -79,6 +87,14 @@ namespace Inventory.Configuration.Api.Graphql.Queries
             return result;
         }
 
+        /// <summary>
+        /// Get location by Name
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="ctx"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public async Task<Payload<LocationDto>> GetLocationByName([Service] IMediator mediator,
             CancellationToken cancellationToken, IResolverContext ctx,
             string name)
