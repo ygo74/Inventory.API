@@ -2,7 +2,7 @@
 using AutoMapper;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
-using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Application.Errors;
 using Inventory.Common.Domain.Filters;
 using Inventory.Provisioning.Domain.Filters;
 using Inventory.Provisioning.Domain.Models;

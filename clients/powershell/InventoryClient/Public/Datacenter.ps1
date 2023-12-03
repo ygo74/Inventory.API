@@ -14,19 +14,40 @@ function New-InventoryDatacenter
         [String]
         $Code,
 
-        [Parameter(ParameterSetName="Default", Position=4, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=2, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [String]
+        [ValidateSet("Cloud","OnPremise")]
+        $Type,
+
+        [Parameter(ParameterSetName="Default", Position=3, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $InventoryCode,
 
-        [Parameter(ParameterSetName="Default", Position=6, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=4, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [String]
+        $RegionCode,
+
+        [Parameter(ParameterSetName="Default", Position=5, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [String]
+        $CountryCode,
+
+        [Parameter(ParameterSetName="Default", Position=6, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [String]
+        $CityyCode,
+
+        [Parameter(ParameterSetName="Default", Position=7, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [String]
+        $Description,
+
+        [Parameter(ParameterSetName="Default", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [bool]
         $Deprecated = $false,
 
-        [Parameter(ParameterSetName="Default", Position=7, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=9, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [DateTime]
         $ValidFrom,
 
-        [Parameter(ParameterSetName="Default", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=10, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [DateTime]
         $ValidTo
     )
@@ -49,8 +70,13 @@ function New-InventoryDatacenter
         {
             $Name          = $InputObject.Name
             $Code          = $InputObject.Code
+            $Type          = $InputObject.Type
             $InventoryCode = $InputObject.InventoryCode
+            $RegionCode    = $InputObject.RegionCode
+            $CountryCode   = $InputObject.CountryCode
+            $CityCode      = $InputObject.CityCode
             $Deprecated    = $InputObject.Deprecated
+            if (![string]::IsNullOrWhiteSpace($Description)) { $Description = $InputObject.Description }
             if ($null -ne $InputObject.ValidFrom) { $ValidFrom = $InputObject.ValidFrom }
             if ($null -ne $InputObject.ValidTo)   { $ValidTo   = $InputObject.ValidTo }
 
@@ -59,6 +85,11 @@ function New-InventoryDatacenter
         # Display input properties
         Trace-Message -Message ("Datacenter Name : '{0}'" -f $Name) -CommandName $MyInvocation.MyCommand.Name
         Trace-Message -Message ("Datacenter Code : '{0}'" -f $Code) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Datacenter Type : '{0}'" -f $Type) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Datacenter RegionCode : '{0}'" -f $RegionCode) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Datacenter CountryCode : '{0}'" -f $CountryCode) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Datacenter CityCode : '{0}'" -f $CityCode) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Datacenter Description : '{0}'" -f $Description) -CommandName $MyInvocation.MyCommand.Name
         Trace-Message -Message ("Datacenter InventoryCode : '{0}'" -f $InventoryCode) -CommandName $MyInvocation.MyCommand.Name
         Trace-Message -Message ("Datacenter Deprecated : '{0}'" -f $Deprecated) -CommandName $MyInvocation.MyCommand.Name
         Trace-Message -Message ("Datacenter ValidFrom : '{0}'" -f $ValidFrom) -CommandName $MyInvocation.MyCommand.Name
@@ -68,14 +99,23 @@ function New-InventoryDatacenter
         if ([string]::IsNullOrWhiteSpace($Name)) {throw "Name is mandatory"}
         if ([string]::IsNullOrWhiteSpace($Code)) {throw "Code is mandatory"}
         if ([string]::IsNullOrWhiteSpace($InventoryCode)) {throw "InventoryCode is mandatory"}
+        if ([string]::IsNullOrWhiteSpace($Type)) {throw "Type is mandatory"}
+        if ([string]::IsNullOrWhiteSpace($RegionCode)) {throw "RegionCode is mandatory"}
+        if ([string]::IsNullOrWhiteSpace($CountryCode)) {throw "CountryCode is mandatory"}
+        if ([string]::IsNullOrWhiteSpace($CityCode)) {throw "CityCode is mandatory"}
+
 
         # Create payload input
         $graphqlInput = @{
             name = $Name
             code = $Code
             inventoryCode = $InventoryCode
-
+            datacenterType = $Type.ToUpper()
+            regionCode = $RegionCode
+            countryCode = $CountryCode
+            cityCode = $CityCode
         }
+        if (![string]::IsNullOrWhiteSpace($Description)) {$graphqlInput[ "description"] = $Description}
         if ($null -ne $Deprecated ) {$graphqlInput[ "deprecated"] = $Deprecated}
         if ($null -ne $ValidFrom ) {$graphqlInput[ "validFrom"] = $ValidFrom}
         if ($null -ne $ValidTo ) {$graphqlInput[ "ValidTo"] = $ValidTo}

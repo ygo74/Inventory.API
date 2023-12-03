@@ -3,9 +3,8 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
-using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Application.Errors;
 using Inventory.Common.Domain.Filters;
-using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Domain.Filters;
 using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
@@ -70,7 +69,7 @@ namespace Inventory.Configuration.Api.Application.Locations
             var location = await dbContext.Locations.FindAsync(request.Id);
 
             if (null == location)
-                Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Id {request.Id}"));
+                return Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Id {request.Id}"));
 
             return Payload<LocationDto>.Success(_mapper.Map<LocationDto>(location));
 
@@ -93,7 +92,7 @@ namespace Inventory.Configuration.Api.Application.Locations
             var location = await dbContext.Locations.FirstOrDefaultAsync(filter.Predicate);
 
             if (null == location)
-                Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Name {request.Name}"));
+                return Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Name {request.Name}"));
 
             return Payload<LocationDto>.Success(_mapper.Map<LocationDto>(location));
 

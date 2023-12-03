@@ -1,4 +1,5 @@
 ﻿using HotChocolate;
+using Inventory.Common.Application.Errors;
 using System;
 using System.Collections.Generic;
 using System.Linq;

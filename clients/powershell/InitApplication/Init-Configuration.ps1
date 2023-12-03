@@ -27,7 +27,7 @@ Write-Host "Load locations" -ForegroundColor Green
 Write-Host $titleSeparator -ForegroundColor Green
 $configuration.locations | Foreach-Object {
     Write-Host "`t - location $($_.Name) : " -NoNewLine
-    $existingLocation = Get-InventoryLocation -Name $_.Name
+    $existingLocation = Get-InventoryLocation -Name $_.Name -ErrorAction SilentlyContinue
     if ($null -eq $existingLocation)
     {
         New-InventoryLocation -InputObject $_
@@ -40,4 +40,27 @@ $configuration.locations | Foreach-Object {
 
     write-Host "Ok"
 }
+
+# -----------------------------------------------------------------------------
+# Load Datacenters
+# -----------------------------------------------------------------------------
+Write-Host ""
+Write-Host "Load Datacenters" -ForegroundColor Green
+Write-Host $titleSeparator -ForegroundColor Green
+$configuration.Datacenters | Foreach-Object {
+    Write-Host "`t - datacenter $($_.Name) : " -NoNewLine
+    $existingDatacenter = Get-InventoryDatacenter -Name $_.Name -ErrorAction SilentlyContinue
+    if ($null -eq $existingDatacenter)
+    {
+        New-InventoryDatacenter -InputObject $_
+    }
+    else
+    {
+        $_ | Add-Member -MemberType NoteProperty -Name Id -Value $existingDatacenter.id
+        Update-InventoryLocation -InputObject $_
+    }
+
+    write-Host "Ok"
+}
+
 

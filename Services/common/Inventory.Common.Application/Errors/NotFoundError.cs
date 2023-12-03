@@ -1,28 +1,27 @@
-﻿using Inventory.Common.Application.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inventory.Common.Application.Exceptions
+namespace Inventory.Common.Application.Errors
 {
     public class NotFoundError : GenericApiError
     {
         public NotFoundError()
         {
-            this.message = "Not found entity in database";
+            Message = "Not found entity in database";
         }
 
-        public NotFoundError(string s)
+        public NotFoundError(string message)
         {
-            this.message = s;
+            Message = message;
         }
 
         public NotFoundError(string propName, string message)
         {
-            this.message = message;
-            this.FieldName = propName;
+            this.Message = message;
+            FieldName = propName;
         }
 
 #nullable enable

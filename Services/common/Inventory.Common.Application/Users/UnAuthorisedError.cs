@@ -1,4 +1,4 @@
-﻿using Inventory.Common.Application.Core;
+﻿using Inventory.Common.Application.Errors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,19 +11,19 @@ namespace Inventory.Common.Application.Users
     {
         public UnAuthorisedError()
         {
-            this.message = "Unauthorised to process or access resource";
+            this.Message = "Unauthorised to process or access resource";
         }
 
         public UnAuthorisedError(string s)
         {
 
-            this.message = s;
+            this.Message = s;
         }
 
         public UnAuthorisedError(object content, string message)
         {
 
-            this.message = message;
+            this.Message = message;
         }
 
     }

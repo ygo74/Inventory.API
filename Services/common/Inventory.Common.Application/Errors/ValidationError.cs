@@ -1,28 +1,27 @@
-﻿using Inventory.Common.Application.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inventory.Common.Application.Exceptions
+namespace Inventory.Common.Application.Errors
 {
     public class ValidationError : GenericApiError
     {
         public ValidationError()
         {
-            this.message = "Some parameter/s are invalid or null";
+            Message = "Some parameter/s are invalid or null";
         }
 
-        public ValidationError(string s)
+        public ValidationError(string message)
         {
-            this.message = s;
+            Message = message;
         }
 
         public ValidationError(string propName, string message)
         {
-            this.message = message;
-            this.FieldName = propName;
+            this.Message = message;
+            FieldName = propName;
         }
 
 #nullable enable

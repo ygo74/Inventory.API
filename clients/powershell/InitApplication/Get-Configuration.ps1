@@ -19,7 +19,7 @@ $plugins = @($pluginsDefinition | % {New-Object -TypeName psobject -Property $_}
 
 
 # -----------------------------------------------------------------------------
-# PLugins
+# Locations
 # -----------------------------------------------------------------------------
 $locationsDefinition = @(
     [Ordered]@{
@@ -33,8 +33,27 @@ $locationsDefinition = @(
 
 $locations = @($locationsDefinition | % {New-Object -TypeName psobject -Property $_})
 
+# -----------------------------------------------------------------------------
+# Datacenters
+# -----------------------------------------------------------------------------
+$datacentersDefinition = @(
+    [Ordered]@{
+        Name = "Azure France Central"
+        Description = "Azure France Central Datacenter"
+        Code = "AZR-FR-CENTRAL"
+        Type = "Cloud"
+        InventoryCode = "azure.fr"
+        CountryCode = "FR"
+        CityCode = "PAR"
+        RegionCode = "EMEA"
+    }
+)
+
+$datacenters = @($datacentersDefinition | % {New-Object -TypeName psobject -Property $_})
+
 
 return @{
     Plugins = $plugins
     Locations = $locations
+    Datacenters = $datacenters
 }

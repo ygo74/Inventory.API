@@ -2,9 +2,7 @@
 using AutoMapper;
 using FluentValidation;
 using Inventory.Common.Application.Core;
-using Inventory.Common.Application.Exceptions;
-using Inventory.Configuration.Api.Application.Locations;
-using Inventory.Configuration.Domain.Models;
+using Inventory.Common.Application.Errors;
 using Inventory.Configuration.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

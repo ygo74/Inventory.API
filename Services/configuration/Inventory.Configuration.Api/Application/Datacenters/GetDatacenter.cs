@@ -3,7 +3,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
-using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Application.Errors;
 using Inventory.Common.Domain.Filters;
 using Inventory.Configuration.Domain.Filters;
 using Inventory.Configuration.Infrastructure;
@@ -73,7 +73,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
                                                                    cancellationToken: cancellationToken);
 
             if (null == datacenter)
-                Payload<DatacenterDto>.Error(new NotFoundError($"Don't find Datacenter with Id {request.Id}"));
+                return Payload<DatacenterDto>.Error(new NotFoundError($"Don't find Datacenter with Id {request.Id}"));
 
             return Payload<DatacenterDto>.Success(_mapper.Map<DatacenterDto>(datacenter));
         }
@@ -99,7 +99,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
                                             .FirstOrDefaultAsync(cancellationToken);
 
             if (null == datacenter)
-                Payload<DatacenterDto>.Error(new NotFoundError($"Don't find Datacenter with Name {request.Name}"));
+                return Payload<DatacenterDto>.Error(new NotFoundError($"Don't find Datacenter with Name {request.Name}"));
 
             return Payload<DatacenterDto>.Success(datacenter);
 
