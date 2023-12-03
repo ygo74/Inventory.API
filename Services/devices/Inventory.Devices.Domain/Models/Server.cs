@@ -29,8 +29,12 @@ namespace Inventory.Devices.Domain.Models
         {
             Guard.Against.Null(os, nameof(os));
             OperatingSystem = os;
-        }   
+        }
 
+        public void SetOperatingSystem(int id)
+        {
+            OperatingSystemId = id;
+        }
 
     }
 

@@ -3,8 +3,10 @@ using HotChocolate.Data;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Inventory.Common.Domain.Repository;
+using Inventory.Devices.Api.Applications.Servers;
 using Inventory.Devices.Domain.Models;
 using Inventory.Devices.Infrastructure;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -39,6 +41,22 @@ namespace Inventory.Devices.Api.Graphql.Queries
             //return dbContext.Devices;
             return null;
         }
+
+        public async Task<IReadOnlyList<ServerDto>> GetSummaryServers([Service] IMediator mediator, IResolverContext ctx, string? datacenterName)
+        {
+
+            // Request
+            var request = new GetServerSummaryRequest()
+            {
+                DatacenterName = datacenterName
+            };
+
+            var result = await mediator.Send(request);
+
+            return result.Data;
+        }
+
+
 
     }
 }

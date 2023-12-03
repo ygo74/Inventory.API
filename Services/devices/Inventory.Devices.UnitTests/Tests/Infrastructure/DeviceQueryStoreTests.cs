@@ -43,7 +43,10 @@ namespace Inventory.Devices.UnitTests.Tests.Infrastructure
             var queryStore = this.GetService<IDeviceQueryStore>();
 
             // Act
-            var devices = await queryStore.ListAllAsync(e => ((Server)e).OperatingSystem);
+            var devices = await queryStore.ListAllAsync(
+                    orderBy: q => q.OrderBy(e => e.Hostname),
+                    includes: e => ((Server)e).OperatingSystem
+            );
 
             // Assert
             Assert.IsNotNull(devices);
@@ -58,7 +61,10 @@ namespace Inventory.Devices.UnitTests.Tests.Infrastructure
             var queryStore = this.GetService<IDeviceQueryStore>();
 
             // Act
-            var devices = await queryStore.ListAllAsync<DeviceSummary>(e => ((Server)e).OperatingSystem);
+            var devices = await queryStore.ListAllAsync<DeviceSummary>(
+                    orderBy: q => q.OrderBy(e => e.Hostname),
+                    includes: e => ((Server)e).OperatingSystem
+            );
 
             // Assert
             Assert.IsNotNull(devices);

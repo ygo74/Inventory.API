@@ -28,6 +28,9 @@ namespace Inventory.Devices.Infrastructure
         public ServerDbContext(DbContextOptions<ServerDbContext> options) : base(options) { }
 
         // Configuration tables
+        public DbSet<DataCenter> Datacenters { get; set; }
+
+        // Devies tqbles
         public DbSet<Server> Servers { get; set; }
         public DbSet<VirtualServer> VirtualServers { get; set; }
         public DbSet<OperatingSystem> OperatingSystems { get; set; }

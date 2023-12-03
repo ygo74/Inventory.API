@@ -36,5 +36,10 @@ namespace Inventory.Devices.Domain.Models
 
         }
 
+        public void SetDataCenter(int dataCenterId)
+        {
+            DataCenterId = dataCenterId;
+        }
+
     }
 }

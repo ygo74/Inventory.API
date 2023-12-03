@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Devices.Infrastructure
 {
-    public class DeviceQueryStore : GenericQueryStore<ServerDbContext, Device>, IDeviceQueryStore
+    public class DeviceQueryStore : GenericQueryStore<ServerDbContext, Server>, IDeviceQueryStore
     {
 
         public DeviceQueryStore(ServerDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
@@ -24,22 +24,22 @@ namespace Inventory.Devices.Infrastructure
 
         }
 
-        public Task<IEnumerable<Device>> GetDevicesByDatacenterAsync(string datacenterCode)
+        public Task<IEnumerable<Server>> GetDevicesByDatacenterAsync(string datacenterCode)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Device>> GetDevicesByDatacenterAsync(int datacenterId)
+        public Task<IEnumerable<Server>> GetDevicesByDatacenterAsync(int datacenterId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Device>> GetDevicesByOperatingSystemAsync(string osCode)
+        public Task<IEnumerable<Server>> GetDevicesByOperatingSystemAsync(string osCode)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Device>> GetDevicesByOperatingSystemAsync(int osId)
+        public Task<IEnumerable<Server>> GetDevicesByOperatingSystemAsync(int osId)
         {
             throw new NotImplementedException();
         }

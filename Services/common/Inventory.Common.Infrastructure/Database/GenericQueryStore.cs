@@ -10,7 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Inventory.Common.Infrastructure.Database
 {
@@ -85,61 +87,105 @@ namespace Inventory.Common.Infrastructure.Database
         }
 
 
-        public async Task<IEnumerable<T>> ListAllAsync(params Expression<Func<T, object>>[] includes)
-        {
-            var query = _dbContext.Set<T>().AsNoTracking();
 
-            foreach (var include in includes)
+        public Task<IEnumerable<TDtoEntity>> ListAllAsync<TDtoEntity>(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, 
+                                                                      int? offset = null, int? limit = null, 
+                                                                      CancellationToken cancellationToken = default, 
+                                                                      params Expression<Func<T, object>>[] includes) where TDtoEntity : class
+        {
+            return GetByCriteriaAsync<TDtoEntity>(criteria: null,
+                                                  orderBy: orderBy,
+                                                  offset: offset,
+                                                  limit: limit, 
+                                                  cancellationToken: cancellationToken, 
+                                                  includes: includes);
+        }
+
+        public Task<IEnumerable<T>> ListAllAsync(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                                 int? offset = null, int? limit = null,
+                                                 CancellationToken cancellationToken = default,
+                                                 params Expression<Func<T, object>>[] includes)
+        {
+            return GetByCriteriaAsync(criteria: null,
+                                      orderBy: orderBy,
+                                      offset: offset,
+                                      limit: limit,
+                                      cancellationToken: cancellationToken,
+                                      includes: includes);
+        }
+
+        public async Task<IEnumerable<TDtoEntity>> GetByCriteriaAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
+                                                                                  Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                                                                  int? offset = null, int? limit = null,
+                                                                                  CancellationToken cancellationToken = default,
+                                                                                  params Expression<Func<T, object>>[] includes) where TDtoEntity : class
+        {
+            var query = _dbContext.Set<T>()
+                                  .AsNoTracking();
+
+            if (criteria is not null && criteria.Predicate is not null)
             {
-                query = query.Include(include);
+                query = query.Where(criteria.Predicate);
+            }
+
+            if (includes != null)
+            {
+                query = includes.Aggregate(query,
+                          (current, include) => current.Include(include));
+            }
+
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+
+            if (offset.HasValue)
+            {
+                query = query.Skip(offset.Value);
+            }
+
+            if (limit.HasValue)
+            {
+                query = query.Take(limit.Value);
+            }
+
+            return await query.ProjectTo<TDtoEntity>(_mapper.ConfigurationProvider)
+                        .ToListAsync();
+
+        }
+
+        public async Task<IEnumerable<T>> GetByCriteriaAsync(IExpressionFilter<T> criteria = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, int? offset = null, int? limit = null, CancellationToken cancellationToken = default, params Expression<Func<T, object>>[] includes)
+        {
+            var query = _dbContext.Set<T>()
+                                  .AsNoTracking();
+
+            if (criteria is not null && criteria.Predicate is not null)
+            {
+                query = query.Where(criteria.Predicate);
+            }
+
+            if (includes != null)
+            {
+                query = includes.Aggregate(query,
+                          (current, include) => current.Include(include));
+            }
+
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+
+            if (offset.HasValue)
+            {
+                query = query.Skip(offset.Value);
+            }
+
+            if (limit.HasValue)
+            {
+                query = query.Take(limit.Value);
             }
 
             return await query.ToListAsync();
         }
-
-
-        public async Task<IEnumerable<TDtoEntity>> ListAllAsync<TDtoEntity>(params Expression<Func<T, object>>[] includes) where TDtoEntity : class
-        {
-            var query = _dbContext.Set<T>().AsNoTracking();
-
-            foreach (var include in includes)
-            {
-                query = query.Include(include);
-            }
-
-            return await query
-                    .ProjectTo<TDtoEntity>(_mapper.ConfigurationProvider)
-                    .ToListAsync();
-        }
-
-        public async Task<IEnumerable<T>> GetByCriteriaAsync(IExpressionFilter<T> criteria = null)
-        {
-            var dbSet = _dbContext.Set<T>()
-                                  .AsNoTracking();
-
-            if (criteria is not null && criteria.Predicate is not null)
-            {
-                dbSet = dbSet.Where(criteria.Predicate);
-            }
-
-            return await dbSet.ToListAsync();
-        }
-
-        public async Task<IEnumerable<TDtoEntity>> GetByCriteriaAsync<TDtoEntity>(IExpressionFilter<T> criteria = null) where TDtoEntity : class
-        {
-            var dbSet = _dbContext.Set<T>()
-                                  .AsNoTracking();
-
-            if (criteria is not null && criteria.Predicate is not null)
-            {
-                dbSet = dbSet.Where(criteria.Predicate);
-            }
-
-            return await dbSet.ProjectTo<TDtoEntity>(_mapper.ConfigurationProvider)
-                        .ToListAsync(); 
-
-
-        }
-
     }
 }

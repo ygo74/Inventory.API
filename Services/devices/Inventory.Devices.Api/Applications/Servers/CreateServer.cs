@@ -80,7 +80,10 @@ namespace Inventory.Devices.Api.Applications.Servers
                 // Map request to Domain entity
                 var newEntity = _mapper.Map<Server>(request);
 
+
                 // Add entity
+                newEntity.SetDataCenter(1);
+                newEntity.SetOperatingSystem(1);
                 var result = await _repository.AddAsync(newEntity, cancellationToken);
 
                 // Map response

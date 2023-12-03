@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Inventory.Devices.Domain.Interfaces
 {
-    public interface IDeviceQueryStore : IGenericQueryStore<Device>
+    public interface IDeviceQueryStore : IGenericQueryStore<Server>
     {
-        Task<IEnumerable<Device>> GetDevicesByDatacenterAsync(string datacenterCode);
-        Task<IEnumerable<Device>> GetDevicesByDatacenterAsync(int datacenterId);
-        Task<IEnumerable<Device>> GetDevicesByOperatingSystemAsync(string osCode);
-        Task<IEnumerable<Device>> GetDevicesByOperatingSystemAsync(int osId);
+        Task<IEnumerable<Server>> GetDevicesByDatacenterAsync(string datacenterCode);
+        Task<IEnumerable<Server>> GetDevicesByDatacenterAsync(int datacenterId);
+        Task<IEnumerable<Server>> GetDevicesByOperatingSystemAsync(string osCode);
+        Task<IEnumerable<Server>> GetDevicesByOperatingSystemAsync(int osId);
     }
 }

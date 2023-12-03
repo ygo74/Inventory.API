@@ -1,10 +1,12 @@
 ﻿using Inventory.Common.Domain.Filters;
 using Inventory.Common.Domain.Models;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Inventory.Common.Domain.Repository
@@ -14,12 +16,27 @@ namespace Inventory.Common.Domain.Repository
         Task<TDtoEntity> GetByIdAsync<TDtoEntity>(int id) where TDtoEntity : class;
         Task<T> GetByIdAsync(int id);
 
-        Task<IEnumerable<TDtoEntity>> ListAllAsync<TDtoEntity>(params Expression<Func<T, object>>[] includes) where TDtoEntity : class;
-        Task<IEnumerable<T>> ListAllAsync(params Expression<Func<T, object>>[] includes);
+        Task<IEnumerable<TDtoEntity>> ListAllAsync<TDtoEntity>(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                                               int? offset = null, int? limit = null,
+                                                               CancellationToken cancellationToken = default,
+                                                               params Expression<Func<T, object>>[] includes) where TDtoEntity : class;
 
+        Task<IEnumerable<T>> ListAllAsync(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                          int? offset = null, int? limit = null,
+                                          CancellationToken cancellationToken = default,
+                                          params Expression<Func<T, object>>[] includes);
 
-        Task<IEnumerable<TDtoEntity>> GetByCriteriaAsync<TDtoEntity>(IExpressionFilter<T> criteria = null) where TDtoEntity: class;
-        Task<IEnumerable<T>> GetByCriteriaAsync(IExpressionFilter<T> criteria = null);
+        Task<IEnumerable<TDtoEntity>> GetByCriteriaAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
+                                                                     Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                                                     int? offset = null, int? limit = null,
+                                                                     CancellationToken cancellationToken = default,
+                                                                     params Expression<Func<T, object>>[] includes) where TDtoEntity : class;
+
+        Task<IEnumerable<T>> GetByCriteriaAsync(IExpressionFilter<T> criteria = null,
+                                                Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                                int? offset = null, int? limit = null,
+                                                CancellationToken cancellationToken = default,
+                                                params Expression<Func<T, object>>[] includes);
     }
 
 }
