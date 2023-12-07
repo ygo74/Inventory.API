@@ -4,6 +4,8 @@ using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Validators;
+using Inventory.Configuration.Api.Application.Datacenters.Dtos;
+using Inventory.Configuration.Api.Application.Datacenters.Validators;
 using Inventory.Configuration.Api.Application.Locations;
 using Inventory.Configuration.Infrastructure;
 using MediatR;
@@ -18,28 +20,27 @@ namespace Inventory.Configuration.Api.Application.Datacenters
     /// <summary>
     /// Update Datacenter request
     /// </summary>
-    public class UpdateDatacenterRequest : UpdateConfigurationEntityRequest<DatacenterDto>
+    public class UpdateDatacenterRequest : UpdateConfigurationEntityRequest<DatacenterDto>, IDatacenterLocation
     {
         public string Description { get; set; }
+        public string CountryCode { get; set; }
+        public string CityCode { get; set; }
+        public string RegionCode { get; set; }
     }
 
     public class UpdateDatacenterValidator : ConfigurationEntityDtoValidator<UpdateDatacenterRequest>
     {
-        public UpdateDatacenterValidator(IDbContextFactory<ConfigurationDbContext> factory)
+        public UpdateDatacenterValidator(DatacenterService datacenterService, ILocationService locationService)
         {
             RuleFor(e => e.Id).Cascade(CascadeMode.Stop)
                 .NotNull()
                 .NotEmpty()
                 .GreaterThan(0)
                 .WithMessage("{PropertyName} is mandatory")
-                .MustAsync(async (id, cancellation) =>
-                    {
-                        using var dbContext = factory.CreateDbContext();
+                .MustAsync(datacenterService.DatacenterExists).WithMessage("Datacenter with {PropertyName} {PropertyValue} doesn't exists in the database");
 
-                        var existingServer = await dbContext.Datacenters.FindAsync(keyValues: new object[] { id }, cancellation);
-                        return (existingServer != null);
-                    }).WithMessage("Datacenter with {PropertyName} {PropertyValue} doesn't exists in the database");
-
+            // Check if location exists in the database with the three attributes LocationCountryCode, LocationCityCode, LocationRegionCode
+            Include(new DatacenterExistValidator(locationService));
         }
     }
 
@@ -68,9 +69,17 @@ namespace Inventory.Configuration.Api.Application.Datacenters
             await using var dbContext = _factory.CreateDbContext();
             var datacenter = await dbContext.Datacenters.FindAsync(keyValues: new object[] { request.Id }, cancellationToken);
 
+            // Update Property
             if (request.Deprecated.HasValue) { datacenter.SetDeprecatedValue(request.Deprecated.Value); }
 
             // Update location
+            if (!string.IsNullOrWhiteSpace(request.RegionCode) && !string.IsNullOrWhiteSpace(request.CountryCode) &&
+                    !string.IsNullOrWhiteSpace(request.CityCode))
+            {
+
+
+            }
+
             var changes = await dbContext.SaveChangesAsync(cancellationToken);
             if (changes > 0)
                 _logger.LogInformation("Updated datacenter '{0}'", request.Id);

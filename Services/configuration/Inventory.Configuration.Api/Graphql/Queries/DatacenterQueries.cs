@@ -18,6 +18,7 @@ using System.Threading;
 using Inventory.Common.Application.Core;
 using HotChocolate.Types.Pagination;
 using Inventory.Common.Application.Graphql.Extensions;
+using Inventory.Configuration.Api.Application.Datacenters.Dtos;
 
 namespace Inventory.Configuration.Api.Graphql.Queries
 {
@@ -67,6 +68,29 @@ namespace Inventory.Configuration.Api.Graphql.Queries
             var result = await mediator.Send(request, cancellationToken);
             return result;
         }
+
+        /// <summary>
+        /// Get Datacenter by Code
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="ctx"></param>
+        /// <param name="name">Datacenter's name</param>
+        /// <returns></returns>
+        public async Task<Payload<DatacenterDto>> GetDatacenterByCode([Service] IMediator mediator,
+            CancellationToken cancellationToken, IResolverContext ctx,
+            string code)
+        {
+
+            var request = new GetDatacenterByCodeRequest
+            {
+                Code = code
+            };
+
+            var result = await mediator.Send(request, cancellationToken);
+            return result;
+        }
+
 
 
         [UsePaging(DefaultPageSize = 100)]

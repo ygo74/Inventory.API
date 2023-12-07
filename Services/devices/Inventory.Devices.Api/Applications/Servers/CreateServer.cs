@@ -30,9 +30,9 @@ namespace Inventory.Devices.Api.Applications.Servers
 
         public class Validator : AbstractValidator<Command>
         {
-            private readonly IAsyncRepository<Server> _serverRepository;
+            private readonly IAsyncRepositoryWithSpecification<Server> _serverRepository;
 
-            public Validator(IAsyncRepository<Server> serverRepository)
+            public Validator(IAsyncRepositoryWithSpecification<Server> serverRepository)
             {
 
                 _serverRepository = serverRepository;
@@ -58,14 +58,14 @@ namespace Inventory.Devices.Api.Applications.Servers
         public class Handler : IRequestHandler<Command, CreateServerPayload>
         {
 
-            private readonly IAsyncRepository<Server> _repository;
+            private readonly IAsyncRepositoryWithSpecification<Server> _repository;
             private readonly ILogger<Handler> _logger;
             private readonly IMediator _mediator;
             private readonly IHttpContextAccessor _httpContextAccessor;
             private readonly IMapper _mapper;
 
 
-            public Handler(ILogger<Handler> logger, IMediator mediator, IMapper mapper, IAsyncRepository<Server> repository,
+            public Handler(ILogger<Handler> logger, IMediator mediator, IMapper mapper, IAsyncRepositoryWithSpecification<Server> repository,
                                               IHttpContextAccessor httpContextAccessor)
             {
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));

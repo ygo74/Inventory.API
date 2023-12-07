@@ -27,7 +27,7 @@ namespace Inventory.Devices.Api.Graphql.Queries
         public string GetStatus() => "OK";
 
         [UseFiltering]
-        public Task<List<Server>> GetServers([Service]IAsyncRepository<Server> _repository, IResolverContext ctx)
+        public Task<List<Server>> GetServers([Service]IAsyncRepositoryWithSpecification<Server> _repository, IResolverContext ctx)
         {
             return _repository.ListAsync();
         }

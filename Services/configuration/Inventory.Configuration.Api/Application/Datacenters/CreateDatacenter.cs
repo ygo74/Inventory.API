@@ -20,10 +20,13 @@ using Inventory.Common.Domain.Filters;
 using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Domain.Filters;
 using Inventory.Common.Application.Errors;
+using Inventory.Configuration.Api.Application.Datacenters.Dtos;
+using Inventory.Configuration.Api.Application.Datacenters.Validators;
+using Inventory.Configuration.Api.Application.Locations;
 
 namespace Inventory.Configuration.Api.Application.Datacenters
 {
-    public class CreateDatacenterRequest : CreateConfigurationEntityRequest<DatacenterDto>
+    public class CreateDatacenterRequest : CreateConfigurationEntityRequest<DatacenterDto>, IDatacenterLocation
     {
         public string Name { get; set; }
         public string Code { get; set; }
@@ -36,7 +39,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
     public class CreateDatacenterValidator : CreateConfigurationEntityDtoValidator<CreateDatacenterRequest>
     {
-        public CreateDatacenterValidator(IDbContextFactory<ConfigurationDbContext> factory)
+        public CreateDatacenterValidator(IDbContextFactory<ConfigurationDbContext> factory, ILocationService locationService)
         {
 
             // Mandatory attributes
@@ -83,25 +86,9 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
                 }).WithMessage("Datacenter with {PropertyName} {PropertyValue} already exists in the database");
 
-            // validate location exists in the database with the three attributes LocationCountryCode, LocationCityCode, LocationRegionCode
-            When(e => !string.IsNullOrEmpty(e.CountryCode) && !string.IsNullOrEmpty(e.CityCode) && !string.IsNullOrEmpty(e.RegionCode), () =>
-            {
-                RuleFor(e => e).Cascade(CascadeMode.Stop)
-                    .MustAsync(async (request, cancellation) =>
-                    {
-                        using var dbContext = factory.CreateDbContext();
+            // Check if location exists in the database with the three attributes LocationCountryCode, LocationCityCode, LocationRegionCode
+            Include(new DatacenterExistValidator(locationService));
 
-                        // create Filter
-                        var filter = ExpressionFilterFactory.Create<Location>()
-                                        .WithCityCode(request.CityCode)
-                                        .WithCountryCode(request.CountryCode)
-                                        .WithRegionCode(request.RegionCode);
-
-                        var existingLocation = await dbContext.Locations.Where(filter.Predicate).FirstOrDefaultAsync(cancellation);
-                        return (existingLocation != null);
-
-                    }).WithMessage("Location with CountryCode {PropertyValue} and CityCode {PropertyValue} and RegionCode {PropertyValue} doesn't exists in the database");
-            });
         }
     }
 

@@ -41,7 +41,7 @@ namespace Inventory.Configuration.UnitTests
             services.AddTelemetryService(Configuration, out sourceName);
 
             // Database
-            services.AddScoped(typeof(IAsyncRepository<>), typeof(ConfigurationRepository<>));
+            services.AddScoped(typeof(IAsyncRepositoryWithSpecification<>), typeof(ConfigurationRepository<>));
             services.AddEntityFrameworkInMemoryDatabase().AddDbContext<ConfigurationDbContext>((sp, options) =>
             {
                 options.UseInMemoryDatabase("in-memory").UseInternalServiceProvider(sp);
@@ -64,7 +64,7 @@ namespace Inventory.Configuration.UnitTests
             // Applications
             services.AddSingleton<PluginResolver>();
             services.AddScoped<PluginService>();
-            services.AddScoped<LocationService>();
+            services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<CredentialService>();
 
 
@@ -83,7 +83,7 @@ namespace Inventory.Configuration.UnitTests
 
         public IMediator GetMediator() => GetService<IMediator>();
         public ConfigurationDbContext DbContext => GetService<ConfigurationDbContext>();
-        public IAsyncRepository<T> GetAsyncRepository<T>() where T : class => GetService<IAsyncRepository<T>>();
+        public IAsyncRepositoryWithSpecification<T> GetAsyncRepository<T>() where T : class => GetService<IAsyncRepositoryWithSpecification<T>>();
 
     }
 }

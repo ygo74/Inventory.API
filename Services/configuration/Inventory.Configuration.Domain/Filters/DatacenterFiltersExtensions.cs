@@ -16,6 +16,11 @@ namespace Inventory.Configuration.Domain.Filters
             return filter.And(e => e.StartDate <= targetedDate && (!e.EndDate.HasValue || e.EndDate >= targetedDate));
         }
 
+        public static IExpressionFilter<Datacenter> WithId(this IExpressionFilter<Datacenter> filter, int id)
+        {
+            return filter.And(e => e.Id == id);
+        }
+
         public static IExpressionFilter<Datacenter> WithCode(this IExpressionFilter<Datacenter> filter, string code)
         {
             if (string.IsNullOrWhiteSpace(code)) return filter;

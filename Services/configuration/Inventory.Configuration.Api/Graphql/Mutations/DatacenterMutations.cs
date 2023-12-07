@@ -2,6 +2,7 @@
 using HotChocolate.Types;
 using Inventory.Common.Application.Core;
 using Inventory.Configuration.Api.Application.Datacenters;
+using Inventory.Configuration.Api.Application.Datacenters.Dtos;
 using MediatR;
 using System;
 using System.Collections.Generic;

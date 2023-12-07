@@ -31,6 +31,8 @@ using Inventory.Configuration.Api.Application.Locations;
 using Inventory.Configuration.Api.Application.Credentials;
 using Inventory.Common.Infrastructure.Http;
 using Inventory.Common.Domain.Interfaces;
+using Inventory.Common.Infrastructure.Database;
+using Inventory.Configuration.Api.Application.Datacenters;
 
 namespace Inventory.Configuration.Api
 {
@@ -59,7 +61,8 @@ namespace Inventory.Configuration.Api
 
             // Add database
             services.AddCustomDbContext(Configuration, Environment);
-            services.AddScoped(typeof(IAsyncRepository<>), typeof(ConfigurationRepository<>));
+            services.AddScoped(typeof(IAsyncRepositoryWithSpecification<>), typeof(ConfigurationRepository<>));
+            services.AddScoped(typeof(IGenericQueryStore<>), typeof(ConfigurationQueryStore<>));
 
             // Add Graphql
             services.AddGraphqlServices(Environment);
@@ -81,7 +84,8 @@ namespace Inventory.Configuration.Api
             // Application
             services.AddSingleton<PluginResolver>();
             services.AddScoped<PluginService>();
-            services.AddScoped<LocationService>();
+            services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<DatacenterService>();
             services.AddScoped<CredentialService>();
 
             // Http hosting

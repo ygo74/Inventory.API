@@ -5,7 +5,10 @@ using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Errors;
 using Inventory.Common.Domain.Filters;
+using Inventory.Common.Domain.Repository;
+using Inventory.Configuration.Api.Application.Datacenters.Dtos;
 using Inventory.Configuration.Domain.Filters;
+using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +33,15 @@ namespace Inventory.Configuration.Api.Application.Datacenters
         public string Name { get; set; }
     }
 
+    /// <summary>
+    /// Get Datacenter By Code
+    /// </summary>
+    public class GetDatacenterByCodeRequest : IRequest<Payload<DatacenterDto>>
+    {
+        public string Code { get; set; }
+    }
+
+
 #nullable enable
     public class GetDatacenterRequest : QueryConfigurationCursorPaginationRequest<DatacenterDto>
     {
@@ -40,6 +52,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
     public class DatacenterQueriesHandler : IRequestHandler<GetDatacenterByIdRequest, Payload<DatacenterDto>>,
                                             IRequestHandler<GetDatacenterByNameRequest, Payload<DatacenterDto>>,
+                                            IRequestHandler<GetDatacenterByCodeRequest, Payload<DatacenterDto>>,
                                             IRequestHandler<GetDatacenterRequest, CursorPaginationdPayload<DatacenterDto>>
     {
 
@@ -47,15 +60,18 @@ namespace Inventory.Configuration.Api.Application.Datacenters
         private readonly IMapper _mapper;
         private readonly IDbContextFactory<ConfigurationDbContext> _factory;
         private readonly IPaginationService _paginationService;
+        private readonly IGenericQueryStore<Datacenter> _queryStore;
 
         public DatacenterQueriesHandler(ILogger<DatacenterQueriesHandler> logger,
-            IMapper mapper, IDbContextFactory<ConfigurationDbContext> factory, IPaginationService paginationService)
+            IMapper mapper, IDbContextFactory<ConfigurationDbContext> factory, IPaginationService paginationService,
+            IGenericQueryStore<Datacenter> queryStore)
         {
 
             _logger = Guard.Against.Null(logger, nameof(logger));
             _mapper = Guard.Against.Null(mapper, nameof(mapper));
             _factory = Guard.Against.Null(factory, nameof(factory));
             _paginationService = Guard.Against.Null(paginationService, nameof(paginationService));
+            _queryStore = Guard.Against.Null(queryStore, nameof(queryStore));
 
         }
 
@@ -67,10 +83,13 @@ namespace Inventory.Configuration.Api.Application.Datacenters
         /// <returns></returns>
         public async Task<Payload<DatacenterDto>> Handle(GetDatacenterByIdRequest request, CancellationToken cancellationToken)
         {
-            await using var dbContext = _factory.CreateDbContext();
 
-            var datacenter = await dbContext.Datacenters.FindAsync(keyValues: new object[] { request.Id }, 
-                                                                   cancellationToken: cancellationToken);
+            // Create filter
+            var filter = ExpressionFilterFactory.Create<Datacenter>()
+                                                .WithId(request.Id);
+
+            // Retrieve entity
+            var datacenter = await _queryStore.GetByIdAsync<DatacenterDto>(request.Id);
 
             if (null == datacenter)
                 return Payload<DatacenterDto>.Error(new NotFoundError($"Don't find Datacenter with Id {request.Id}"));
@@ -87,16 +106,13 @@ namespace Inventory.Configuration.Api.Application.Datacenters
         /// <exception cref="System.NotImplementedException"></exception>
         public async Task<Payload<DatacenterDto>> Handle(GetDatacenterByNameRequest request, CancellationToken cancellationToken)
         {
-            await using var dbContext = _factory.CreateDbContext();
-
+            
+            // Create filter
             var filter = ExpressionFilterFactory.Create<Inventory.Configuration.Domain.Models.Datacenter>()
                                                 .WithName(request.Name);
 
-            var datacenter = await dbContext.Datacenters
-                                            .AsNoTracking()
-                                            .Where(filter.Predicate)
-                                            .ProjectTo<DatacenterDto>(_mapper.ConfigurationProvider)
-                                            .FirstOrDefaultAsync(cancellationToken);
+            // Retrieve entity
+            var datacenter = await _queryStore.FirstOrDefaultAsync<DatacenterDto>(filter);
 
             if (null == datacenter)
                 return Payload<DatacenterDto>.Error(new NotFoundError($"Don't find Datacenter with Name {request.Name}"));
@@ -149,6 +165,28 @@ namespace Inventory.Configuration.Api.Application.Datacenters
                 EndCursor = result.Data.Count > 0 ? result.Data[result.Data.Count - 1].Id.ToString() : string.Empty,
             };
 
+        }
+
+        /// <summary>
+        /// Get datacenter by code
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="System.NotImplementedException"></exception>
+        public async Task<Payload<DatacenterDto>> Handle(GetDatacenterByCodeRequest request, CancellationToken cancellationToken)
+        {
+            // Create filter
+            var filter = ExpressionFilterFactory.Create<Inventory.Configuration.Domain.Models.Datacenter>()
+                                                .WithCode(request.Code);
+
+            // Retrieve entity
+            var datacenter = await _queryStore.FirstOrDefaultAsync<DatacenterDto>(filter);
+
+            if (null == datacenter)
+                return Payload<DatacenterDto>.Error(new NotFoundError($"Don't find Datacenter with Code {request.Code}"));
+
+            return Payload<DatacenterDto>.Success(datacenter);
         }
     }
 }

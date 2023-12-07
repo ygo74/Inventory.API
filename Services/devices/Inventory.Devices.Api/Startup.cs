@@ -56,7 +56,7 @@ namespace Inventory.Devices.Api
 
             // Add database
             services.AddCustomDbContext(Configuration,Environment);
-            services.AddScoped(typeof(IAsyncRepository<>), typeof(DevicesRepository<>));
+            services.AddScoped(typeof(IAsyncRepositoryWithSpecification<>), typeof(DevicesRepository<>));
             services.AddScoped(typeof(IDeviceQueryStore), typeof(DeviceQueryStore));
 
 

@@ -28,7 +28,7 @@ namespace Inventory.Configuration.Api.Application.Locations
 
     public class UpdateLocationValidator : ConfigurationEntityDtoValidator<UpdateLocationRequest>
     {
-        public UpdateLocationValidator(LocationService service) 
+        public UpdateLocationValidator(ILocationService service) 
         {
             RuleFor(e => e.Id).Cascade(CascadeMode.Stop)
                 .NotNull()

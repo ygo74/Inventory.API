@@ -24,7 +24,7 @@ namespace Inventory.Configuration.Api.Application.Locations
     public class DeleteLocationValidator : AbstractValidator<DeleteLocationRequest>
     {
 
-        public DeleteLocationValidator(LocationService service)
+        public DeleteLocationValidator(ILocationService service)
         {
 
 

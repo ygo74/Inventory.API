@@ -67,12 +67,12 @@ namespace Inventory.Configuration.Api.Application.Plugin
     public class CreatePluginHanlder : IRequestHandler<CreatePluginRequest, Payload<PluginDto>>
     {
 
-        private readonly IAsyncRepository<Domain.Models.Plugin> _repository;
+        private readonly IAsyncRepositoryWithSpecification<Domain.Models.Plugin> _repository;
         private readonly ILogger<CreatePluginHanlder> _logger;
         private readonly IMapper _mapper;
         private readonly PluginService _pluginService;
 
-        public CreatePluginHanlder(IAsyncRepository<Domain.Models.Plugin> repository, ILogger<CreatePluginHanlder> logger, IMapper mapper, PluginService pluginService)
+        public CreatePluginHanlder(IAsyncRepositoryWithSpecification<Domain.Models.Plugin> repository, ILogger<CreatePluginHanlder> logger, IMapper mapper, PluginService pluginService)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

@@ -32,14 +32,14 @@ namespace Inventory.Configuration.Api.Application.Plugin
 
     public class GetPluginHandler : IRequestHandler<GetPluginRequest, CursorPaginationdPayload<PluginDto>>
     {
-        private readonly IAsyncRepository<Domain.Models.Plugin> _repository;
+        private readonly IAsyncRepositoryWithSpecification<Domain.Models.Plugin> _repository;
         private readonly ILogger<GetPluginHandler> _logger;
         private readonly IMapper _mapper;
         private readonly PluginService _pluginService;
         private readonly IDbContextFactory<ConfigurationDbContext> _factory;
         private readonly IPaginationService _paginationService;
 
-        public GetPluginHandler(IAsyncRepository<Domain.Models.Plugin> repository, ILogger<GetPluginHandler> logger,
+        public GetPluginHandler(IAsyncRepositoryWithSpecification<Domain.Models.Plugin> repository, ILogger<GetPluginHandler> logger,
             IMapper mapper, PluginService pluginService, IDbContextFactory<ConfigurationDbContext> factory, IPaginationService paginationService)
         {
             _repository = Guard.Against.Null(repository, nameof(repository));

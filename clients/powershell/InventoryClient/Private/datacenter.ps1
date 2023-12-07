@@ -27,7 +27,7 @@ mutation updateDatacenter(`$input: UpdateDatacenterRequestInput)
 $script:GetDatacenterByNameQuery=@"
 query getDatacenter(`$name: String)
 {
-  datacenterByName(name: `$name) {
+  datacenter:datacenterByName(name: `$name) {
     data { ... DatacenterDto }
     errors {
         __typename
@@ -39,6 +39,23 @@ query getDatacenter(`$name: String)
   }
 }
 "@
+
+$script:GetDatacenterByCodeQuery=@"
+query getDatacenter(`$code: String)
+{
+  datacenter:datacenterByCode(code: `$code) {
+    data { ... DatacenterDto }
+    errors {
+        __typename
+        ... error
+        ... genericError
+        ... validationError
+        ... genericError
+    }
+  }
+}
+"@
+
 
 $script:GetDatacenterByIdQuery=@"
 query getDatacenter(`$id: Int!)
@@ -78,6 +95,12 @@ fragment DatacenterDto on DatacenterDto {
   name
   Code
   inventoryCode
+  datacenterType
+  description
+  locationName
+  locationRegionCode
+  locationCountryCode
+  locationCityCode
   deprecated
   startDate
   endDate

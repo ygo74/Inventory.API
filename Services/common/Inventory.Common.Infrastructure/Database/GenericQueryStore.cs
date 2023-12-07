@@ -87,17 +87,59 @@ namespace Inventory.Common.Infrastructure.Database
         }
 
 
+        public async Task<T> FirstOrDefaultAsync(IExpressionFilter<T> criteria = null,
+                                                CancellationToken cancellationToken = default,
+                                                params Expression<Func<T, object>>[] includes)
+        {
+            var query = _dbContext.Set<T>()
+                               .AsNoTracking();
 
-        public Task<IEnumerable<TDtoEntity>> ListAllAsync<TDtoEntity>(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, 
-                                                                      int? offset = null, int? limit = null, 
-                                                                      CancellationToken cancellationToken = default, 
+            if (criteria is not null && criteria.Predicate is not null)
+            {
+                query = query.Where(criteria.Predicate);
+            }
+
+            if (includes != null)
+            {
+                query = includes.Aggregate(query,
+                                             (current, include) => current.Include(include));
+            }
+
+            return await query.FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<TDtoEntity> FirstOrDefaultAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
+                                                                      CancellationToken cancellationToken = default,
+                                                                      params Expression<Func<T, object>>[] includes) where TDtoEntity : class
+        {
+            var query = _dbContext.Set<T>()
+                               .AsNoTracking();
+
+            if (criteria is not null && criteria.Predicate is not null)
+            {
+                query = query.Where(criteria.Predicate);
+            }
+
+            if (includes != null)
+            {
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
+            }
+
+            return await query.ProjectTo<TDtoEntity>(_mapper.ConfigurationProvider)
+                               .FirstOrDefaultAsync(cancellationToken);
+        }
+
+
+        public Task<IEnumerable<TDtoEntity>> ListAllAsync<TDtoEntity>(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                                                      int? offset = null, int? limit = null,
+                                                                      CancellationToken cancellationToken = default,
                                                                       params Expression<Func<T, object>>[] includes) where TDtoEntity : class
         {
             return GetByCriteriaAsync<TDtoEntity>(criteria: null,
                                                   orderBy: orderBy,
                                                   offset: offset,
-                                                  limit: limit, 
-                                                  cancellationToken: cancellationToken, 
+                                                  limit: limit,
+                                                  cancellationToken: cancellationToken,
                                                   includes: includes);
         }
 
@@ -187,5 +229,6 @@ namespace Inventory.Common.Infrastructure.Database
 
             return await query.ToListAsync();
         }
+
     }
 }
