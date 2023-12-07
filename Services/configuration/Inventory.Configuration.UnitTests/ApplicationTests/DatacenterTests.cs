@@ -1,5 +1,6 @@
 ﻿using FluentValidation.TestHelper;
 using Inventory.Configuration.Api.Application.Datacenters;
+using Inventory.Configuration.UnitTests.SeedWork;
 using Inventory.Configuration.UnitTests.TestCases;
 using MediatR;
 using NUnit.Framework;
@@ -40,7 +41,7 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
             var validator = UnitTestsContext.Current.GetService<CreateDatacenterValidator>();
 
             // Act
-            var actual = validator.TestValidate(newEntity);
+            var actual = await validator.TestValidateAsync(newEntity);
 
             // Assert
             actual.ShouldHaveValidationErrorFor(e => e.Code);
@@ -61,6 +62,25 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
 
             // Assert
             Assert.IsNotNull(result);
+        }
+
+        [Test]
+        public async Task Should_successfull_update_datacenter_description()
+        {
+            // Arrange
+            var existingDatacenter = DataCenterSeed.Get().First();
+            var updateRequest = new UpdateDatacenterRequest()
+            {
+                Id = 1,
+                Description = "New description"
+            };
+
+            var result = await _mediator.Send(updateRequest);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(updateRequest.Description, result.Data.Description);
+            Assert.AreNotEqual(existingDatacenter.Description, result.Data.Description);
         }
 
     }

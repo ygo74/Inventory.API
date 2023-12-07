@@ -26,10 +26,10 @@ namespace Inventory.Configuration.Infrastructure
 
     public class ConfigurationRepository<T> : GenericRepository<ConfigurationDbContext, T> where T : Entity
     {
-        public ConfigurationRepository(ConfigurationDbContext dbContext) : base(dbContext)
-        {
+        //public ConfigurationRepository(ConfigurationDbContext dbContext) : base(dbContext)
+        //{
 
-        }
+        //}
 
         public ConfigurationRepository(IDbContextFactory<ConfigurationDbContext> dbContextFactory) : base(dbContextFactory)
         {
@@ -40,10 +40,10 @@ namespace Inventory.Configuration.Infrastructure
 
     public class ConfigurationQueryStore<T> : GenericQueryStore<ConfigurationDbContext, T> where T : Entity
     {
-        public ConfigurationQueryStore(ConfigurationDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
-        {
+        //public ConfigurationQueryStore(ConfigurationDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        //{
 
-        }
+        //}
 
         public ConfigurationQueryStore(IDbContextFactory<ConfigurationDbContext> dbContextFactory, IMapper mapper) : base(dbContextFactory, mapper)
         {

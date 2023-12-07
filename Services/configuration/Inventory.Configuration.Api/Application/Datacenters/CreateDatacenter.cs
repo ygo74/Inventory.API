@@ -72,19 +72,22 @@ namespace Inventory.Configuration.Api.Application.Datacenters
                 .WithMessage("{PropertyName} is mandatory");
 
             // Validate datacenter doesn't exists in the database with the same code
-            RuleFor(e => e).Cascade(CascadeMode.Stop)
-                .MustAsync(async (request, cancellation) =>
-                {
-                    using var dbContext = factory.CreateDbContext();
+            When(e => !string.IsNullOrWhiteSpace(e.Code), () =>
+            {
+                RuleFor(e => e).Cascade(CascadeMode.Stop)
+                    .MustAsync(async (request, cancellation) =>
+                    {
+                        using var dbContext = factory.CreateDbContext();
 
-                    // create Filter
-                    var filter = ExpressionFilterFactory.Create<Domain.Models.Datacenter>()
-                                    .WithCode(request.Code);
+                        // create Filter
+                        var filter = ExpressionFilterFactory.Create<Domain.Models.Datacenter>()
+                                        .WithCode(request.Code);
 
-                    var existingDatacenter = await dbContext.Datacenters.Where(filter.Predicate).FirstOrDefaultAsync(cancellation);
-                    return (existingDatacenter == null);
+                        var existingDatacenter = await dbContext.Datacenters.Where(filter.Predicate).FirstOrDefaultAsync(cancellation);
+                        return (existingDatacenter == null);
 
-                }).WithMessage("Datacenter with {PropertyName} {PropertyValue} already exists in the database");
+                    }).WithMessage("Datacenter with {PropertyName} {PropertyValue} already exists in the database");
+            });
 
             // Check if location exists in the database with the three attributes LocationCountryCode, LocationCityCode, LocationRegionCode
             Include(new DatacenterExistValidator(locationService));

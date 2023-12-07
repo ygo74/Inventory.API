@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Inventory.Common.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Inventory.Configuration.Api.Application.Datacenters;
 
 namespace Inventory.Configuration.UnitTests
 {
@@ -41,7 +42,6 @@ namespace Inventory.Configuration.UnitTests
             services.AddTelemetryService(Configuration, out sourceName);
 
             // Database
-            services.AddScoped(typeof(IAsyncRepositoryWithSpecification<>), typeof(ConfigurationRepositoryWithSpec<>));
             services.AddEntityFrameworkInMemoryDatabase().AddDbContext<ConfigurationDbContext>((sp, options) =>
             {
                 options.UseInMemoryDatabase("in-memory").UseInternalServiceProvider(sp);
@@ -53,6 +53,9 @@ namespace Inventory.Configuration.UnitTests
                 options.EnableSensitiveDataLogging(true);
 
             });
+            services.AddScoped(typeof(IAsyncRepositoryWithSpecification<>), typeof(ConfigurationRepositoryWithSpec<>));
+            services.AddScoped(typeof(IGenericQueryStore<>), typeof(ConfigurationQueryStore<>));
+            services.AddScoped(typeof(IAsyncRepository<>), typeof(ConfigurationRepository<>));
 
 
             //pagination
@@ -66,6 +69,7 @@ namespace Inventory.Configuration.UnitTests
             services.AddScoped<PluginService>();
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<CredentialService>();
+            services.AddScoped<DatacenterService>();
 
 
             // Unit tests specific configuration
