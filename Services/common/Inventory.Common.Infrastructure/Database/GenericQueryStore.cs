@@ -196,6 +196,17 @@ namespace Inventory.Common.Infrastructure.Database
 
         }
 
+        /// <summary>
+        /// Retrieves a list of entities based on the specified criteria, ordering, offset, and limit.
+        /// </summary>
+        /// <param name="criteria">The expression filter criteria.</param>
+        /// <param name="orderBy">The ordering function.</param>
+        /// <param name="offset">The number of items to skip.</param>
+        /// <param name="limit">The maximum number of items to retrieve.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="includes">The related entities to include in the query.</param>
+        /// <returns>The list of entities.</returns>
+        /// <summary>
         public async Task<IEnumerable<T>> GetByCriteriaAsync(IExpressionFilter<T> criteria = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, int? offset = null, int? limit = null, CancellationToken cancellationToken = default, params Expression<Func<T, object>>[] includes)
         {
             var query = _dbContext.Set<T>()
@@ -230,5 +241,46 @@ namespace Inventory.Common.Infrastructure.Database
             return await query.ToListAsync();
         }
 
+        /// Retrieves a queryable object based on the specified criteria, ordering, offset, and limit.
+        /// </summary>
+        /// <param name="criteria">The expression filter criteria.</param>
+        /// <param name="orderBy">The ordering function.</param>
+        /// <param name="offset">The number of items to skip.</param>
+        /// <param name="limit">The maximum number of items to retrieve.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="includes">The related entities to include in the query.</param>
+        /// <returns>The queryable object.</returns>
+        public IQueryable<T> GetQuery(IExpressionFilter<T> criteria = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, int? offset = null, int? limit = null, CancellationToken cancellationToken = default, params Expression<Func<T, object>>[] includes)
+        {
+            var query = _dbContext.Set<T>()
+                                  .AsNoTracking();
+
+            if (criteria is not null && criteria.Predicate is not null)
+            {
+                query = query.Where(criteria.Predicate);
+            }
+
+            if (includes != null)
+            {
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
+            }
+
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+
+            if (offset.HasValue)
+            {
+                query = query.Skip(offset.Value);
+            }
+
+            if (limit.HasValue)
+            {
+                query = query.Take(limit.Value);
+            }
+
+            return query;
+        }
     }
 }

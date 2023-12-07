@@ -130,21 +130,21 @@ namespace Inventory.Configuration.Api.Application.Datacenters
         /// <exception cref="System.NotImplementedException"></exception>
         public async Task<CursorPaginationdPayload<DatacenterDto>> Handle(GetDatacenterRequest request, CancellationToken cancellationToken)
         {
-            await using var dbContext = _factory.CreateDbContext();
-            var query = dbContext.Datacenters.AsNoTracking();
+            //await using var dbContext = _factory.CreateDbContext();
+            //var query = dbContext.Datacenters.AsNoTracking();
 
             // Filtering data
             var filter = request.GetConfigurationEntityFilter<Inventory.Configuration.Domain.Models.Datacenter, DatacenterDto>()
                                 .WithInventoryCode(request.InventoryCode);  
 
-            if (null != filter.Predicate)
-                query = query.Where(filter.Predicate);
+            //if (null != filter.Predicate)
+            //    query = query.Where(filter.Predicate);
 
             // call keyset pagination
             var result = await _paginationService.KeysetPaginateAsync(
-                source: query,
+                source: _queryStore.GetQuery(filter),
                 builderAction: b => b.Ascending(e => e.Name).Ascending(e => e.Id),
-                getReferenceAsync: async id => await dbContext.Datacenters.FindAsync(int.Parse(id)),
+                getReferenceAsync: async id => await _queryStore.GetByIdAsync(int.Parse(id)),
                 map: q => q.ProjectTo<DatacenterDto>(_mapper.ConfigurationProvider),
                 queryModel: new KeysetQueryModel
                 {

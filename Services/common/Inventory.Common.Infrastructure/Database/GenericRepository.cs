@@ -76,9 +76,18 @@ namespace Inventory.Common.Infrastructure.Database
 
         #endregion
 
-        public virtual async Task<T> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public virtual async Task<T> GetByIdAsync(int id, CancellationToken cancellationToken = default, params Expression<Func<T, object>>[] includes)
         {
-            return await _dbContext.Set<T>().FindAsync(new object[] { id }, cancellationToken: cancellationToken);
+            var query = _dbContext.Set<T>().AsQueryable();
+
+            if (includes != null)
+            {
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
+            }
+
+            return await query.Where(x => x.Id == id)
+                              .FirstOrDefaultAsync(cancellationToken);
+
         }
 
         public virtual Task<T> FirstAsync(IExpressionFilter<T> criteria = null, CancellationToken cancellationToken = default)

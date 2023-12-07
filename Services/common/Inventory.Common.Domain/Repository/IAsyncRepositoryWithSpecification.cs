@@ -20,9 +20,11 @@ namespace Inventory.Common.Domain.Repository
 
     public interface IAsyncRepository<T> where T : Entity
     {
+
+
         IUnitOfWork UnitOfWork { get; }
 
-        Task<T> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<T> GetByIdAsync(int id, CancellationToken cancellationToken = default, params Expression<Func<T, object>>[] includes);
 
         Task<T> FirstAsync(IExpressionFilter<T> criteria = null, CancellationToken cancellationToken = default);
         Task<T> FirstOrDefaultAsync(IExpressionFilter<T> criteria = null, CancellationToken cancellationToken = default);

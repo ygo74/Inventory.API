@@ -41,7 +41,7 @@ namespace Inventory.Configuration.UnitTests
             services.AddTelemetryService(Configuration, out sourceName);
 
             // Database
-            services.AddScoped(typeof(IAsyncRepositoryWithSpecification<>), typeof(ConfigurationRepository<>));
+            services.AddScoped(typeof(IAsyncRepositoryWithSpecification<>), typeof(ConfigurationRepositoryWithSpec<>));
             services.AddEntityFrameworkInMemoryDatabase().AddDbContext<ConfigurationDbContext>((sp, options) =>
             {
                 options.UseInMemoryDatabase("in-memory").UseInternalServiceProvider(sp);

@@ -45,6 +45,14 @@ namespace Inventory.Common.Domain.Repository
                                                 int? offset = null, int? limit = null,
                                                 CancellationToken cancellationToken = default,
                                                 params Expression<Func<T, object>>[] includes);
+
+        IQueryable<T> GetQuery(IExpressionFilter<T> criteria = null,
+                               Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                               int? offset = null, int? limit = null,
+                               CancellationToken cancellationToken = default,
+                               params Expression<Func<T, object>>[] includes);
+
+
     }
 
 }

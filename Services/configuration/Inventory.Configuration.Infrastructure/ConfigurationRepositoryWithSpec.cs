@@ -10,19 +10,33 @@ using System.Threading.Tasks;
 
 namespace Inventory.Configuration.Infrastructure
 {
-    public class ConfigurationRepository<T> : EfAsyncRepository<ConfigurationDbContext, T> where T : class
+    public class ConfigurationRepositoryWithSpec<T> : EfAsyncRepository<ConfigurationDbContext, T> where T : class
     {
         //public ConfigurationRepository(ConfigurationDbContext dbContext) :base(dbContext)
         //{
 
         //}
 
-        public ConfigurationRepository(IDbContextFactory<ConfigurationDbContext> dbContextFactory) : base(dbContextFactory)
+        public ConfigurationRepositoryWithSpec(IDbContextFactory<ConfigurationDbContext> dbContextFactory) : base(dbContextFactory)
         {
 
         }
 
     }
+
+    public class ConfigurationRepository<T> : GenericRepository<ConfigurationDbContext, T> where T : Entity
+    {
+        public ConfigurationRepository(ConfigurationDbContext dbContext) : base(dbContext)
+        {
+
+        }
+
+        public ConfigurationRepository(IDbContextFactory<ConfigurationDbContext> dbContextFactory) : base(dbContextFactory)
+        {
+
+        }
+    }
+
 
     public class ConfigurationQueryStore<T> : GenericQueryStore<ConfigurationDbContext, T> where T : Entity
     {

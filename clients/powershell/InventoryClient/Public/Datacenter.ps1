@@ -7,55 +7,47 @@ function New-InventoryDatacenter
         $InputObject,
 
         [Parameter(ParameterSetName="Default", Position=0, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="UpdateLocation", Position=0, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $Name,
 
-        [Parameter(ParameterSetName="Default", Position=1, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="UpdateLocation", Position=1, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=1, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $Code,
 
-        [Parameter(ParameterSetName="Default", Position=2, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="UpdateLocation", Position=2, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=2, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
-        [ValidateSet("Cloud","OnPremise")]
+        [ValidateSet("Cloud","On_Premise")]
         $Type,
 
-        [Parameter(ParameterSetName="Default", Position=3, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="UpdateLocation", Position=3, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=3, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $InventoryCode,
 
-        [Parameter(ParameterSetName="UpdateLocation", Position=4, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=4, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $RegionCode,
 
-        [Parameter(ParameterSetName="UpdateLocation", Position=5, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=5, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $CountryCode,
 
-        [Parameter(ParameterSetName="UpdateLocation", Position=6, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=6, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $CityyCode,
 
-        [Parameter(ParameterSetName="Default", Position=4, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="UpdateLocation", Position=7, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=7, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $Description,
 
-        [Parameter(ParameterSetName="Default", Position=5, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="UpdateLocation", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [bool]
-        $Deprecated = $false,
+        $Deprecated = $null,
 
-        [Parameter(ParameterSetName="Default", Position=6, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="UpdateLocation", Position=9, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=9, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [DateTime]
         $ValidFrom,
 
-        [Parameter(ParameterSetName="Default", Position=7, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="UpdateLocation", Position=10, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=10, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [DateTime]
         $ValidTo
     )
@@ -154,51 +146,60 @@ function Update-InventoryDatacenter
         $InputObject,
 
         [Parameter(ParameterSetName="Default", Position=0, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="UpdateLocation", Position=0, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [int]
         $Id,
 
         [Parameter(ParameterSetName="Default", Position=1, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="UpdateLocation", Position=1, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $Name,
 
-        [Parameter(ParameterSetName="Default", Position=2, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=2, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="UpdateLocation", Position=2, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $Code,
 
-        [Parameter(ParameterSetName="Default", Position=3, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=3, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="UpdateLocation", Position=3, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
-        [ValidateSet("Cloud","OnPremise")]
+        [ValidateSet("Cloud","On_Premise")]
         $Type,
 
-        [Parameter(ParameterSetName="Default", Position=4, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=4, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="UpdateLocation", Position=4, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $InventoryCode,
 
-        [Parameter(ParameterSetName="Default", Position=5, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="UpdateLocation", Position=5, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $RegionCode,
 
-        [Parameter(ParameterSetName="Default", Position=6, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="UpdateLocation", Position=6, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $CountryCode,
 
-        [Parameter(ParameterSetName="Default", Position=7, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="UpdateLocation", Position=7, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $CityyCode,
 
-        [Parameter(ParameterSetName="Default", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=5, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="UpdateLocation", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
         $Description,
 
-        [Parameter(ParameterSetName="Default", Position=9, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=6, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="UpdateLocation", Position=9, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [bool]
         $Deprecated = $false,
 
-        [Parameter(ParameterSetName="Default", Position=10, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=7, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="UpdateLocation", Position=10, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [DateTime]
         $ValidFrom,
 
-        [Parameter(ParameterSetName="Default", Position=11, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="Default", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="UpdateLocation", Position=11, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [DateTime]
         $ValidTo
     )
@@ -264,7 +265,7 @@ function Update-InventoryDatacenter
         if (![string]::IsNullOrWhiteSpace($CountryCode)) {$graphqlInput[ "countryCode"] = $CountryCode}
         if (![string]::IsNullOrWhiteSpace($CityCode)) {$graphqlInput[ "cityCode"] = $CityCode}
         if (![string]::IsNullOrWhiteSpace($InventoryCode)) {$graphqlInput[ "inventoryCode"] = $InventoryCode}
-        if (![string]::IsNullOrWhiteSpace($Description)) {$graphqlInput[ "description"] = $Description}
+        if ($null -ne $Description) {$graphqlInput[ "description"] = $Description}
         if ($null -ne $Deprecated ) {$graphqlInput[ "deprecated"] = $Deprecated}
         if ($null -ne $ValidFrom ) {$graphqlInput[ "validFrom"] = $ValidFrom}
         if ($null -ne $ValidTo ) {$graphqlInput[ "ValidTo"] = $ValidTo}

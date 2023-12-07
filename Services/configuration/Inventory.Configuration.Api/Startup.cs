@@ -61,8 +61,9 @@ namespace Inventory.Configuration.Api
 
             // Add database
             services.AddCustomDbContext(Configuration, Environment);
-            services.AddScoped(typeof(IAsyncRepositoryWithSpecification<>), typeof(ConfigurationRepository<>));
+            services.AddScoped(typeof(IAsyncRepositoryWithSpecification<>), typeof(ConfigurationRepositoryWithSpec<>));
             services.AddScoped(typeof(IGenericQueryStore<>), typeof(ConfigurationQueryStore<>));
+            services.AddScoped(typeof(IAsyncRepository<>), typeof(ConfigurationRepository<>));
 
             // Add Graphql
             services.AddGraphqlServices(Environment);

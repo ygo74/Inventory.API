@@ -53,6 +53,7 @@ namespace Inventory.Configuration.Domain.Models
                     .SetPlugin(plugin);
 
                 _plugins.Add(newEndpoint);
+                AddDomainEvent(new Event<Datacenter>(this, Event<Datacenter>.EntityAction.Updated));
             }
 
             return this;
@@ -66,6 +67,7 @@ namespace Inventory.Configuration.Domain.Models
             if (null != existingEndpoint)
             {
                 _plugins.Remove(existingEndpoint);
+                AddDomainEvent(new Event<Datacenter>(this, Event<Datacenter>.EntityAction.Updated));
             }
 
             return this;
@@ -74,9 +76,29 @@ namespace Inventory.Configuration.Domain.Models
         public Datacenter SetLocation(Location location) 
         { 
             Location = location;
+            AddDomainEvent(new Event<Datacenter>(this, Event<Datacenter>.EntityAction.Updated));
             return this;
         }
 
 
+        public Datacenter SetDescription(string description)
+        {
+            var newValue = description;
+            if (string.IsNullOrWhiteSpace(newValue))
+                newValue = null;
+            else
+                newValue = newValue.Trim();
+
+            Description = newValue;
+            AddDomainEvent(new Event<Datacenter>(this, Event<Datacenter>.EntityAction.Updated));
+            return this;
+        }
+
+        public Datacenter SetDatacenterType(DatacenterType value)
+        {
+            DataCenterType = value;
+            AddDomainEvent(new Event<Datacenter>(this, Event<Datacenter>.EntityAction.Updated));
+            return this;
+        }
     }
 }

@@ -4,9 +4,13 @@ using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Validators;
+using Inventory.Common.Domain.Filters;
+using Inventory.Common.Domain.Repository;
 using Inventory.Configuration.Api.Application.Datacenters.Dtos;
 using Inventory.Configuration.Api.Application.Datacenters.Validators;
 using Inventory.Configuration.Api.Application.Locations;
+using Inventory.Configuration.Domain.Filters;
+using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -22,10 +26,12 @@ namespace Inventory.Configuration.Api.Application.Datacenters
     /// </summary>
     public class UpdateDatacenterRequest : UpdateConfigurationEntityRequest<DatacenterDto>, IDatacenterLocation
     {
-        public string Description { get; set; }
-        public string CountryCode { get; set; }
-        public string CityCode { get; set; }
-        public string RegionCode { get; set; }
+        public string Name { get; set; }
+        public DatacenterTypeDto? DatacenterType { get; set; }
+        public string Description { get; set; } = null;
+        public string CountryCode { get; set; } = null;
+        public string CityCode { get; set; } = null;
+        public string RegionCode { get; set; } = null;
     }
 
     public class UpdateDatacenterValidator : ConfigurationEntityDtoValidator<UpdateDatacenterRequest>
@@ -52,13 +58,17 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
         private readonly ILogger<UpdateDatacenterHanlder> _logger;
         private readonly IMapper _mapper;
-        private readonly IDbContextFactory<ConfigurationDbContext> _factory;
+        private readonly IAsyncRepository<Datacenter> _dcRepository;
+        private readonly IAsyncRepository<Location> _locationRepository;
 
-        public UpdateDatacenterHanlder(ILogger<UpdateDatacenterHanlder> logger, IMapper mapper, IDbContextFactory<ConfigurationDbContext> factory)
+        public UpdateDatacenterHanlder(ILogger<UpdateDatacenterHanlder> logger, IMapper mapper, 
+                                       IAsyncRepository<Datacenter> dcRepository, IAsyncRepository<Location> locationRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _factory = Guard.Against.Null(factory, nameof(factory));
+            _dcRepository = Guard.Against.Null(dcRepository, nameof(dcRepository));
+            _locationRepository = Guard.Against.Null(locationRepository, nameof(locationRepository));
+            
         }
 
         public async Task<Payload<DatacenterDto>> Handle(UpdateDatacenterRequest request, CancellationToken cancellationToken)
@@ -66,21 +76,37 @@ namespace Inventory.Configuration.Api.Application.Datacenters
             _logger.LogInformation("Start updating datacenter '{0}'", request.Id);
 
             // Find entity
-            await using var dbContext = _factory.CreateDbContext();
-            var datacenter = await dbContext.Datacenters.FindAsync(keyValues: new object[] { request.Id }, cancellationToken);
+            var datacenter = await _dcRepository.GetByIdAsync(request.Id, cancellationToken,
+                                                                e => e.Location, e => e.Plugins);
 
             // Update Property
             if (request.Deprecated.HasValue) { datacenter.SetDeprecatedValue(request.Deprecated.Value); }
+            if (request.Description != null) { datacenter.SetDescription(request.Description); }
+            if (!string.IsNullOrWhiteSpace(request.InventoryCode)) { datacenter.SetInventoryCode(request.InventoryCode); }
+            if (request.DatacenterType is not null) { 
+                // convert enum DatacenterTypeDto to DatacenterType by using standard enum parsing
+                var datacenterType = Enum.Parse<DatacenterType>(request.DatacenterType.ToString());
+                datacenter.SetDatacenterType(datacenterType);
+            }
+
+
 
             // Update location
             if (!string.IsNullOrWhiteSpace(request.RegionCode) && !string.IsNullOrWhiteSpace(request.CountryCode) &&
                     !string.IsNullOrWhiteSpace(request.CityCode))
             {
+                // find the location thanks to regionCode, countrycode and citycode by using ExpressionFilter and locationRepository, then update the datacenter location
+                var locationFilter = ExpressionFilterFactory.Create<Location>()
+                                                                .WithRegionCode(request.RegionCode)
+                                                                .WithCountryCode(request.CountryCode)
+                                                                .WithCityCode(request.CityCode);    
 
+                var location = await _locationRepository.FirstOrDefaultAsync(locationFilter, cancellationToken: cancellationToken);
+                datacenter.SetLocation(location);
 
             }
 
-            var changes = await dbContext.SaveChangesAsync(cancellationToken);
+            var changes = await _dcRepository.SaveChangesAsync(cancellationToken);
             if (changes > 0)
                 _logger.LogInformation("Updated datacenter '{0}'", request.Id);
 
