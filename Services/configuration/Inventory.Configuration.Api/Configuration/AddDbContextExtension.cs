@@ -35,7 +35,24 @@ namespace Inventory.Configuration.Api.Configuration
                 options.EnableSensitiveDataLogging(env.IsDevelopment());
                 //options.LogTo(Log.Logger.Information, LogLevel.Information, null);
 
-        });
+            });
+
+            services.AddEntityFrameworkNpgsql().AddDbContext<ConfigurationDbContext>((serviceProvider, options) =>
+            {
+                options.UseNpgsql(configuration.GetConnectionString("InventoryDatabase"),
+                                  npgsqlOptionsAction: sqlOptions =>
+                                  {
+                                      sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
+                                      //Configuring Connection Resiliency: https://docs.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency 
+                                      sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), null);
+                                  });
+
+                options.UseInternalServiceProvider(serviceProvider);
+                options.EnableDetailedErrors(env.IsDevelopment());
+                options.EnableSensitiveDataLogging(env.IsDevelopment());
+                //options.LogTo(Log.Logger.Information, LogLevel.Information, null);
+
+            });
 
             return services;
         }

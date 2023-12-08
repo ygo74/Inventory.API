@@ -3,6 +3,7 @@ using AutoMapper;
 using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
+using Inventory.Common.Application.Errors;
 using Inventory.Common.Application.Validators;
 using Inventory.Common.Domain.Filters;
 using Inventory.Common.Domain.Repository;
@@ -106,9 +107,15 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
             }
 
+            // Update entity
             var changes = await _dcRepository.SaveChangesAsync(cancellationToken);
             if (changes > 0)
                 _logger.LogInformation("Updated datacenter '{0}'", request.Id);
+            else
+            {
+                var errorMessage = $"Error when Updating datacenter '{datacenter.Id}' with code '{datacenter.Code}'";
+                return Payload<DatacenterDto>.Error(new GenericApiError(errorMessage));
+            }
 
             return Payload<DatacenterDto>.Success(_mapper.Map<DatacenterDto>(datacenter));
         }

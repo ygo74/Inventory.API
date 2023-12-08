@@ -48,7 +48,7 @@ namespace Inventory.Common.Domain.Repository
         /// A task that represents the asynchronous operation.
         /// The task result contains the <typeparamref name="T" />.
         /// </returns>
-        Task<T> AddAsync(T entity, CancellationToken cancellationToken = default);
+        Task<(T result, int nbchanges)> AddAsync(T entity, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Adds the given entities in the database

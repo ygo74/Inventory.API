@@ -33,7 +33,7 @@ function New-InventoryDatacenter
 
         [Parameter(ParameterSetName="Default", Position=6, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
-        $CityyCode,
+        $CityCode,
 
         [Parameter(ParameterSetName="Default", Position=7, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
@@ -181,7 +181,7 @@ function Update-InventoryDatacenter
 
         [Parameter(ParameterSetName="UpdateLocation", Position=7, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
-        $CityyCode,
+        $CityCode,
 
         [Parameter(ParameterSetName="Default", Position=5, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [Parameter(ParameterSetName="UpdateLocation", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]

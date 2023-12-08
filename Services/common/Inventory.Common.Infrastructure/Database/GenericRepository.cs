@@ -157,13 +157,13 @@ namespace Inventory.Common.Infrastructure.Database
             return await query.ToListAsync();
         }
 
-        public virtual async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
+        public virtual async Task<(T result, int nbchanges)> AddAsync(T entity, CancellationToken cancellationToken = default)
         {
             _dbContext.Set<T>().Add(entity);
 
-            await SaveChangesAsync(cancellationToken);
+            var nbChanges = await SaveChangesAsync(cancellationToken);
 
-            return entity;
+            return (entity, nbChanges);
         }
 
         public virtual async Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)

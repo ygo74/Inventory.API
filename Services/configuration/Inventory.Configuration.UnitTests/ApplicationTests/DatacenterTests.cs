@@ -1,8 +1,12 @@
 ﻿using FluentValidation.TestHelper;
+using Inventory.Common.Domain.Repository;
 using Inventory.Configuration.Api.Application.Datacenters;
+using Inventory.Configuration.Api.Application.Datacenters.Dtos;
+using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.UnitTests.SeedWork;
 using Inventory.Configuration.UnitTests.TestCases;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -64,23 +68,28 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
             Assert.IsNotNull(result);
         }
 
-        [Test]
-        public async Task Should_successfull_update_datacenter_description()
+        [TestCase("new description","new description")]
+        [TestCase(null, "new description")]
+        [TestCase("", null)]
+        public async Task Should_successfull_update_datacenter_description(string updateDescriptionValue, string expectedDescriptionValue)
         {
             // Arrange
-            var existingDatacenter = DataCenterSeed.Get().First();
+            var repository = UnitTestsContext.Current.GetService<IGenericQueryStore<Datacenter>>();
+            var existingDatacenter = await repository.GetByIdAsync<DatacenterDto>(1);
             var updateRequest = new UpdateDatacenterRequest()
             {
                 Id = 1,
-                Description = "New description"
+                Description = updateDescriptionValue
             };
-
+            
+            // Act
             var result = await _mediator.Send(updateRequest);
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(updateRequest.Description, result.Data.Description);
-            Assert.AreNotEqual(existingDatacenter.Description, result.Data.Description);
+            Assert.AreEqual(expectedDescriptionValue, result.Data.Description);
+            // manage case null to inform that this field should not be updated
+            if (updateDescriptionValue != null) Assert.AreNotEqual(existingDatacenter.Description, result.Data.Description);
         }
 
     }

@@ -24,7 +24,7 @@ namespace Inventory.Configuration.UnitTests.SeedWork
             var adminCred = dbContext.Credentials.First(e => e.Name == CredentialSeed.ADMINISTRATOR);
 
 
-            yield return new Datacenter("EMEA-FR-PARIS", "France", DatacenterType.OnPremise, "dc.paris")
+            yield return new Datacenter("EMEA-FR-PARIS", "France", DatacenterType.OnPremise, "dc.paris", "Main datacenter")
                 .SetLocation(parisLocation)
                 .AddPluginEndpoint(AzPlugin, adminCred);
 

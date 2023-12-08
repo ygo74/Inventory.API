@@ -23,6 +23,7 @@ using Inventory.Common.Application.Errors;
 using Inventory.Configuration.Api.Application.Datacenters.Dtos;
 using Inventory.Configuration.Api.Application.Datacenters.Validators;
 using Inventory.Configuration.Api.Application.Locations;
+using Ardalis.GuardClauses;
 
 namespace Inventory.Configuration.Api.Application.Datacenters
 {
@@ -98,15 +99,18 @@ namespace Inventory.Configuration.Api.Application.Datacenters
     public class CreateDatacenterHandler : IRequestHandler<CreateDatacenterRequest, Payload<DatacenterDto>>
     {
 
-        private readonly IDbContextFactory<ConfigurationDbContext> _factory;
+        private readonly IAsyncRepository<Datacenter> _dcRepository;
+        private readonly IAsyncRepository<Location> _locationRepository;
         private readonly ILogger<CreateDatacenterHandler> _logger;
         private readonly IMapper _mapper;
 
-        public CreateDatacenterHandler(IDbContextFactory<ConfigurationDbContext> factory, ILogger<CreateDatacenterHandler> logger, IMapper mapper)
+        public CreateDatacenterHandler(ILogger<CreateDatacenterHandler> logger, IMapper mapper,
+                                       IAsyncRepository<Datacenter> dcRepository, IAsyncRepository<Location> locationRepository)
         {
-            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _dcRepository = Guard.Against.Null(dcRepository, nameof(dcRepository));
+            _locationRepository = Guard.Against.Null(locationRepository, nameof(locationRepository));
         }
 
         /// <summary>
@@ -124,13 +128,12 @@ namespace Inventory.Configuration.Api.Application.Datacenters
                                                         startDate: request.ValidFrom, endDate: request.ValidTo);
 
             // Find location and add it to the datacenter
-            await using var dbContext = _factory.CreateDbContext();
-            var filter = ExpressionFilterFactory.Create<Location>()
-                            .WithCityCode(request.CityCode)
-                            .WithCountryCode(request.CountryCode)
-                            .WithRegionCode(request.RegionCode);
+            var locationFilter = ExpressionFilterFactory.Create<Location>()
+                                    .WithCityCode(request.CityCode)
+                                    .WithCountryCode(request.CountryCode)
+                                    .WithRegionCode(request.RegionCode);
 
-            var existingLocation = await dbContext.Locations.Where(filter.Predicate).FirstOrDefaultAsync(cancellationToken);
+            var existingLocation = await _locationRepository.FirstOrDefaultAsync(locationFilter, cancellationToken: cancellationToken);
             if (existingLocation == null) 
             { 
                 var errorMessage = $"Location with CountryCode {request.CountryCode} and CityCode {request.CityCode} and RegionCode {request.RegionCode} doesn't exists in the database";
@@ -140,9 +143,8 @@ namespace Inventory.Configuration.Api.Application.Datacenters
             newEntity.SetLocation(existingLocation);
 
             // Add entity
-            var result =  await dbContext.Datacenters.AddAsync(newEntity, cancellationToken);
-            var nbChanges = await dbContext.SaveChangesAsync(cancellationToken);
-            if (nbChanges == 0)
+            var result =  await _dcRepository.AddAsync(newEntity, cancellationToken);
+            if (result.nbchanges == 0)
             {
                 var errorMessage = $"Error when adding datacenter '{request.Name}' with code '{request.Code}'";
                 return Payload<DatacenterDto>.Error(new GenericApiError(errorMessage));

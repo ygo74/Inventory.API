@@ -31,7 +31,7 @@ namespace Inventory.Configuration.Infrastructure
 
         //}
 
-        public ConfigurationRepository(IDbContextFactory<ConfigurationDbContext> dbContextFactory) : base(dbContextFactory)
+        public ConfigurationRepository(ConfigurationDbContext dbContext) : base(dbContext)
         {
 
         }
