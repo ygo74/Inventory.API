@@ -6,17 +6,17 @@ $configuration = . $scriptPath
 
 $titleSeparator = "".PadRight(80,"=")
 
-# # -----------------------------------------------------------------------------
-# # Load plugins
-# # -----------------------------------------------------------------------------
-# Write-Host ""
-# Write-Host "Load plugins" -ForegroundColor Green
-# Write-Host $titleSeparator -ForegroundColor Green
-# $configuration.plugins | Foreach-Object {
-#     Write-Host "`t - plugin $($_.Name) : " -NoNewLine
-#     New-InventoryPlugin -Name $_.Name -Code $_.Code -Version $_.Version -Path $_.Path -InventoryCode $_.InventoryCode
-#     write-Host "Ok"
-# }
+# -----------------------------------------------------------------------------
+# Load plugins
+# -----------------------------------------------------------------------------
+Write-Host ""
+Write-Host "Load plugins" -ForegroundColor Green
+Write-Host $titleSeparator -ForegroundColor Green
+$configuration.plugins | Foreach-Object {
+    Write-Host "`t - plugin $($_.Name) : " -NoNewLine
+    New-InventoryPlugin -Name $_.Name -Code $_.Code -Version $_.Version -Path $_.Path -InventoryCode $_.InventoryCode -verbose
+    write-Host "Ok"
+}
 
 
 # -----------------------------------------------------------------------------

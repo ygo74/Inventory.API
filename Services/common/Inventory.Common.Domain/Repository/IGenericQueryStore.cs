@@ -35,6 +35,7 @@ namespace Inventory.Common.Domain.Repository
                                           params Expression<Func<T, object>>[] includes);
 
         Task<IEnumerable<TDtoEntity>> GetByCriteriaAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
+                                                                     Expression<Func<T, IEnumerable<TDtoEntity>>> ChildProjection = null,
                                                                      Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
                                                                      int? offset = null, int? limit = null,
                                                                      CancellationToken cancellationToken = default,

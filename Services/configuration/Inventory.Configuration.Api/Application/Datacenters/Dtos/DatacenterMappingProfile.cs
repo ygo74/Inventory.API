@@ -26,6 +26,13 @@ namespace Inventory.Configuration.Api.Application.Datacenters.Dtos
             CreateMap<Domain.Models.Datacenter, DatacenterIntegrationEvent>()
                 .ForMember(d => d.Id, options => options.Ignore());
 
+
+            CreateMap<Domain.Models.Datacenter, DatacenterPluginsDto>()
+                 //.IncludeBase<ConfigurationEntity, ConfigurationEntityDto>();
+                 .ForMember(d => d.DatacenterId, options => options.MapFrom(src => src.Id))
+                 .ForMember(d => d.PluginName, options => options.MapFrom(src => src.Plugins.Select(p => p.Plugin.Name)))
+                 .ForMember(d => d.CredentialName, options => options.MapFrom(src => src.Plugins.Select(p => p.Credential.Name)));
+
         }
     }
 }

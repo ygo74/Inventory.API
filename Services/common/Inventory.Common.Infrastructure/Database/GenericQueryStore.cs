@@ -157,6 +157,7 @@ namespace Inventory.Common.Infrastructure.Database
         }
 
         public async Task<IEnumerable<TDtoEntity>> GetByCriteriaAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
+                                                                                  Expression<Func<T, IEnumerable<TDtoEntity>>> ChildProjection = null,
                                                                                   Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
                                                                                   int? offset = null, int? limit = null,
                                                                                   CancellationToken cancellationToken = default,
@@ -191,6 +192,13 @@ namespace Inventory.Common.Infrastructure.Database
                 query = query.Take(limit.Value);
             }
 
+            // return the child projection if it is not null
+            if (ChildProjection != null)
+            {
+                return await query.SelectMany<T, TDtoEntity>(ChildProjection).ToListAsync();
+            }
+
+            // return the default query projection
             return await query.ProjectTo<TDtoEntity>(_mapper.ConfigurationProvider)
                         .ToListAsync();
 

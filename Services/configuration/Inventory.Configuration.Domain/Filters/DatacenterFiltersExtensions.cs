@@ -39,5 +39,11 @@ namespace Inventory.Configuration.Domain.Filters
             return filter.And(e => e.InventoryCode == inventoryCode);
         }
 
+        public static IExpressionFilter<Datacenter> ForMultipleDatacenter(this IExpressionFilter<Datacenter> filter, IEnumerable<int> ids)
+        {
+            if (ids == null || ids.Count() == 0) return filter;
+            return filter.And(e => ids.Contains(e.Id));
+        }
+
     }
 }

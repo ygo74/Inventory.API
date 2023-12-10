@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Inventory.Common.Domain.Models;
 using Inventory.Common.Infrastructure.Database;
+using Inventory.Configuration.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,21 @@ namespace Inventory.Configuration.Infrastructure
         {
 
         }
+    }
+
+    public class DatacenterQueryStore : ConfigurationQueryStore<Datacenter>
+    {
+        //public DatacenterQueryStore(ConfigurationDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        //{
+
+        //}
+
+        public DatacenterQueryStore(IDbContextFactory<ConfigurationDbContext> dbContextFactory, IMapper mapper) : base(dbContextFactory, mapper)
+        {
+
+        }
+
+
     }
 
 }

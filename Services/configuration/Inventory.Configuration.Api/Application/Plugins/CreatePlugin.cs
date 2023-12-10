@@ -4,9 +4,11 @@ using FluentValidation;
 using HotChocolate;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
+using Inventory.Common.Application.Errors;
 using Inventory.Common.Application.Exceptions;
 using Inventory.Common.Application.Validators;
 using Inventory.Common.Domain.Repository;
+using Inventory.Configuration.Api.Application.Datacenters.Dtos;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -67,12 +69,12 @@ namespace Inventory.Configuration.Api.Application.Plugin
     public class CreatePluginHanlder : IRequestHandler<CreatePluginRequest, Payload<PluginDto>>
     {
 
-        private readonly IAsyncRepositoryWithSpecification<Domain.Models.Plugin> _repository;
+        private readonly IAsyncRepository<Domain.Models.Plugin> _repository;
         private readonly ILogger<CreatePluginHanlder> _logger;
         private readonly IMapper _mapper;
         private readonly PluginService _pluginService;
 
-        public CreatePluginHanlder(IAsyncRepositoryWithSpecification<Domain.Models.Plugin> repository, ILogger<CreatePluginHanlder> logger, IMapper mapper, PluginService pluginService)
+        public CreatePluginHanlder(IAsyncRepository<Domain.Models.Plugin> repository, ILogger<CreatePluginHanlder> logger, IMapper mapper, PluginService pluginService)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -84,26 +86,21 @@ namespace Inventory.Configuration.Api.Application.Plugin
         {
             _logger.LogInformation($"Start adding Plugin '{request.Name}' with code '{request.Code}'");
 
-            bool success = false;
-            try
-            {
-                var newEntity = new Domain.Models.Plugin(request.Name, request.Code, request.Version, request.InventoryCode, request.Deprecated, request.ValidFrom, request.ValidTo);
-                newEntity.SetPath(request.Path);
+            var newEntity = new Domain.Models.Plugin(request.Name, request.Code, request.Version, request.InventoryCode, 
+                                                     request.Deprecated, request.ValidFrom, request.ValidTo);
+            newEntity.SetPath(request.Path);
 
-                // Add entity
-                var result = await _repository.AddAsync(newEntity, cancellationToken);
-
-                // Map response
-                success = true;
-                return Payload<PluginDto>.Success(_pluginService.GetPluginDto(result));
-            }
-            finally
+            // Add entity
+            var result = await _repository.AddAsync(newEntity, cancellationToken);
+            if (result.nbchanges == 0)
             {
-                if (success)
-                    _logger.LogInformation($"Successfully adding Plugin '{request.Name}' with Code '{request.Code}' and version '{request.Version}'");
-                else
-                    _logger.LogInformation($"Error when adding Plugin '{request.Name}' with Code '{request.Code}' and version '{request.Version}'");
+                var errorMessage = $"Error when adding Plugin '{request.Name}' with code '{request.Code}'";
+                return Payload<PluginDto>.Error(new GenericApiError(errorMessage));
             }
+
+            // return result
+            _logger.LogInformation("Successfully added plugin '{0}' with code '{1}'", request.Name, request.Code);
+            return Payload<PluginDto>.Success(_pluginService.GetPluginDto(newEntity));
 
         }
     }

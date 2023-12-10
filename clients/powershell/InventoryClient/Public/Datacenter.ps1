@@ -41,7 +41,7 @@ function New-InventoryDatacenter
 
         [Parameter(ParameterSetName="Default", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [bool]
-        $Deprecated = $null,
+        $Deprecated = $false,
 
         [Parameter(ParameterSetName="Default", Position=9, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [DateTime]

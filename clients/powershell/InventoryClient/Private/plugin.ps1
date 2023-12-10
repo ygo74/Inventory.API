@@ -1,6 +1,6 @@
 
 $script:CreatePluginMutation=@"
-mutation createPlugin(`$input: CreatePluginInput)
+mutation createPlugin(`$input: CreatePluginRequestInput)
 {
  createPlugin(input: `$input) {
    data {

@@ -53,19 +53,39 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
 
         }
 
-        [TestCaseSource(typeof(DatacenterTestCases), nameof(DatacenterTestCases.GetCreateDatacenterWithCorrectMandatoryValues))]
-        public async Task Should_successfull_create_application_with_valid_values(CreateDatacenterRequest newEntity)
+        [TestCase("Datacenter-1", "DC1", "dc.dc1", LocationSeed.RegionCode_EMEA, LocationSeed.CountryCode_France, LocationSeed.CityCode_Paris,
+                  DatacenterTypeDto.OnPremise)]
+        [TestCase("Datacenter-2", "DC2", "dc.dc2", LocationSeed.RegionCode_EMEA, LocationSeed.CountryCode_France, LocationSeed.CityCode_Paris,
+                  DatacenterTypeDto.OnPremise, false, "Test full attributes", null , null )]
+        public async Task Should_successfull_create_application_with_valid_values(string name, string code, string inventoryCode,
+                                                                                  string regionCode, string countryCode, string cityCode,
+                                                                                  DatacenterTypeDto datacenterType, bool? deprecated = null,
+                                                                                  string description=null, DateTime? validFrom=null,
+                                                                                  DateTime? validTo = null)
         {
             // Arrange
-            //var result = Assert.Throws<Inventory.Common.Application.Exceptions.ValidationException>(async () => 
-            //{
-            //    await _mediator.Send(newEntity);
-            //});
+            var newEntity = new CreateDatacenterRequest()
+            {
+                Name = name,
+                Code = code,
+                DatacenterType = datacenterType,
+                InventoryCode = inventoryCode,
+                CountryCode = countryCode,
+                CityCode = cityCode,
+                RegionCode = regionCode,
+                Description = description,
+                ValidFrom = validFrom,  
+                ValidTo = validTo,
+                Deprecated = deprecated                
+            };
 
+            // Act
             var result = await _mediator.Send(newEntity);
 
             // Assert
             Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Data);
+            Assert.IsEmpty(result.Errors);
         }
 
         [TestCase("new description","new description")]
