@@ -33,6 +33,7 @@ using Inventory.Common.Infrastructure.Http;
 using Inventory.Common.Domain.Interfaces;
 using Inventory.Common.Infrastructure.Database;
 using Inventory.Configuration.Api.Application.Datacenters;
+using Inventory.Plugins.Interfaces;
 
 namespace Inventory.Configuration.Api
 {
@@ -84,6 +85,15 @@ namespace Inventory.Configuration.Api
 
             // Application
             services.AddSingleton<PluginResolver>();
+            //services.AddSingleton<PluginResolver>(sp =>
+            //{
+            //    var pluginResolver = new PluginResolver();
+            //    var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net6.0\Inventory.Plugins.Azure.dll");
+
+            //    pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(services, Configuration, assembly);
+
+            //    return pluginResolver;
+            //});
             services.AddScoped<PluginService>();
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<DatacenterService>();
@@ -93,6 +103,14 @@ namespace Inventory.Configuration.Api
             services.UseHttpHostingConfigurationServices(Configuration);
 
             services.AddControllers();
+
+            // test
+            //var pluginResolver = new PluginResolver();
+            //var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net6.0\Inventory.Plugins.Azure.dll");
+
+            //pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(services, Configuration, assembly);
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
