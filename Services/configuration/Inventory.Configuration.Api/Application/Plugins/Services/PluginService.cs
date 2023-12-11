@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using AutoMapper;
 using Inventory.Common.Application.Plugins;
+using Inventory.Configuration.Api.Application.Plugins.Dtos;
 using Inventory.Configuration.Infrastructure;
 using Inventory.Plugins.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Inventory.Configuration.Api.Application.Plugin
+namespace Inventory.Configuration.Api.Application.Plugins.Services
 {
     public class PluginService
     {

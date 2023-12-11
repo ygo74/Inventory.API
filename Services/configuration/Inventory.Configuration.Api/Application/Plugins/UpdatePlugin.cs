@@ -4,17 +4,17 @@ using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Validators;
-using Inventory.Common.Domain.Repository;
+using Inventory.Configuration.Api.Application.Plugins.Dtos;
+using Inventory.Configuration.Api.Application.Plugins.Services;
 using Inventory.Configuration.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MR.AspNetCore.Pagination;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Inventory.Configuration.Api.Application.Plugin
+namespace Inventory.Configuration.Api.Application.Plugins
 {
 #nullable enable
     public class UpdatePluginRequest : UpdateConfigurationEntityRequest<PluginDto>

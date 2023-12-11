@@ -2,12 +2,8 @@
 using Inventory.Common.Application.Core;
 using Inventory.Configuration.Api.Application.Datacenters;
 using Inventory.Configuration.Api.Application.Datacenters.Dtos;
-using Inventory.Configuration.Api.Application.Plugin;
 using MediatR;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Inventory.Configuration.Api.Graphql.Types
 {

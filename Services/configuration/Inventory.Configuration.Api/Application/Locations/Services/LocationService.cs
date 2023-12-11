@@ -7,7 +7,7 @@ using System.Threading;
 using Inventory.Common.Domain.Filters;
 using Inventory.Configuration.Domain.Filters;
 
-namespace Inventory.Configuration.Api.Application.Locations
+namespace Inventory.Configuration.Api.Application.Locations.Services
 {
     public class LocationService : ILocationService
     {

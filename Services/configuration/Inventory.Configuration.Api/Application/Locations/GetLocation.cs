@@ -5,6 +5,7 @@ using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Errors;
 using Inventory.Common.Domain.Filters;
+using Inventory.Configuration.Api.Application.Locations.Dtos;
 using Inventory.Configuration.Domain.Filters;
 using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;

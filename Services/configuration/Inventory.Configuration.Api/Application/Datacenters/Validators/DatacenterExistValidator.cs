@@ -1,13 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using FluentValidation;
-using Inventory.Common.Domain.Filters;
-using Inventory.Configuration.Domain.Filters;
 using Inventory.Configuration.Api.Application.Datacenters.Dtos;
-using Inventory.Configuration.Domain.Models;
-using Inventory.Configuration.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using Inventory.Configuration.Api.Application.Locations;
+using Inventory.Configuration.Api.Application.Locations.Services;
 
 namespace Inventory.Configuration.Api.Application.Datacenters.Validators
 {

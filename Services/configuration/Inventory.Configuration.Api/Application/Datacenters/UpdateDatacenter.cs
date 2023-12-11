@@ -8,8 +8,9 @@ using Inventory.Common.Application.Validators;
 using Inventory.Common.Domain.Filters;
 using Inventory.Common.Domain.Repository;
 using Inventory.Configuration.Api.Application.Datacenters.Dtos;
+using Inventory.Configuration.Api.Application.Datacenters.Services;
 using Inventory.Configuration.Api.Application.Datacenters.Validators;
-using Inventory.Configuration.Api.Application.Locations;
+using Inventory.Configuration.Api.Application.Locations.Services;
 using Inventory.Configuration.Domain.Filters;
 using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
@@ -25,7 +26,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
     /// <summary>
     /// Update Datacenter request
     /// </summary>
-    public class UpdateDatacenterRequest : UpdateConfigurationEntityRequest<DatacenterDto>, IDatacenterLocation
+    public class UpdateDatacenterRequest : UpdateConfigurationEntityRequest<DatacenterDto>, IDatacenterId, IDatacenterLocation
     {
         public string Name { get; set; }
         public DatacenterTypeDto? DatacenterType { get; set; }
@@ -37,7 +38,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
     public class UpdateDatacenterValidator : ConfigurationEntityDtoValidator<UpdateDatacenterRequest>
     {
-        public UpdateDatacenterValidator(DatacenterService datacenterService, ILocationService locationService)
+        public UpdateDatacenterValidator(IDatacenterService datacenterService, ILocationService locationService)
         {
             RuleFor(e => e.Id).Cascade(CascadeMode.Stop)
                 .NotNull()

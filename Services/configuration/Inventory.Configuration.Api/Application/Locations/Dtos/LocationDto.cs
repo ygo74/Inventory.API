@@ -1,6 +1,6 @@
 ﻿using Inventory.Common.Application.Dto;
 
-namespace Inventory.Configuration.Api.Application.Locations
+namespace Inventory.Configuration.Api.Application.Locations.Dtos
 {
     public class LocationDto : ConfigurationEntityDto
     {

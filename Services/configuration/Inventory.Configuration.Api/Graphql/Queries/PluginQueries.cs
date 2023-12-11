@@ -7,18 +7,16 @@ using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
 using Inventory.Common.Application.Graphql.Extensions;
-using Inventory.Configuration.Api.Application.Plugin;
-using Inventory.Configuration.Domain.Filters;
+using Inventory.Configuration.Api.Application.Plugins;
 using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
-using Inventory.Common.Domain.Repository;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Inventory.Configuration.Api.Application.Plugins.Dtos;
+using Inventory.Configuration.Api.Application.Plugins.Services;
 
 namespace Inventory.Configuration.Api.Graphql.Queries
 {

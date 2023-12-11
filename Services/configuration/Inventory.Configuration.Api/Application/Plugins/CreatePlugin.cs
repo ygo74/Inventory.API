@@ -9,6 +9,8 @@ using Inventory.Common.Application.Exceptions;
 using Inventory.Common.Application.Validators;
 using Inventory.Common.Domain.Repository;
 using Inventory.Configuration.Api.Application.Datacenters.Dtos;
+using Inventory.Configuration.Api.Application.Plugins.Dtos;
+using Inventory.Configuration.Api.Application.Plugins.Services;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -17,7 +19,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Inventory.Configuration.Api.Application.Plugin
+namespace Inventory.Configuration.Api.Application.Plugins
 {
     /// <summary>
     /// Create plugin request

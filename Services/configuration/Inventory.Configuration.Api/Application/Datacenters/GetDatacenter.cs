@@ -84,10 +84,6 @@ namespace Inventory.Configuration.Api.Application.Datacenters
         public async Task<Payload<DatacenterDto>> Handle(GetDatacenterByIdRequest request, CancellationToken cancellationToken)
         {
 
-            // Create filter
-            var filter = ExpressionFilterFactory.Create<Datacenter>()
-                                                .WithId(request.Id);
-
             // Retrieve entity
             var datacenter = await _queryStore.GetByIdAsync<DatacenterDto>(request.Id);
 

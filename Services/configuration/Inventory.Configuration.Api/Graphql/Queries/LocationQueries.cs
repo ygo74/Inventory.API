@@ -2,15 +2,14 @@
 using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
-using Inventory.Configuration.Api.Application.Plugin;
 using MediatR;
 using System.Threading.Tasks;
 using System.Threading;
-using System;
 using Inventory.Configuration.Api.Application.Locations;
 using Inventory.Common.Application.Graphql.Extensions;
 using System.Linq;
 using Inventory.Common.Application.Core;
+using Inventory.Configuration.Api.Application.Locations.Dtos;
 
 namespace Inventory.Configuration.Api.Graphql.Queries
 {

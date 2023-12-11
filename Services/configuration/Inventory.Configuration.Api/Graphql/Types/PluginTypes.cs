@@ -1,9 +1,6 @@
 ﻿using HotChocolate.Types;
-using Inventory.Configuration.Api.Application.Plugin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Inventory.Configuration.Api.Application.Plugins;
+using Inventory.Configuration.Api.Application.Plugins.Dtos;
 
 namespace Inventory.Configuration.Api.Graphql.Types
 {

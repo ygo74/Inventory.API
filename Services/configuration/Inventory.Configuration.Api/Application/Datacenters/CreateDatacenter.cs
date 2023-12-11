@@ -22,7 +22,7 @@ using Inventory.Configuration.Domain.Filters;
 using Inventory.Common.Application.Errors;
 using Inventory.Configuration.Api.Application.Datacenters.Dtos;
 using Inventory.Configuration.Api.Application.Datacenters.Validators;
-using Inventory.Configuration.Api.Application.Locations;
+using Inventory.Configuration.Api.Application.Locations.Services;
 using Ardalis.GuardClauses;
 
 namespace Inventory.Configuration.Api.Application.Datacenters

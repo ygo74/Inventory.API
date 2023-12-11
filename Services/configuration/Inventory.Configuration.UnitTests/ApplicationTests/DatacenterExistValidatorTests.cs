@@ -1,6 +1,6 @@
 using Inventory.Configuration.Api.Application.Datacenters.Dtos;
 using Inventory.Configuration.Api.Application.Datacenters.Validators;
-using Inventory.Configuration.Api.Application.Locations;
+using Inventory.Configuration.Api.Application.Locations.Services;
 using Moq;
 using NUnit.Framework;
 using System.Threading.Tasks;

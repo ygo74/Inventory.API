@@ -3,7 +3,6 @@ using AutoMapper;
 using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
-using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +11,8 @@ using System.Threading.Tasks;
 using System.Threading;
 using System;
 using Inventory.Common.Application.Errors;
+using Inventory.Configuration.Api.Application.Plugins.Dtos;
+using Inventory.Configuration.Api.Application.Plugins.Services;
 
 namespace Inventory.Configuration.Api.Application.Plugins
 {

@@ -1,10 +1,6 @@
 ﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Inventory.Configuration.Api.Application.Plugin
+namespace Inventory.Configuration.Api.Application.Plugins.Dtos
 {
     public class PluginMappingProfile : Profile
     {

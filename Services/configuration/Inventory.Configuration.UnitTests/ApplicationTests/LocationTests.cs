@@ -1,17 +1,12 @@
-﻿using Elastic.Apm.Api;
-using Inventory.Common.Domain.Filters;
+﻿using Inventory.Common.Domain.Filters;
 using Inventory.Configuration.Api.Application.Locations;
-using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
 using Inventory.Configuration.UnitTests.TestCases;
 using MediatR;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using Inventory.Configuration.Domain.Filters;
 

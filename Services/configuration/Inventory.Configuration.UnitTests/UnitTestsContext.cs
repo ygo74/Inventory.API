@@ -9,14 +9,13 @@ using Microsoft.EntityFrameworkCore;
 using Inventory.Common.Infrastructure.Events;
 using Inventory.Common.UnitTests.Events;
 using Inventory.Common.Application.Plugins;
-using Inventory.Configuration.Api.Application.Plugin;
-using Inventory.Configuration.Api.Application.Locations;
 using Inventory.Configuration.Api.Application.Credentials;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Inventory.Common.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Inventory.Configuration.Api.Application.Datacenters;
+using Inventory.Configuration.Api.Application.Datacenters.Services;
+using Inventory.Configuration.Api.Application.Plugins.Services;
+using Inventory.Configuration.Api.Application.Locations.Services;
 
 namespace Inventory.Configuration.UnitTests
 {

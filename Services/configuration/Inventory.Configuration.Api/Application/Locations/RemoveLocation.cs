@@ -4,6 +4,8 @@ using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Errors;
+using Inventory.Configuration.Api.Application.Locations.Dtos;
+using Inventory.Configuration.Api.Application.Locations.Services;
 using Inventory.Configuration.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Inventory.Configuration.Api.Application.Datacenters.Events;
 using Inventory.Configuration.Domain.Models;
 using System;
 using System.Collections.Generic;

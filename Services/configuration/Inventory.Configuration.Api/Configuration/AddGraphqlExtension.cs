@@ -6,7 +6,6 @@ using HotChocolate.Types.Pagination;
 using Inventory.Common.Application.Errors;
 using Inventory.Common.Application.Graphql;
 using Inventory.Common.Application.Users;
-using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Api.Graphql.Mutations;
 using Inventory.Configuration.Api.Graphql.Queries;
 using Inventory.Configuration.Api.Graphql.Types;
@@ -17,11 +16,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using static Inventory.Common.Application.Graphql.Types.ErrorTypes;
-using static Inventory.Configuration.Api.Graphql.Mutations.PluginMutations;
 
 namespace Inventory.Configuration.Api.Configuration
 {

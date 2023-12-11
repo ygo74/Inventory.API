@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Inventory.Configuration.Api.Application.Plugin
+namespace Inventory.Configuration.Api.Application.Plugins.Dtos
 {
     public class PluginDto : ConfigurationEntityDto
     {
@@ -27,7 +27,8 @@ namespace Inventory.Configuration.Api.Application.Plugin
         public string Version { get; set; }
 
         [GraphQLType(typeof(AnyType))]
-        public IReadOnlyDictionary<string, object> Capacities { 
+        public IReadOnlyDictionary<string, object> Capacities
+        {
             get { return _capacities; }
         }
 

@@ -25,15 +25,15 @@ using System.Threading.Tasks;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Resources;
 using System.Diagnostics;
-using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Common.Application.Plugins;
-using Inventory.Configuration.Api.Application.Locations;
 using Inventory.Configuration.Api.Application.Credentials;
 using Inventory.Common.Infrastructure.Http;
 using Inventory.Common.Domain.Interfaces;
 using Inventory.Common.Infrastructure.Database;
-using Inventory.Configuration.Api.Application.Datacenters;
 using Inventory.Plugins.Interfaces;
+using Inventory.Configuration.Api.Application.Datacenters.Services;
+using Inventory.Configuration.Api.Application.Locations.Services;
+using Inventory.Configuration.Api.Application.Plugins.Services;
 
 namespace Inventory.Configuration.Api
 {

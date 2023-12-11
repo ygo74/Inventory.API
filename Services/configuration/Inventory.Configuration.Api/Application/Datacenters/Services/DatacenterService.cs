@@ -7,9 +7,9 @@ using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Inventory.Configuration.Api.Application.Datacenters
+namespace Inventory.Configuration.Api.Application.Datacenters.Services
 {
-    public class DatacenterService
+    public class DatacenterService : IDatacenterService
     {
         private readonly IDbContextFactory<ConfigurationDbContext> _factory;
         private readonly ILogger<DatacenterService> _logger;
@@ -35,7 +35,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
             // check if datacenter exists in the database
             await using ConfigurationDbContext dbContext = _factory.CreateDbContext();
-            return (await dbContext.Datacenters.FindAsync(new object[] { id }, cancellationToken) != null);
+            return await dbContext.Datacenters.FindAsync(new object[] { id }, cancellationToken) != null;
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
             // Check if datacenter exists in the database
             await using ConfigurationDbContext dbContext = _factory.CreateDbContext();
-            return (await dbContext.Datacenters.AnyAsync(filter.Predicate, cancellationToken));
+            return await dbContext.Datacenters.AnyAsync(filter.Predicate, cancellationToken);
         }
 
 
