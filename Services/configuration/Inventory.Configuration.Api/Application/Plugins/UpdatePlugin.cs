@@ -3,10 +3,15 @@ using AutoMapper;
 using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
+using Inventory.Common.Application.Errors;
 using Inventory.Common.Application.Validators;
+using Inventory.Common.Domain.Repository;
+using Inventory.Configuration.Api.Application.Datacenters.Dtos;
 using Inventory.Configuration.Api.Application.Plugins.Dtos;
 using Inventory.Configuration.Api.Application.Plugins.Services;
+using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
+using Inventory.Networks.Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -44,44 +49,39 @@ namespace Inventory.Configuration.Api.Application.Plugins
         private readonly ILogger<UpdatePluginHanlder> _logger;
         private readonly IMapper _mapper;
         private readonly PluginService _pluginService;
-        private readonly IDbContextFactory<ConfigurationDbContext> _factory;
+        private readonly IAsyncRepository<Plugin> _repository;
 
-        public UpdatePluginHanlder(IDbContextFactory<ConfigurationDbContext> factory, 
+        public UpdatePluginHanlder(IAsyncRepository<Plugin> repository,
             ILogger<UpdatePluginHanlder> logger, IMapper mapper, PluginService pluginService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _pluginService = Guard.Against.Null(pluginService, nameof(pluginService));
-            _factory = Guard.Against.Null(factory, nameof(factory));
+            _repository = Guard.Against.Null(repository, nameof(repository));
         }
 
         public async Task<Payload<PluginDto>> Handle(UpdatePluginRequest request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Start Update plugin {0}", request.Id);
-            bool success = false;
-            try
+
+            // Find plugin by Id
+            var plugin = await _repository.GetByIdAsync(request.Id, cancellationToken);
+
+            if (request.Deprecated.HasValue) { plugin.SetDeprecatedValue(request.Deprecated.Value); }
+            if (!string.IsNullOrWhiteSpace(request.Path)) { plugin.SetPath(request.Path); }
+
+            var changes = await _repository.SaveChangesAsync(cancellationToken);
+
+            if (changes <= 0)
             {
-
-                await using var dbContext = _factory.CreateDbContext();
-
-                var plugin = await dbContext.Plugins.FindAsync(new object[] { request.Id },cancellationToken);
-
-                if (request.Deprecated.HasValue) { plugin.SetDeprecatedValue(request.Deprecated.Value); }
-                if (!string.IsNullOrWhiteSpace(request.Path)) { plugin.SetPath(request.Path); }
-
-                var changes = await dbContext.SaveChangesAsync(cancellationToken);
-
-                success = true;
-                return Payload<PluginDto>.Success(_pluginService.GetPluginDto(plugin));
-            }
-            finally
-            {
-                if (success)
-                    _logger.LogInformation("Successfully Updating plugin {0}", request.Id);
-                else
-                    _logger.LogError("Error when updating plugin {0}", request.Id);
+                var errorMessage = $"Error when updating plugin {request.Id}";
+                _logger.LogError(errorMessage);
+                return Payload<PluginDto>.Error(new GenericApiError(errorMessage));
 
             }
+
+            _logger.LogInformation("Successfully Updating plugin {0}", request.Id);
+            return Payload<PluginDto>.Success(_pluginService.GetPluginDto(plugin));
 
 
         }

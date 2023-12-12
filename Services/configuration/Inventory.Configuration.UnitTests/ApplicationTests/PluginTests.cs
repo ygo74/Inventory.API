@@ -83,5 +83,35 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
             Assert.AreEqual(request.Code, result.Data.Code);
         }
 
+        [TestCase(1, "Azure Inventory", "AZURE_INVENTORY", "AZURE_INVENTORY", "Azure Inventory", 
+                  "C:\\Program Files\\Inventory\\Plugins\\AzureInventory.dll", false, "2021-01-01", "2021-12-31")]
+        public async Task Should_successfull_update_plugin(int id, string name, string code, string inventoryCode, string description,
+                                                           string path, bool? deprecated = null, DateTime? validFrom = null, DateTime? validTo = null)
+        {
+
+            // Arrange
+            var request = new UpdatePluginRequest
+            {
+                Id = id,
+                //Name = "Azure Inventory",
+                //Code = "AZURE_INVENTORY",
+                Path = path,
+                InventoryCode = inventoryCode,
+                Deprecated = deprecated,
+                ValidFrom = validFrom,
+                ValidTo = validTo                
+            };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(request.Id, result.Data.Id);
+            //Assert.AreEqual(request.Name, result.Data.Name);
+            //Assert.AreEqual(request.Code, result.Data.Code);
+            //Assert.AreEqual(request.Path, result.Data.Path);
+        }
+
     }
 }

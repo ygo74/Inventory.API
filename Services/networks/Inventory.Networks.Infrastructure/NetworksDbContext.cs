@@ -11,7 +11,7 @@ namespace Inventory.Networks.Infrastructure
         public NetworksDbContext(DbContextOptions<NetworksDbContext> options) : base(options) { }
 
         // Configuration tables
-        public DbSet<Plugin> Plugins { get; set; }
+        public DbSet<NetworkPlugin> Plugins { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
