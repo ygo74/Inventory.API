@@ -112,11 +112,6 @@ namespace Inventory.Configuration.Api.Application.Datacenters
             var changes = await _dcRepository.SaveChangesAsync(cancellationToken);
             if (changes > 0)
                 _logger.LogInformation("Updated datacenter '{0}'", request.Id);
-            else
-            {
-                var errorMessage = $"Error when Updating datacenter '{datacenter.Id}' with code '{datacenter.Code}'";
-                return Payload<DatacenterDto>.Error(new GenericApiError(errorMessage));
-            }
 
             return Payload<DatacenterDto>.Success(_mapper.Map<DatacenterDto>(datacenter));
         }

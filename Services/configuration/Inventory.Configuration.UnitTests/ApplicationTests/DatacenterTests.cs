@@ -94,8 +94,9 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
         public async Task Should_successfull_update_datacenter_description(string updateDescriptionValue, string expectedDescriptionValue)
         {
             // Arrange
-            var repository = UnitTestsContext.Current.GetService<IGenericQueryStore<Datacenter>>();
-            var existingDatacenter = await repository.GetByIdAsync<DatacenterDto>(1);
+            var queryStore = UnitTestsContext.Current.GetService<IGenericQueryStore<Datacenter>>();
+
+            var existingDatacenter = await queryStore.GetByIdAsync<DatacenterDto>(1);
             var updateRequest = new UpdateDatacenterRequest()
             {
                 Id = 1,
