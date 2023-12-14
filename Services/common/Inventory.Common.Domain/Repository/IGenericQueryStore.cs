@@ -54,6 +54,8 @@ namespace Inventory.Common.Domain.Repository
                                params Expression<Func<T, object>>[] includes);
 
 
+        Task<int> CountAsync(IExpressionFilter<T> criteria = null, CancellationToken cancellationToken = default);
+        Task<bool> AnyAsync(IExpressionFilter<T> criteria = null, CancellationToken cancellationToken = default);
     }
 
 }

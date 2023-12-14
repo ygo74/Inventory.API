@@ -144,7 +144,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
             // Add entity
             var result =  await _dcRepository.AddAsync(newEntity, cancellationToken);
-            if (result.nbchanges == 0)
+            if (result == 0)
             {
                 var errorMessage = $"Error when adding datacenter '{request.Name}' with code '{request.Code}'";
                 return Payload<DatacenterDto>.Error(new GenericApiError(errorMessage));

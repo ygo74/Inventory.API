@@ -94,7 +94,7 @@ namespace Inventory.Configuration.Api.Application.Plugins
 
             // Add entity
             var result = await _repository.AddAsync(newEntity, cancellationToken);
-            if (result.nbchanges == 0)
+            if (result == 0)
             {
                 var errorMessage = $"Error when adding Plugin '{request.Name}' with code '{request.Code}'";
                 return Payload<PluginDto>.Error(new GenericApiError(errorMessage));

@@ -290,5 +290,31 @@ namespace Inventory.Common.Infrastructure.Database
 
             return query;
         }
+
+        public async Task<int> CountAsync(IExpressionFilter<T> criteria = null, CancellationToken cancellationToken = default)
+        {
+            var query = _dbContext.Set<T>()
+                                  .AsNoTracking();
+
+            if (criteria is not null && criteria.Predicate is not null)
+            {
+                query = query.Where(criteria.Predicate);
+            }
+
+            return await query.CountAsync(cancellationToken);
+        }
+
+        public async Task<bool> AnyAsync(IExpressionFilter<T> criteria = null, CancellationToken cancellationToken = default)
+        {
+            var query = _dbContext.Set<T>()
+                                  .AsNoTracking();
+
+            if (criteria is not null && criteria.Predicate is not null)
+            {
+                query = query.Where(criteria.Predicate);
+            }
+
+            return await query.AnyAsync(cancellationToken);
+        }
     }
 }

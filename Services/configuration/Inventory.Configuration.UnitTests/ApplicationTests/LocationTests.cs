@@ -9,6 +9,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Inventory.Configuration.Domain.Filters;
+using Inventory.Common.Domain.Repository;
+using Inventory.Configuration.UnitTests.SeedWork;
 
 namespace Inventory.Configuration.UnitTests.ApplicationTests
 {
@@ -61,11 +63,33 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
 
             // Assert
             Assert.IsNotNull(result);
+            Assert.IsEmpty(result.Errors);
             Assert.IsTrue(result.Data.Id > 0);
         }
 
 
+        [Test]
+        public async Task Should_successfull_delete_location()
+        {
 
+            // Arrange
+            var queryStore = UnitTestsContext.Current.GetService<IGenericQueryStore<Location>>();
+            var existingLocation = await queryStore.FirstOrDefaultAsync(criteria: ExpressionFilterFactory.Create<Location>()
+                                                                                                         .WithName(LocationSeed.Name_To_Be_Deleted));
+            
+            var request = new DeleteLocationRequest()
+            {
+                Id = existingLocation.Id
+            };
+            
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result.Errors);
+            Assert.IsNull(result.Data);
+        }
 
     }
 }

@@ -68,7 +68,7 @@ namespace Inventory.Configuration.UnitTests
             services.AddScoped<PluginService>();
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<CredentialService>();
-            services.AddScoped<DatacenterService>();
+            services.AddScoped<IDatacenterService, DatacenterService>();
 
 
             // Unit tests specific configuration

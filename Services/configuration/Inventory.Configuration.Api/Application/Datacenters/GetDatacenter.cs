@@ -58,7 +58,6 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
         private readonly ILogger<DatacenterQueriesHandler> _logger;
         private readonly IMapper _mapper;
-        private readonly IDbContextFactory<ConfigurationDbContext> _factory;
         private readonly IPaginationService _paginationService;
         private readonly IGenericQueryStore<Datacenter> _queryStore;
 
@@ -69,7 +68,6 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
             _logger = Guard.Against.Null(logger, nameof(logger));
             _mapper = Guard.Against.Null(mapper, nameof(mapper));
-            _factory = Guard.Against.Null(factory, nameof(factory));
             _paginationService = Guard.Against.Null(paginationService, nameof(paginationService));
             _queryStore = Guard.Against.Null(queryStore, nameof(queryStore));
 
