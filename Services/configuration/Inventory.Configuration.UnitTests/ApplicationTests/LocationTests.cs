@@ -91,5 +91,68 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
             Assert.IsNull(result.Data);
         }
 
+        [Test]
+        public async Task Should_successfull_get_location_by_id()
+        {
+
+            var request = new GetLocationByIdRequest()
+            {
+                Id = 1
+            };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result.Errors);
+            Assert.IsNotNull(result.Data);
+            Assert.AreEqual(request.Id, result.Data.Id);
+        }
+
+        [Test]
+        public async Task Should_successfull_get_location_by_filter()
+        {
+
+            var request = new GetLocationRequest()
+            {
+                CityCode = LocationSeed.CityCode_London,
+                CountryCode = LocationSeed.CountryCode_UK,
+                RegionCode = LocationSeed.RegionCode_EMEA
+            };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result.Errors);
+            Assert.IsNotNull(result.Data);
+            Assert.IsTrue(result.Data.Count > 0);
+            StringAssert.AreEqualIgnoringCase(LocationSeed.CityCode_London, result.Data[0].CityCode);
+            StringAssert.AreEqualIgnoringCase(LocationSeed.CountryCode_UK, result.Data[0].CountryCode);
+            StringAssert.AreEqualIgnoringCase(LocationSeed.RegionCode_EMEA, result.Data[0].RegionCode);
+        }
+
+        [Test]
+        public async Task Should_successfull_get_location_by_name()
+        {
+
+            var request = new GetLocationByNameRequest()
+            {
+                Name = LocationSeed.Name_London
+            };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result.Errors);
+            Assert.IsNotNull(result.Data);
+            Assert.AreEqual(LocationSeed.Name_London, result.Data.Name);
+        }
+        
+
     }
 }
