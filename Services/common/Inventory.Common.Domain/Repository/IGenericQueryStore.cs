@@ -21,6 +21,7 @@ namespace Inventory.Common.Domain.Repository
                                                 params Expression<Func<T, object>>[] includes);
 
         Task<TDtoEntity> FirstOrDefaultAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
+                                                         Expression<Func<T, TDtoEntity>> Projection = null,
                                                         CancellationToken cancellationToken = default,
                                                         params Expression<Func<T, object>>[] includes) where TDtoEntity : class;
 

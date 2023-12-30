@@ -19,6 +19,32 @@ namespace Inventory.Configuration.Api.Application.Datacenters.Dtos
         public string LocationCountryCode { get; set; }
         public string LocationCityCode { get; set; }
         public string LocationRegionCode { get; set; }
+
+        public static Expression<Func<Datacenter, DatacenterDto>> Projection
+        {
+            get
+            {
+                return d => new DatacenterDto
+                {
+                    Id = d.Id,
+                    Code = d.Code,
+                    Name = d.Name,
+                    Description = d.Description,
+                    DatacenterType = d.DataCenterType.ToString(),
+                    LocationName = d.Location.Name,
+                    LocationCountryCode = d.Location.CountryCode,
+                    LocationCityCode = d.Location.CityCode,
+                    LocationRegionCode = d.Location.RegionCode,
+                    CreatedBy = d.CreatedBy,
+                    Created = d.Created,
+                    LastModifiedBy = d.LastModifiedBy,
+                    LastModified = d.LastModified,
+                    Deprecated = d.Deprecated,
+                    StartDate = d.StartDate,
+                    EndDate = d.EndDate
+                };
+            }
+        }
     }
 
     public enum DatacenterTypeDto

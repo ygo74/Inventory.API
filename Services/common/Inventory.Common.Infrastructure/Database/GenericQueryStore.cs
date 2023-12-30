@@ -109,6 +109,7 @@ namespace Inventory.Common.Infrastructure.Database
         }
 
         public async Task<TDtoEntity> FirstOrDefaultAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
+                                                                      Expression<Func<T, TDtoEntity>> Projection = null,
                                                                       CancellationToken cancellationToken = default,
                                                                       params Expression<Func<T, object>>[] includes) where TDtoEntity : class
         {
@@ -123,6 +124,11 @@ namespace Inventory.Common.Infrastructure.Database
             if (includes != null)
             {
                 query = includes.Aggregate(query, (current, include) => current.Include(include));
+            }
+
+            if (Projection != null)
+            {
+                return await query.Select<T, TDtoEntity>(Projection).FirstOrDefaultAsync(cancellationToken);
             }
 
             return await query.ProjectTo<TDtoEntity>(_mapper.ConfigurationProvider)

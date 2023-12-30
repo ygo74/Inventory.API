@@ -32,14 +32,14 @@ namespace Inventory.Configuration.Api.Application.Locations
 
     public class GetLocationByIdRequest : QueryEntityByIdRequest<LocationDto> { }
 
-    public class GetLocationByNameRequest : IRequest<Payload<LocationDto>> 
+    public class GetLocationByNameRequest : IRequest<Payload<LocationWithDatacentersDto>> 
     { 
         public string Name { get; set; }
     }
 
     public class LocationQueriesHandler : IRequestHandler<GetLocationRequest, CursorPaginationdPayload<LocationDto>>,
                                           IRequestHandler<GetLocationByIdRequest, Payload<LocationDto>>,
-                                          IRequestHandler<GetLocationByNameRequest, Payload<LocationDto>>
+                                          IRequestHandler<GetLocationByNameRequest, Payload<LocationWithDatacentersDto>>
     {
 
         private readonly ILogger<LocationQueriesHandler> _logger;
@@ -85,19 +85,19 @@ namespace Inventory.Configuration.Api.Application.Locations
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         /// <exception cref="System.NotImplementedException"></exception>
-        public async Task<Payload<LocationDto>> Handle(GetLocationByNameRequest request, CancellationToken cancellationToken)
+        public async Task<Payload<LocationWithDatacentersDto>> Handle(GetLocationByNameRequest request, CancellationToken cancellationToken)
         {
             // Create filter
             var filter = ExpressionFilterFactory.Create<Location>()
                                                 .WithName(request.Name);   
 
             // Retrieve entity
-            var location = await _queryStore.FirstOrDefaultAsync<LocationDto>(filter);
+            var location = await _queryStore.FirstOrDefaultAsync<LocationWithDatacentersDto>(filter, LocationWithDatacentersDto.Projection);
 
             if (null == location)
-                return Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Name {request.Name}"));
+                return Payload<LocationWithDatacentersDto>.Error(new NotFoundError($"Don't find Location with Name {request.Name}"));
 
-            return Payload<LocationDto>.Success(location);
+            return Payload<LocationWithDatacentersDto>.Success(location);
 
         }
 

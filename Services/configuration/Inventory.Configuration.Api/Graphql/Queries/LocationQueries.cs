@@ -94,7 +94,7 @@ namespace Inventory.Configuration.Api.Graphql.Queries
         /// <param name="ctx"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public async Task<Payload<LocationDto>> GetLocationByName([Service] IMediator mediator,
+        public async Task<Payload<LocationWithDatacentersDto>> GetLocationByName([Service] IMediator mediator,
             CancellationToken cancellationToken, IResolverContext ctx,
             string name)
         {

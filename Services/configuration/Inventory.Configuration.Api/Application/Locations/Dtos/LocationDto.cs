@@ -1,4 +1,10 @@
 ﻿using Inventory.Common.Application.Dto;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System;
+using Inventory.Configuration.Domain.Models;
+using Inventory.Configuration.Api.Application.Datacenters.Dtos;
+using System.Linq;
 
 namespace Inventory.Configuration.Api.Application.Locations.Dtos
 {
@@ -11,7 +17,80 @@ namespace Inventory.Configuration.Api.Application.Locations.Dtos
         public string CityCode { get; set; }
         public string RegionCode { get; set; }
 
+        public static Expression<Func<Location, LocationDto>> Projection
+        {
+            get
+            {
+                return e => new LocationDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Description = e.Description,
+                    CountryCode = e.CountryCode,
+                    CityCode = e.CityCode,
+                    RegionCode = e.RegionCode,
+                    CreatedBy = e.CreatedBy,
+                    Created = e.Created,
+                    LastModifiedBy = e.LastModifiedBy,
+                    LastModified = e.LastModified,
+                    Deprecated = e.Deprecated,
+                    StartDate = e.StartDate,
+                    EndDate = e.EndDate                    
+                };
+            }
+        }
+
     }
 
+    public class LocationDatacenterDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string DatacenterType { get; set; }
 
+        public static Expression<Func<Datacenter, LocationDatacenterDto>> Projection
+        {
+            get
+            {
+                return e => new LocationDatacenterDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    DatacenterType = e.DataCenterType.ToString()
+                };
+            }
+        }
+    }
+
+    
+
+
+    public class LocationWithDatacentersDto : LocationDto
+    {
+        public IEnumerable<LocationDatacenterDto> Datacenters { get; set; }
+
+        public new static Expression<Func<Location, LocationWithDatacentersDto>> Projection
+        {
+            get
+            {
+                return e => new LocationWithDatacentersDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Description = e.Description,
+                    CountryCode = e.CountryCode,
+                    CityCode = e.CityCode,
+                    RegionCode = e.RegionCode,
+                    CreatedBy = e.CreatedBy,
+                    Created = e.Created,
+                    LastModifiedBy = e.LastModifiedBy,
+                    LastModified = e.LastModified,
+                    Deprecated = e.Deprecated,
+                    StartDate = e.StartDate,
+                    EndDate = e.EndDate,
+                    Datacenters = e.Datacenters.AsQueryable().Select(LocationDatacenterDto.Projection).ToList()
+                };
+            }
+        }
+    }
 }

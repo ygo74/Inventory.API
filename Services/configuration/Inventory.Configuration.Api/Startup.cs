@@ -96,7 +96,7 @@ namespace Inventory.Configuration.Api
             //});
             services.AddScoped<PluginService>();
             services.AddScoped<ILocationService, LocationService>();
-            services.AddScoped<DatacenterService>();
+            services.AddScoped<IDatacenterService, DatacenterService>();
             services.AddScoped<CredentialService>();
 
             // Http hosting
