@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 
-namespace Inventory.Configuration.Api.Application.Credentials
+namespace Inventory.Configuration.Api.Application.Credentials.Dtos
 {
     public class CredentialDto : AuditEntityDto
     {

@@ -26,7 +26,6 @@ using OpenTelemetry.Trace;
 using OpenTelemetry.Resources;
 using System.Diagnostics;
 using Inventory.Common.Application.Plugins;
-using Inventory.Configuration.Api.Application.Credentials;
 using Inventory.Common.Infrastructure.Http;
 using Inventory.Common.Domain.Interfaces;
 using Inventory.Common.Infrastructure.Database;
@@ -34,6 +33,7 @@ using Inventory.Plugins.Interfaces;
 using Inventory.Configuration.Api.Application.Datacenters.Services;
 using Inventory.Configuration.Api.Application.Locations.Services;
 using Inventory.Configuration.Api.Application.Plugins.Services;
+using Inventory.Configuration.Api.Application.Credentials.Services;
 
 namespace Inventory.Configuration.Api
 {
@@ -97,7 +97,7 @@ namespace Inventory.Configuration.Api
             services.AddScoped<PluginService>();
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<IDatacenterService, DatacenterService>();
-            services.AddScoped<CredentialService>();
+            services.AddScoped<ICredentialService, CredentialService>();
 
             // Http hosting
             services.UseHttpHostingConfigurationServices(Configuration);

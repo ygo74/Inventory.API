@@ -3,6 +3,9 @@ using AutoMapper;
 using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Errors;
+using Inventory.Configuration.Api.Application.Credentials.Dtos;
+using Inventory.Configuration.Api.Application.Credentials.Services;
+using Inventory.Configuration.Api.Application.Credentials.Validators;
 using Inventory.Configuration.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +19,7 @@ namespace Inventory.Configuration.Api.Application.Credentials
     /// <summary>
     /// Update credential request
     /// </summary>
-    public class UpdateCredentialRequest : IRequest<Payload<CredentialDto>>
+    public class UpdateCredentialRequest : IRequest<Payload<CredentialDto>>, ICredentialId
     {
         public int Id { get; set; }
         public string Username { get; set; }
@@ -28,14 +31,9 @@ namespace Inventory.Configuration.Api.Application.Credentials
     /// </summary>
     public class UpdateCredentialRequestValidator : AbstractValidator<UpdateCredentialRequest>
     {
-        public UpdateCredentialRequestValidator(CredentialService service)
+        public UpdateCredentialRequestValidator(ICredentialService service)
         {
-            RuleFor(e => e.Id).Cascade(CascadeMode.Stop)
-                .NotNull()
-                .NotEmpty()
-                .GreaterThan(0)
-                .WithMessage("{PropertyName} is mandatory")
-                .MustAsync(service.CredentialExists).WithMessage("Credential with {PropertyName} {PropertyValue} doesn't exists in the database");
+            Include(new CredentialExistByIdValidator(service));
         }
     }
 

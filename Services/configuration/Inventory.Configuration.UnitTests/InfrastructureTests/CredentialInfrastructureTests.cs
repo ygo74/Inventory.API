@@ -19,11 +19,11 @@ namespace Inventory.Configuration.UnitTests.InfrastructureTests
             var repo = UnitTestsContext.Current.GetAsyncRepository<Credential>();
 
             // Act
-            var credentials = await repo.ListAsync();
+            var credentials = await repo.ListAllAsync();
 
             // Assert
             Assert.IsNotNull(credentials);
-            Assert.IsTrue(credentials.Count > 0);
+            Assert.IsNotEmpty(credentials);
 
         }
 

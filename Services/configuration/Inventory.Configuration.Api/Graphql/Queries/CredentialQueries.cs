@@ -9,6 +9,7 @@ using Inventory.Configuration.Api.Application.Credentials;
 using HotChocolate.Types.Pagination;
 using Inventory.Common.Application.Graphql.Extensions;
 using System.Linq;
+using Inventory.Configuration.Api.Application.Credentials.Dtos;
 
 namespace Inventory.Configuration.Api.Graphql.Queries
 {

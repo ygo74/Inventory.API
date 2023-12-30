@@ -9,13 +9,14 @@ using Microsoft.EntityFrameworkCore;
 using Inventory.Common.Infrastructure.Events;
 using Inventory.Common.UnitTests.Events;
 using Inventory.Common.Application.Plugins;
-using Inventory.Configuration.Api.Application.Credentials;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Inventory.Common.Domain.Interfaces;
 using Inventory.Configuration.Api.Application.Datacenters.Services;
 using Inventory.Configuration.Api.Application.Plugins.Services;
 using Inventory.Configuration.Api.Application.Locations.Services;
+using Inventory.Configuration.Api.Application.Credentials.Services;
+using Inventory.Common.Domain.Models;
 
 namespace Inventory.Configuration.UnitTests
 {
@@ -67,7 +68,7 @@ namespace Inventory.Configuration.UnitTests
             services.AddSingleton<PluginResolver>();
             services.AddScoped<PluginService>();
             services.AddScoped<ILocationService, LocationService>();
-            services.AddScoped<CredentialService>();
+            services.AddScoped<ICredentialService, CredentialService>();
             services.AddScoped<IDatacenterService, DatacenterService>();
 
 
@@ -86,7 +87,7 @@ namespace Inventory.Configuration.UnitTests
 
         public IMediator GetMediator() => GetService<IMediator>();
         public ConfigurationDbContext DbContext => GetService<ConfigurationDbContext>();
-        public IAsyncRepositoryWithSpecification<T> GetAsyncRepository<T>() where T : class => GetService<IAsyncRepositoryWithSpecification<T>>();
+        public IAsyncRepository<T> GetAsyncRepository<T>() where T : Entity => GetService<IAsyncRepository<T>>();
 
     }
 }

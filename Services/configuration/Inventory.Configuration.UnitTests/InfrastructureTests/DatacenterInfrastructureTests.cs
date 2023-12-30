@@ -19,10 +19,11 @@ namespace Inventory.Configuration.UnitTests.InfrastructureTests
             var repo = UnitTestsContext.Current.GetAsyncRepository<Datacenter>();
 
             // Act
-            var datacenters = await repo.ListAsync();
+            var datacenters = await repo.ListAllAsync();
 
             // Assert
             Assert.IsNotNull(datacenters);
+            Assert.IsNotEmpty(datacenters);
 
         }
 
