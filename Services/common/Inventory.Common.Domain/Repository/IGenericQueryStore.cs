@@ -13,8 +13,10 @@ namespace Inventory.Common.Domain.Repository
 {
     public interface IGenericQueryStore<T> where T : Entity
     {
-        Task<TDtoEntity> GetByIdAsync<TDtoEntity>(int id) where TDtoEntity : class;
-        Task<T> GetByIdAsync(int id);
+        Task<TDtoEntity> GetByIdAsync<TDtoEntity>(int id,
+                                                  Expression<Func<T, TDtoEntity>> Projection = null,
+                                                  CancellationToken cancellationToken = default) where TDtoEntity : class;
+        Task<T> GetByIdAsync(int id, CancellationToken cancellationToken = default);
 
         Task<T> FirstOrDefaultAsync(IExpressionFilter<T> criteria = null,
                                                 CancellationToken cancellationToken = default,
@@ -26,6 +28,8 @@ namespace Inventory.Common.Domain.Repository
                                                         params Expression<Func<T, object>>[] includes) where TDtoEntity : class;
 
         Task<IEnumerable<TDtoEntity>> ListAllAsync<TDtoEntity>(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                                               Expression<Func<T, TDtoEntity>> Projection = null,
+                                                               Expression<Func<T, IEnumerable<TDtoEntity>>> ManyProjection = null,
                                                                int? offset = null, int? limit = null,
                                                                CancellationToken cancellationToken = default,
                                                                params Expression<Func<T, object>>[] includes) where TDtoEntity : class;
@@ -36,7 +40,8 @@ namespace Inventory.Common.Domain.Repository
                                           params Expression<Func<T, object>>[] includes);
 
         Task<IEnumerable<TDtoEntity>> GetByCriteriaAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
-                                                                     Expression<Func<T, IEnumerable<TDtoEntity>>> ChildProjection = null,
+                                                                     Expression<Func<T, TDtoEntity>> Projection = null,
+                                                                     Expression<Func<T, IEnumerable<TDtoEntity>>> ManyProjection = null,
                                                                      Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
                                                                      int? offset = null, int? limit = null,
                                                                      CancellationToken cancellationToken = default,

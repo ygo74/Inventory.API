@@ -50,7 +50,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
             // Execute the query
             var result = await _queryStore.GetByCriteriaAsync<DatacenterPluginsDto>(criteria: filter,
-                                                                              ChildProjection: DatacenterPluginsDto.Projection,   
+                                                                              ManyProjection: DatacenterPluginsDto.Projection,   
                                                                               orderBy: q => q.OrderBy(e => e.Id),
                                                                               cancellationToken: cancellationToken);
             using var dbContext = _dbContextFactory.CreateDbContext();

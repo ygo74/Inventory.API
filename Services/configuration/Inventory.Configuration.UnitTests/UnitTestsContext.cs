@@ -88,6 +88,8 @@ namespace Inventory.Configuration.UnitTests
         public IMediator GetMediator() => GetService<IMediator>();
         public ConfigurationDbContext DbContext => GetService<ConfigurationDbContext>();
         public IAsyncRepository<T> GetAsyncRepository<T>() where T : Entity => GetService<IAsyncRepository<T>>();
+        public IGenericQueryStore<T> GetGenericStore<T>() where T : Entity => GetService<IGenericQueryStore<T>>();
+
 
     }
 }

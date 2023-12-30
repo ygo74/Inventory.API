@@ -69,21 +69,32 @@ namespace Inventory.Common.Infrastructure.Database
         #endregion
 
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Set<T>()
                                     .AsNoTracking()
                                     .Where(x => x.Id == id)
-                                    .FirstOrDefaultAsync();
+                                    .FirstOrDefaultAsync(cancellationToken);
         }
 
-        public Task<TDtoEntity> GetByIdAsync<TDtoEntity>(int id) where TDtoEntity : class
+        public Task<TDtoEntity> GetByIdAsync<TDtoEntity>(int id, 
+                                                        Expression<Func<T, TDtoEntity>> Projection = null,
+                                                        CancellationToken cancellationToken = default) where TDtoEntity : class
         {
-            return _dbContext.Set<T>()
-                              .AsNoTracking()
-                              .Where(x => x.Id == id)
-                              .ProjectTo<TDtoEntity>(_mapper.ConfigurationProvider)
-                              .FirstOrDefaultAsync();
+
+            var query = _dbContext.Set<T>()
+                               .AsNoTracking()
+                               .Where(x => x.Id == id);
+
+            if (Projection != null)
+            {
+                // return custom projection
+                return query.Select<T, TDtoEntity>(Projection).FirstOrDefaultAsync(cancellationToken);
+            }
+
+            // return default mapping from AutoMapper
+            return query.ProjectTo<TDtoEntity>(_mapper.ConfigurationProvider)
+                        .FirstOrDefaultAsync(cancellationToken);
         }
 
 
@@ -137,12 +148,16 @@ namespace Inventory.Common.Infrastructure.Database
 
 
         public Task<IEnumerable<TDtoEntity>> ListAllAsync<TDtoEntity>(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                                                      Expression<Func<T, TDtoEntity>> Projection = null,
+                                                                      Expression<Func<T, IEnumerable<TDtoEntity>>> ManyProjection = null,
                                                                       int? offset = null, int? limit = null,
                                                                       CancellationToken cancellationToken = default,
                                                                       params Expression<Func<T, object>>[] includes) where TDtoEntity : class
         {
             return GetByCriteriaAsync<TDtoEntity>(criteria: null,
                                                   orderBy: orderBy,
+                                                  Projection: Projection,
+                                                  ManyProjection: ManyProjection,
                                                   offset: offset,
                                                   limit: limit,
                                                   cancellationToken: cancellationToken,
@@ -163,7 +178,8 @@ namespace Inventory.Common.Infrastructure.Database
         }
 
         public async Task<IEnumerable<TDtoEntity>> GetByCriteriaAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
-                                                                                  Expression<Func<T, IEnumerable<TDtoEntity>>> ChildProjection = null,
+                                                                                  Expression<Func<T, TDtoEntity>> Projection = null,
+                                                                                  Expression<Func<T, IEnumerable<TDtoEntity>>> ManyProjection = null,
                                                                                   Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
                                                                                   int? offset = null, int? limit = null,
                                                                                   CancellationToken cancellationToken = default,
@@ -199,9 +215,13 @@ namespace Inventory.Common.Infrastructure.Database
             }
 
             // return the child projection if it is not null
-            if (ChildProjection != null)
+            if (Projection != null)
             {
-                return await query.SelectMany<T, TDtoEntity>(ChildProjection).ToListAsync();
+                return await query.Select<T, TDtoEntity>(Projection).ToListAsync();
+            }
+            else if (ManyProjection != null)
+            {
+                return await query.SelectMany<T, TDtoEntity>(ManyProjection).ToListAsync();
             }
 
             // return the default query projection
