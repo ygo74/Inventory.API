@@ -79,6 +79,7 @@ namespace Inventory.Configuration.Api.Configuration
                     .AddTypeExtension<DatacenterMutations>()
                     .AddTypeExtension<PluginMutations>()
                     .AddTypeExtension<LocationMutations>()
+                    .AddTypeExtension<CredentialMutations>()
                 .AddType<GenericApiError>()
                 .AddType<ValidationError>()
                 .AddType<UnAuthorisedError>()

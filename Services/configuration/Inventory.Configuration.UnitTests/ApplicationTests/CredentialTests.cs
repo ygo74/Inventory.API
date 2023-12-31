@@ -1,5 +1,6 @@
 ﻿using Inventory.Configuration.Api.Application.Credentials;
 using Inventory.Configuration.Api.Application.Credentials.Services;
+using Inventory.Configuration.Infrastructure;
 using MediatR;
 using Moq;
 using NUnit.Framework;
@@ -33,13 +34,13 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
         }
 
         [Test]
-        public void Name_ShouldBeMandatory()
+        public async Task Name_ShouldBeMandatory_when_create_credential()
         {
             // Arrange
             var request = new CreateCredentialRequest();
 
             // Act
-            var result = _validator.Validate(request);
+            var result = await _validator.ValidateAsync(request);
 
             // Assert
             Assert.IsFalse(result.IsValid);
@@ -47,7 +48,7 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
         }
 
         [Test]
-        public async Task Name_ShouldNotAlreadyExistInDatabase()
+        public async Task Name_ShouldNotAlreadyExistInDatabase_when_create_credential()
         {
             // Arrange
             var request = new CreateCredentialRequest { Name = "TestCredential" };
@@ -61,6 +62,38 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
             // Assert
             Assert.IsFalse(result.IsValid);
             Assert.IsTrue(result.Errors.Any(e => e.ErrorMessage == "Credential's name with value TestCredential already exists in the database"));
+        }
+
+        [Test]
+        public async Task Should_successfull_get_credential_by_id()
+        {
+            // Arrange
+            var dbContext = UnitTestsContext.Current.GetService<ConfigurationDbContext>();
+            var foundCredential = dbContext.Credentials.First();
+            var request = new GetCredentialByIdRequest { Id = foundCredential.Id };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(foundCredential.Id, result.Data.Id);
+        }
+
+        [Test]
+        public async Task Should_successfull_get_credential_by_name()
+        {
+            // Arrange
+            var dbContext = UnitTestsContext.Current.GetService<ConfigurationDbContext>();
+            var foundCredential = dbContext.Credentials.First();
+            var request = new GetCredentialByNameRequest { Name = foundCredential.Name };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(foundCredential.Id, result.Data.Id);
         }
 
 

@@ -10,7 +10,7 @@ namespace Inventory.Common.Application.Core
 
     public interface IPaginationRequest
     {
-        int? Size { get; set; }
+        int Size { get; set; } 
     }
 
 # nullable enable
@@ -18,7 +18,7 @@ namespace Inventory.Common.Application.Core
     {
         public string? After { get; set; }
         public string? Before { get; set; }
-        public int? Size { get; set; }
+        public int Size { get; set; } = 50;
         public bool FirstPage { get; set; }
         public bool LasttPage { get; set; }
     }
@@ -26,8 +26,8 @@ namespace Inventory.Common.Application.Core
 
     public class OffsetPaginationRequest : IPaginationRequest
     {
-        public int? Size { get; set; }
-        public int Page { get; set; } = 1;
+        public int Size { get; set; } = 50;
+        public int Skip { get; set; } = 0;
     }
 
 

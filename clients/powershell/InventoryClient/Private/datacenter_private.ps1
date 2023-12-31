@@ -2,13 +2,7 @@ $script:CreateDatacenterMutation=@"
 mutation createDatacenter(`$input: CreateDatacenterRequestInput!) {
     createDatacenter(input: `$input) {
     data { ... DatacenterDto }
-    errors {
-      __typename
-      ... error
-      ... genericError
-      ... validationError
-      ... genericError
-    }
+    errors { ... error }
   }
 }
 "@

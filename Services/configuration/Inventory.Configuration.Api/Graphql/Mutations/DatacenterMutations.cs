@@ -20,6 +20,7 @@ namespace Inventory.Configuration.Api.Graphql.Mutations
         /// </summary>
         /// <param name="input"></param>
         /// <param name="_mediator"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public async Task<Payload<DatacenterDto>> CreateDatacenter(
             CreateDatacenterRequest input,
@@ -30,6 +31,13 @@ namespace Inventory.Configuration.Api.Graphql.Mutations
             return await _mediator.Send(input, cancellationToken);
         }
 
+        /// <summary>
+        /// Update Datacenter
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="_mediator"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<Payload<DatacenterDto>> UpdateDatacenter(
             UpdateDatacenterRequest input,
             [Service] IMediator _mediator,

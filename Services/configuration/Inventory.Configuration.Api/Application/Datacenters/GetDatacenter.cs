@@ -81,13 +81,20 @@ namespace Inventory.Configuration.Api.Application.Datacenters
         /// <returns></returns>
         public async Task<Payload<DatacenterDto>> Handle(GetDatacenterByIdRequest request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Start Get Datacenter by Id {0}", request.Id);
 
             // Retrieve entity
-            var datacenter = await _queryStore.GetByIdAsync<DatacenterDto>(request.Id);
+            var datacenter = await _queryStore.GetByIdAsync<DatacenterDto>(request.Id, DatacenterDto.Projection);
 
             if (null == datacenter)
-                return Payload<DatacenterDto>.Error(new NotFoundError($"Don't find Datacenter with Id {request.Id}"));
+            {
+                var errorMessage = $"Don't find Datacenter with Id {request.Id}";
+                _logger.LogInformation(errorMessage);
+                return Payload<DatacenterDto>.Error(new NotFoundError(errorMessage));
+            }
 
+            // return datacenter
+            _logger.LogInformation("Successfully Get Datacenter by Id {0}", request.Id);
             return Payload<DatacenterDto>.Success(_mapper.Map<DatacenterDto>(datacenter));
         }
 
@@ -101,16 +108,24 @@ namespace Inventory.Configuration.Api.Application.Datacenters
         public async Task<Payload<DatacenterDto>> Handle(GetDatacenterByNameRequest request, CancellationToken cancellationToken)
         {
             
+            _logger.LogInformation("Start Get Datacenter by Name {0}", request.Name);
+
             // Create filter
             var filter = ExpressionFilterFactory.Create<Inventory.Configuration.Domain.Models.Datacenter>()
                                                 .WithName(request.Name);
 
             // Retrieve entity
-            var datacenter = await _queryStore.FirstOrDefaultAsync<DatacenterDto>(filter);
+            var datacenter = await _queryStore.FirstOrDefaultAsync<DatacenterDto>(filter, DatacenterDto.Projection);
 
             if (null == datacenter)
-                return Payload<DatacenterDto>.Error(new NotFoundError($"Don't find Datacenter with Name {request.Name}"));
+            {
+                var errorMessage = $"Don't find Datacenter with Name {request.Name}";
+                _logger.LogInformation(errorMessage);
+                return Payload<DatacenterDto>.Error(new NotFoundError(errorMessage));
+            }
 
+            //return datacenter
+            _logger.LogInformation("Successfully Get Datacenter by Name {0}", request.Name);
             return Payload<DatacenterDto>.Success(datacenter);
 
         }

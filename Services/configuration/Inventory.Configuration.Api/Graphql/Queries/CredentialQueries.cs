@@ -29,7 +29,7 @@ namespace Inventory.Configuration.Api.Graphql.Queries
             int id)
         {
 
-            var request = new GetCredentialById
+            var request = new GetCredentialByIdRequest
             {
                 Id = id
             };
@@ -51,7 +51,7 @@ namespace Inventory.Configuration.Api.Graphql.Queries
             string name)
         {
 
-            var request = new GetCredentialByName
+            var request = new GetCredentialByNameRequest
             {
                 Name = name
             };
@@ -67,23 +67,21 @@ namespace Inventory.Configuration.Api.Graphql.Queries
         /// <param name="cancellationToken"></param>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        [UsePaging(DefaultPageSize = 10)]
-        public async Task<Connection<CredentialDto>> GetCredentials([Service] IMediator mediator,
+        [UseOffsetPaging(DefaultPageSize = 2)]
+        public async Task<CollectionSegment<CredentialDto>> GetCredentials(
+            GetCredentialsRequest request,
+            [Service] IMediator mediator,
             CancellationToken cancellationToken, IResolverContext ctx)
         {
-            var request = new GetCredentialsRequest
-            {
-                Pagination = ctx.GetCursorPaggingRequest()
-            };
-
+            if (request == null) { request = new GetCredentialsRequest(); }
+            request.Pagination = ctx.GetOffsetPagingRequest();
+            
             var result = await mediator.Send(request, cancellationToken);
-            var edges = result.Data.Select(e => new Edge<CredentialDto>(e, e.Id.ToString())).ToList();
+            
+            var pageInfo = new CollectionSegmentInfo(result.Page < result.PageCount, result.Page > 1);
 
-            var pageInfo = new ConnectionPageInfo(result.HasNext, result.HasPrevious, result.StartCursor, result.EndCursor);
-
-            var connection = new Connection<CredentialDto>(edges, pageInfo, result.TotalCount);
-            return connection;
-
+            var collectionSegment = new CollectionSegment<CredentialDto>(result.Data, pageInfo, ct => ValueTask.FromResult(result.TotalCount));
+            return collectionSegment;
 
         }
     }
