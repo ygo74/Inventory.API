@@ -23,13 +23,7 @@ query getDatacenter(`$name: String)
 {
   datacenter:datacenterByName(name: `$name) {
     data { ... DatacenterDto }
-    errors {
-        __typename
-        ... error
-        ... genericError
-        ... validationError
-        ... genericError
-    }
+    errors { ... error }
   }
 }
 "@
@@ -39,13 +33,7 @@ query getDatacenter(`$code: String)
 {
   datacenter:datacenterByCode(code: `$code) {
     data { ... DatacenterDto }
-    errors {
-        __typename
-        ... error
-        ... genericError
-        ... validationError
-        ... genericError
-    }
+    errors { ... error }
   }
 }
 "@
@@ -56,13 +44,7 @@ query getDatacenter(`$id: Int!)
 {
   datacenter(id: `$id) {
     data { ... DatacenterDto }
-    errors {
-        __typename
-        ... error
-        ... genericError
-        ... validationError
-        ... genericError
-    }
+    errors { ... error }
   }
 }
 "@
