@@ -3,9 +3,11 @@ using AutoMapper;
 using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Errors;
+using Inventory.Common.Domain.Repository;
 using Inventory.Configuration.Api.Application.Credentials.Dtos;
 using Inventory.Configuration.Api.Application.Credentials.Services;
 using Inventory.Configuration.Api.Application.Credentials.Validators;
+using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -44,13 +46,14 @@ namespace Inventory.Configuration.Api.Application.Credentials
     {
         private readonly ILogger<UpdateCredentialHanlder> _logger;
         private readonly IMapper _mapper;
-        private readonly IDbContextFactory<ConfigurationDbContext> _factory;
+        private readonly IAsyncRepository<Credential> _repository;
 
-        public UpdateCredentialHanlder(ILogger<UpdateCredentialHanlder> logger, IMapper mapper, IDbContextFactory<ConfigurationDbContext> factory)
+
+        public UpdateCredentialHanlder(ILogger<UpdateCredentialHanlder> logger, IMapper mapper, IAsyncRepository<Credential> repository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _factory = Guard.Against.Null(factory, nameof(factory));
+            _repository = Guard.Against.Null(repository, nameof(repository));
 
         }
 
@@ -58,32 +61,20 @@ namespace Inventory.Configuration.Api.Application.Credentials
         {
             _logger.LogInformation($"Start updating Credential with id '{request.Id}'");
 
-            bool success = false;
-            try
-            {
-                // Find entity
-                await using var dbContext = _factory.CreateDbContext();
-                var entity = await dbContext.Credentials.FindAsync(new object[] { request.Id }, cancellationToken);
+            // Find entity
+            var entity = await _repository.GetByIdAsync(request.Id, cancellationToken);
+            if (null == entity)
+                return Payload<CredentialDto>.Error(new NotFoundError($"Don't find Credential with Id {request.Id}"));
 
-                if (null == entity)
-                    return Payload<CredentialDto>.Error(new NotFoundError($"Don't find Credential with Id {request.Id}"));
+            // Update entity
+            var nbChanges = await _repository.UpdateAsync(entity, cancellationToken);
+            if (nbChanges > 0)
+                _logger.LogInformation($"Successfully updated Credential with id '{request.Id}'");
 
-                // Updat entity
-                var nbChanges = await dbContext.SaveChangesAsync(cancellationToken);
+            // return response
+            var resultDto = _mapper.Map<CredentialDto>(entity);
+            return Payload<CredentialDto>.Success(_mapper.Map<CredentialDto>(entity));
 
-                // Map response
-                var resultDto = _mapper.Map<CredentialDto>(entity);
-
-                success = true;
-                return Payload<CredentialDto>.Success(resultDto);
-            }
-            finally
-            {
-                if (success)
-                    _logger.LogInformation($"Successfully updating Credential with id '{request.Id}'");
-                else
-                    _logger.LogInformation($"Error when updating Credential '{request.Id}'");
-            }
         }
     }
 

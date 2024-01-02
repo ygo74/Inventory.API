@@ -1,6 +1,8 @@
 ﻿using Inventory.Configuration.Api.Application.Credentials;
 using Inventory.Configuration.Api.Application.Credentials.Services;
+using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
+using Inventory.Configuration.UnitTests.SeedWork;
 using MediatR;
 using Moq;
 using NUnit.Framework;
@@ -101,18 +103,63 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
         public async Task Should_successfull_create_credential_with_valid_values(string name, string description)
         {
             // Arrange
-            var newEntity = new CreateCredentialRequest()
+            var request = new CreateCredentialRequest()
             {
                 Name = name,
                 Description = description
             };
 
             // Act
-            var result = await _mediator.Send(newEntity);
+            var result = await _mediator.Send(request);
 
             // Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result.Data.Id > 0);
         }
+
+        [Test]
+        public async Task Should_successfull_update_credential_with_valid_values()
+        {
+            // Arrane
+            var dbContext = UnitTestsContext.Current.DbContext;
+            var existingCredential = dbContext.Credentials.First();
+
+            var request = new UpdateCredentialRequest()
+            {
+                Id = existingCredential.Id,
+                Username = "newName",
+                Password = "xxx"
+            };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result.Errors);
+
+        }
+
+        [Test]
+        public async Task Should_successfull_delete_credential()
+        {
+            // Arrane
+            var dbContext = UnitTestsContext.Current.DbContext;
+            var existingCredential = dbContext.Credentials.Where(e => e.Name == CredentialSeed.TO_BE_DELETED).First();
+
+            var request = new RemoveCredentialRequest
+            {
+                Id = existingCredential.Id,
+            };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result.Errors);
+
+        }
+
     }
 }
