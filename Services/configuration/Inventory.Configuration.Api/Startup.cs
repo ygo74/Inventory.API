@@ -86,17 +86,28 @@ namespace Inventory.Configuration.Api
             services.AddPagination();
 
             // Application
-            //services.AddSingleton<PluginResolver>();
-            services.AddSingleton<PluginResolver>(sp =>
-            {
-                var logger = sp.GetService<ILogger<PluginResolver>>();
+            services.AddSingleton<PluginResolver>();
+            //services.AddSingleton<PluginResolver>(sp =>
+            //{
+            //    var logger = sp.GetService<ILogger<PluginResolver>>();
 
-                var pluginResolver = new PluginResolver(logger);
-                var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net6.0\Inventory.Plugins.Azure.dll");
+            //    var pluginResolver = new PluginResolver(logger);
+            //    var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net6.0\Inventory.Plugins.Azure.dll");
+            //    pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(Configuration, assembly);
 
-                pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(Configuration, assembly);              
-                return pluginResolver;
-            });
+            //    //// Get all active plugins
+            //    //var pluginService = sp.GetService<PluginService>();
+            //    //var plugins = pluginService.GetAllActivePlugins().GetAwaiter().GetResult()
+            //    //                           .Where(e => !string.IsNullOrWhiteSpace(e.Path));
+
+            //    //foreach (var plugin in plugins)
+            //    //{
+            //    //    //var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net6.0\Inventory.Plugins.Azure.dll");
+            //    //    var assembly = pluginResolver.LoadPlugin(plugin.Path);
+            //    //    pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(Configuration, assembly);
+            //    //}
+            //    return pluginResolver;
+            //});
             services.AddScoped<PluginService>();
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<IDatacenterService, DatacenterService>();
@@ -137,28 +148,31 @@ namespace Inventory.Configuration.Api
                 endpoints.MapGraphQLEndpoint();
             });
 
+            UsePluginConfigurationsFromDatabase(app);
         }
 
-        private Dictionary<string, object> GetPluginConfigurationsFromDatabase(IServiceProvider serviceScopeFactory)
+        private void UsePluginConfigurationsFromDatabase(IApplicationBuilder app)
         {
 
-            var pluginConfigurations = new Dictionary<string, object>();
-
-            using (var scope = serviceScopeFactory.CreateScope())
+            // Get all active plugins
+            using (var scope = app.ApplicationServices.CreateScope())
             {
-                // Résoudre le DbContext à partir de la portée actuelle
-                var dbContext = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+                var pluginResolver = scope.ServiceProvider.GetService<PluginResolver>();
+                var pluginService = scope.ServiceProvider.GetService<PluginService>();
 
-                // Utilisez dbContext pour interagir avec la base de données et récupérer les configurations des plugins
-                // Exemple simplifié pour illustration
-                // dbContext.Set<VotreEntityType>().ToList() ou d'autres opérations nécessaires
+                var plugins = pluginService.GetAllActivePlugins().GetAwaiter().GetResult()
+                                           .Where(e => !string.IsNullOrWhiteSpace(e.Path) && e.Path.ToLower() != "null");
 
-                // Exemple d'ajout de configurations fictives
-                pluginConfigurations.Add("PluginConfig1", "Configuration1");
-                pluginConfigurations.Add("PluginConfig2", "Configuration2");
+                foreach (var plugin in plugins)
+                {
+                    //var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net6.0\Inventory.Plugins.Azure.dll");
+                    var assembly = pluginResolver.LoadPlugin(plugin.Path);
+                    pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(Configuration, assembly);
+                }
+
             }
 
-            return pluginConfigurations;
+
         }
 
     }

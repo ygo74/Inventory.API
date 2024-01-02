@@ -1,7 +1,9 @@
 ﻿using Ardalis.GuardClauses;
 using AutoMapper;
 using Inventory.Common.Application.Plugins;
+using Inventory.Common.Domain.Filters;
 using Inventory.Configuration.Api.Application.Plugins.Dtos;
+using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
 using Inventory.Plugins.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +56,19 @@ namespace Inventory.Configuration.Api.Application.Plugins.Services
 
             return await dbContext.Plugins.AnyAsync(e => e.Id == id, cancellationToken);
         }
+
+        public async Task<List<Plugin>> GetAllActivePlugins(CancellationToken cancellationToken = default)
+        {
+            await using var dbContext = _factory.CreateDbContext();
+
+            // filter
+            var filter = ExpressionFilterFactory.Create<Plugin>()
+                                                .Valid();
+
+            return await dbContext.Plugins.Where(filter.Predicate).ToListAsync();
+
+        }
+
 
     }
 }
