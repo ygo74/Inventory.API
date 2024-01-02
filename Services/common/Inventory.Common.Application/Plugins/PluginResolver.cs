@@ -72,16 +72,21 @@ namespace Inventory.Common.Application.Plugins
             } 
         }
 
-        public T GetService<T>() where T : class
+        public T GetService<T>(string pluginKey) where T : class
         {
-            return this.ServiceProvider.GetService<T>();
+            return this.ServiceProvider.GetKeyedService<T>(pluginKey);
         }
 
         public Assembly LoadPlugin(string path)
         {
+            if (!System.IO.File.Exists(path))
+            {
+                _logger.LogWarning("Assembly with path {0} doesn't exist", path);
+                return null;
+            }
+
             //Log.Information("Load assembly from file {0}", path);
             PluginLoadContext loadContext = new PluginLoadContext(path);
-
             return loadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(path)));
         }
 
@@ -124,9 +129,9 @@ namespace Inventory.Common.Application.Plugins
             return commands;
         }
 
-        public void RegisterIntegrationsFromAssembly<T>(IConfiguration configuration, Assembly assembly)
+        public void RegisterIntegrationsFromAssembly<T>(string pluginKey, IConfiguration configuration, Assembly assembly)
         {
-            RegisterIntegrationsFromAssembly<T>(_serviceCollection, configuration, assembly);
+            RegisterIntegrationsFromAssembly<T>(pluginKey, _serviceCollection, configuration, assembly);
         }
 
         /// <summary>
@@ -137,33 +142,11 @@ namespace Inventory.Common.Application.Plugins
         /// <param name="services"></param>
         /// <param name="configuration"></param>
         /// <param name="assembly"></param>
-        private void RegisterIntegrationsFromAssembly<T>(IServiceCollection services, IConfiguration configuration, Assembly assembly)
+        private void RegisterIntegrationsFromAssembly<T>(string pluginKey, IServiceCollection services, IConfiguration configuration, Assembly assembly)
         {
-            // Search Startup class to configure services before added the Integration classes
-            var startupType = assembly.GetTypes()
-                .FirstOrDefault(t => t.Name == "Startup");
 
-            if (startupType != null)
-            {
-                var configureServicesMethod = startupType.GetMethod("ConfigureServices");
-
-                if (configureServicesMethod != null)
-                {
-                    // Créer une instance de la classe de configuration du plugin
-                    var instance = Activator.CreateInstance(startupType);
-
-                    // Appeler la méthode de configuration du service du plugin
-                    configureServicesMethod.Invoke(instance, new object[] { services });
-                }
-                else
-                {
-                    Console.WriteLine("Méthode de configuration des services introuvable dans le plugin.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Classe de configuration des services introuvable dans le plugin.");
-            }
+            // Configureservices from plugin's startup
+            UsePluginStartup(assembly, services);
 
             var pluginTypes = assembly.GetTypes().Where(e => typeof(T).IsAssignableFrom(e));
             foreach (var type in pluginTypes)
@@ -175,7 +158,9 @@ namespace Inventory.Common.Application.Plugins
                     // instance. If this would be a Controller or something else with clearly defined
                     // scope that is not the lifetime of the application, use AddScoped.
                     //services.AddSingleton(typeof(T), type);
-                    services.AddScoped(typeof(T), type);
+                    //services.AddScoped(typeof(T), type);
+                    services.AddKeyedScoped(typeof(T), pluginKey, type);
+
                 }
 
                 //if (typeof(IPluginFactory).IsAssignableFrom(type))
@@ -202,6 +187,40 @@ namespace Inventory.Common.Application.Plugins
                 //    services.AddSingleton(type, settings);
                 //}
             }
+        }
+
+        /// <summary>
+        /// Call the ConfigureServices method from startup class in the Plugin
+        /// </summary>
+        /// <param name="assembly"></param>
+        private void UsePluginStartup(Assembly assembly, IServiceCollection services) 
+        {
+            // Search Startup class to configure services before added the Integration classes
+            var startupType = assembly.GetTypes()
+                .FirstOrDefault(t => t.Name == "Startup");
+
+            if (startupType != null)
+            {
+                var configureServicesMethod = startupType.GetMethod("ConfigureServices");
+
+                if (configureServicesMethod != null)
+                {
+                    // Créer une instance de la classe de configuration du plugin
+                    var instance = Activator.CreateInstance(startupType);
+
+                    // Appeler la méthode de configuration du service du plugin
+                    configureServicesMethod.Invoke(instance, new object[] { services });
+                }
+                else
+                {
+                    _logger.LogInformation("No method 'ConfigureServices' in the startup class of plugin {0}", assembly.FullName);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("No startup class in the plugin {0}", assembly.FullName);
+            }
+
         }
 
     }

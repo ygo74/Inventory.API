@@ -100,6 +100,9 @@ namespace Inventory.Configuration.Api.Application.Plugins
                 return Payload<PluginDto>.Error(new GenericApiError(errorMessage));
             }
 
+            // Register the plugin for direct usage
+            _pluginService.RegisterPlugin(newEntity);
+
             // return result
             _logger.LogInformation("Successfully added plugin '{0}' with code '{1}'", request.Name, request.Code);
             return Payload<PluginDto>.Success(_pluginService.GetPluginDto(newEntity));

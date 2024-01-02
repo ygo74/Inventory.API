@@ -157,17 +157,13 @@ namespace Inventory.Configuration.Api
             // Get all active plugins
             using (var scope = app.ApplicationServices.CreateScope())
             {
-                var pluginResolver = scope.ServiceProvider.GetService<PluginResolver>();
                 var pluginService = scope.ServiceProvider.GetService<PluginService>();
 
-                var plugins = pluginService.GetAllActivePlugins().GetAwaiter().GetResult()
-                                           .Where(e => !string.IsNullOrWhiteSpace(e.Path) && e.Path.ToLower() != "null");
+                var plugins = pluginService.GetAllActivePlugins().GetAwaiter().GetResult();
 
                 foreach (var plugin in plugins)
                 {
-                    //var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net6.0\Inventory.Plugins.Azure.dll");
-                    var assembly = pluginResolver.LoadPlugin(plugin.Path);
-                    pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(Configuration, assembly);
+                    pluginService.RegisterPlugin(plugin);
                 }
 
             }
