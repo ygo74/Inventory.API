@@ -33,8 +33,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\plugins\Interfaces\Inventory.Plugins.Interfaces\Inventory.Plugins.Interfaces.csproj" />
     <ProjectReference Include="..\Inventory.Common.Infrastructure\Inventory.Common.Infrastructure.csproj" />
-    <ProjectReference Include="..\Inventory.Common.Plugins\Inventory.Common.Plugins.csproj" />
+    <!--<ProjectReference Include="..\Inventory.Common.Plugins\Inventory.Common.Plugins.csproj" />-->
   </ItemGroup>
 
 </Project>

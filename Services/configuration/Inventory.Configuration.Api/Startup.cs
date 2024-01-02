@@ -34,6 +34,8 @@ using Inventory.Configuration.Api.Application.Datacenters.Services;
 using Inventory.Configuration.Api.Application.Locations.Services;
 using Inventory.Configuration.Api.Application.Plugins.Services;
 using Inventory.Configuration.Api.Application.Credentials.Services;
+using Microsoft.EntityFrameworkCore;
+using HotChocolate.Utilities;
 
 namespace Inventory.Configuration.Api
 {
@@ -84,16 +86,17 @@ namespace Inventory.Configuration.Api
             services.AddPagination();
 
             // Application
-            services.AddSingleton<PluginResolver>();
-            //services.AddSingleton<PluginResolver>(sp =>
-            //{
-            //    var pluginResolver = new PluginResolver();
-            //    var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net6.0\Inventory.Plugins.Azure.dll");
+            //services.AddSingleton<PluginResolver>();
+            services.AddSingleton<PluginResolver>(sp =>
+            {
+                var logger = sp.GetService<ILogger<PluginResolver>>();
 
-            //    pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(services, Configuration, assembly);
+                var pluginResolver = new PluginResolver(logger);
+                var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net6.0\Inventory.Plugins.Azure.dll");
 
-            //    return pluginResolver;
-            //});
+                pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(Configuration, assembly);              
+                return pluginResolver;
+            });
             services.AddScoped<PluginService>();
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<IDatacenterService, DatacenterService>();
@@ -134,6 +137,28 @@ namespace Inventory.Configuration.Api
                 endpoints.MapGraphQLEndpoint();
             });
 
+        }
+
+        private Dictionary<string, object> GetPluginConfigurationsFromDatabase(IServiceProvider serviceScopeFactory)
+        {
+
+            var pluginConfigurations = new Dictionary<string, object>();
+
+            using (var scope = serviceScopeFactory.CreateScope())
+            {
+                // Résoudre le DbContext à partir de la portée actuelle
+                var dbContext = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+
+                // Utilisez dbContext pour interagir avec la base de données et récupérer les configurations des plugins
+                // Exemple simplifié pour illustration
+                // dbContext.Set<VotreEntityType>().ToList() ou d'autres opérations nécessaires
+
+                // Exemple d'ajout de configurations fictives
+                pluginConfigurations.Add("PluginConfig1", "Configuration1");
+                pluginConfigurations.Add("PluginConfig2", "Configuration2");
+            }
+
+            return pluginConfigurations;
         }
 
     }

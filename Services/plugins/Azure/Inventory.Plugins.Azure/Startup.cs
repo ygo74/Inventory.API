@@ -1,4 +1,4 @@
-﻿using Inventory.Common.Plugins;
+﻿//using Inventory.Common.Plugins;
 using Inventory.Plugins.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Inventory.Plugins.Azure
 {
-    public class PluginFactory : IPluginFactory
+    public class Startup
     {
-        public void Configure(IServiceCollection services)
+        public void ConfigureServices(ServiceCollection services)
         {
             services.UseInfrastructureAzureService();
         }

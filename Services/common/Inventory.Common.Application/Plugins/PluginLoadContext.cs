@@ -22,7 +22,15 @@ namespace Inventory.Common.Application.Plugins
             string assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
             if (assemblyPath != null)
             {
-                return LoadFromAssemblyPath(assemblyPath);
+                try
+                {
+                    return LoadFromAssemblyPath(assemblyPath);
+                }
+                catch(Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    return null;
+                }
             }
 
             return null;
@@ -38,5 +46,6 @@ namespace Inventory.Common.Application.Plugins
 
             return IntPtr.Zero;
         }
+
     }
 }
