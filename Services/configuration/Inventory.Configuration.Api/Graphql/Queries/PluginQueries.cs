@@ -17,12 +17,61 @@ using System.Threading;
 using System.Threading.Tasks;
 using Inventory.Configuration.Api.Application.Plugins.Dtos;
 using Inventory.Configuration.Api.Application.Plugins.Services;
+using Inventory.Common.Application.Core;
+using Inventory.Configuration.Api.Application.Datacenters.Dtos;
+using Inventory.Configuration.Api.Application.Datacenters;
 
 namespace Inventory.Configuration.Api.Graphql.Queries
 {
     [ExtendObjectType(OperationTypeNames.Query)]
     public class PluginQueries
     {
+
+        /// <summary>
+        /// Get Plugin by Id
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="ctx"></param>
+        /// <param name="id">Datacenter's id</param>
+        /// <returns></returns>
+        public async Task<Payload<PluginDto>> GetPlugin([Service] IMediator mediator,
+            CancellationToken cancellationToken, IResolverContext ctx,
+            int id)
+        {
+
+            var request = new GetPluginByIdRequest
+            {
+                Id = id
+            };
+
+            var result = await mediator.Send(request, cancellationToken);
+            return result;
+        }
+
+        /// <summary>
+        /// Get Plugin by Code
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="ctx"></param>
+        /// <param name="code">Datacenter's name</param>
+        /// <returns></returns>
+        public async Task<Payload<PluginDto>> GetPluginByCode([Service] IMediator mediator,
+            CancellationToken cancellationToken, IResolverContext ctx,
+            string code)
+        {
+
+            var request = new GetPluginByCodeRequest
+            {
+                Code = code
+            };
+
+            var result = await mediator.Send(request, cancellationToken);
+            return result;
+        }
+
+
         /// <summary>
         /// Full free search on plugins
         /// Use offsetpagination for direct database access as cursor based pagination is not really implemented
@@ -63,8 +112,8 @@ namespace Inventory.Configuration.Api.Graphql.Queries
 
         [UsePaging(DefaultPageSize = 10)]
         public async Task<Connection<PluginDto>> GetPlugins([Service] IMediator mediator,
-            CancellationToken cancellationToken, IResolverContext ctx, 
-            string? code, string? name, string? version, DateTime? validFrom, DateTime? validTo, bool? includeDeprecated=false, bool? includeAllEntitites = false)
+            CancellationToken cancellationToken, IResolverContext ctx,
+            string? code, string? name, string? version, DateTime? validFrom, DateTime? validTo, bool? includeDeprecated = false, bool? includeAllEntitites = false)
         {
 
             var request = new GetPluginRequest
@@ -75,14 +124,14 @@ namespace Inventory.Configuration.Api.Graphql.Queries
                 Code = code,
                 Name = name,
                 Version = version,
-                ValidFrom = validFrom, 
+                ValidFrom = validFrom,
                 ValidTo = validTo
             };
 
             var result = await mediator.Send(request, cancellationToken);
             var edges = result.Data.Select(e => new Edge<PluginDto>(e, e.Id.ToString())).ToList();
 
-            var pageInfo = new ConnectionPageInfo(result.HasNext, result.HasPrevious, result.StartCursor , result.EndCursor);
+            var pageInfo = new ConnectionPageInfo(result.HasNext, result.HasPrevious, result.StartCursor, result.EndCursor);
 
             var connection = new Connection<PluginDto>(edges, pageInfo, result.TotalCount);
             return connection;
@@ -111,12 +160,12 @@ namespace Inventory.Configuration.Api.Graphql.Queries
         //        plugins.Data,
         //        pageInfo,
         //        plugins.TotalCount);
-                
+
 
         //    return collectionSegment;
         //}
 
-        
+
 
     }
 

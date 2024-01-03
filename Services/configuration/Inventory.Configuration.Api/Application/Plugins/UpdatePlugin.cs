@@ -72,15 +72,9 @@ namespace Inventory.Configuration.Api.Application.Plugins
 
             var changes = await _repository.SaveChangesAsync(cancellationToken);
 
-            if (changes <= 0)
-            {
-                var errorMessage = $"Error when updating plugin {request.Id}";
-                _logger.LogError(errorMessage);
-                return Payload<PluginDto>.Error(new GenericApiError(errorMessage));
+            if (changes > 0)
+                _logger.LogInformation("Successfully Updating plugin {0}", request.Id);
 
-            }
-
-            _logger.LogInformation("Successfully Updating plugin {0}", request.Id);
             return Payload<PluginDto>.Success(_pluginService.GetPluginDto(plugin));
 
 
