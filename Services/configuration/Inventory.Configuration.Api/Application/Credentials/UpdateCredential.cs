@@ -75,9 +75,11 @@ namespace Inventory.Configuration.Api.Application.Credentials
             if (request.Description != null)
                 entity.SetDescription(request.Description);
 
-            var inputPropertyBag = JsonSerializer.Deserialize<Dictionary<string, object>>(request.PropertyBag.ToString(), new System.Text.Json.JsonSerializerOptions());
-            if (inputPropertyBag != null)
+            if (request.PropertyBag.ValueKind != JsonValueKind.Null && request.PropertyBag.ValueKind != JsonValueKind.Undefined)
+            {
+                var inputPropertyBag = JsonSerializer.Deserialize<Dictionary<string, object>>(request.PropertyBag.ToString(), new System.Text.Json.JsonSerializerOptions());
                 entity.SetPropertyBag(inputPropertyBag);
+            }
 
             // Update entity
             var nbChanges = await _repository.UpdateAsync(entity, cancellationToken);

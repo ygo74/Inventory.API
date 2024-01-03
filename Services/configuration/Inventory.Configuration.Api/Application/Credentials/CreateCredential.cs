@@ -76,8 +76,11 @@ namespace Inventory.Configuration.Api.Application.Credentials
             // Create entity
             var newEntity = new Credential(request.Name, request.Description);
 
-            var inputPropertyBag = JsonSerializer.Deserialize<Dictionary<string, object>>(request.PropertyBag.ToString(), new System.Text.Json.JsonSerializerOptions());
-            newEntity.SetPropertyBag(inputPropertyBag);
+            if (request.PropertyBag.ValueKind != JsonValueKind.Null && request.PropertyBag.ValueKind != JsonValueKind.Undefined)
+            {
+                var inputPropertyBag = JsonSerializer.Deserialize<Dictionary<string, object>>(request.PropertyBag.ToString(), new System.Text.Json.JsonSerializerOptions());
+                newEntity.SetPropertyBag(inputPropertyBag);
+            }
 
             // Add new entity
             var result = await _repository.AddAsync(newEntity, cancellationToken);

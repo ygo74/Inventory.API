@@ -27,8 +27,6 @@ namespace Inventory.Configuration.Api.Application.Datacenters.Services
             _logger = Guard.Against.Null(logger, nameof(logger));
             _pluginResolver = Guard.Against.Null(pluginResolver, nameof(pluginResolver));
 
-            var subnetProvider = _pluginResolver.GetService<ISubnetProvider>("Azure.Plugin");
-            subnetProvider.ListAllAsync().Wait();
         }
 
         /// <summary>
