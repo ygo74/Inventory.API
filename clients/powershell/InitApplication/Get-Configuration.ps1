@@ -51,9 +51,34 @@ $datacentersDefinition = @(
 
 $datacenters = @($datacentersDefinition | % {New-Object -TypeName psobject -Property $_})
 
+# -----------------------------------------------------------------------------
+# Credentials
+# -----------------------------------------------------------------------------
+$propertyBag = @{}
+Get-Content -Path $(Join-Path -Path $env:USERPROFILE -ChildPath "azure_credentials") | Foreach-Object {
+    $line = $_
+    $lineValues = $line.split("=", [StringSplitOptions]::RemoveEmptyEntries)
+    $keyAzureCredential = $lineValues[0]
+
+    if (($null -ne $keyAzureCredential) -and ($keyAzureCredential.startsWith("AZURE")))
+    {
+        $propertyBag[ $keyAzureCredential.ToLower() ] = $lineValues[1].Trim()
+    }
+}
+
+$CredentialDefinitions = @(
+    [Ordered]@{
+        Name = "Azure Credential"
+        Description = "Default credential for my azure subscription"
+        PropertyBag = $(New-Object -TypeName psobject -Property $propertyBag)
+    }
+)
+
+$crdentials = @($CredentialDefinitions | % {New-Object -TypeName psobject -Property $_})
 
 return @{
     Plugins = $plugins
     Locations = $locations
     Datacenters = $datacenters
+    Credentials = $crdentials
 }

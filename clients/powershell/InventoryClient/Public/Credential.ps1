@@ -12,7 +12,12 @@ function New-InventoryCredential
 
         [Parameter(ParameterSetName="Default", Position=1, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
         [String]
-        $Description
+        $Description,
+
+        [Parameter(ParameterSetName="Default", Position=2, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [PsObject]
+        $PropertyBag
+
     )
     Begin
     {
@@ -32,11 +37,13 @@ function New-InventoryCredential
         {
             $Name          = $InputObject.Name
             $Description   = $InputObject.Description
+            $PropertyBag   = $InputObject.PropertyBag
         }
 
         # Display input properties
         Trace-Message -Message ("Credential Name : '{0}'" -f $Name) -CommandName $MyInvocation.MyCommand.Name
         Trace-Message -Message ("Credential Description : '{0}'" -f $Description) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Credential PropertyBag : '{0}'" -f $PropertyBag) -CommandName $MyInvocation.MyCommand.Name
 
         # Assert Mandatory variables
         if ([string]::IsNullOrWhiteSpace($Name)) {throw "Name is mandatory"}
@@ -46,6 +53,7 @@ function New-InventoryCredential
             name = $Name
         }
         if (![string]::IsNullOrWhiteSpace($Description)) {$graphqlInput[ "description"] = $Description}
+        if ($null -ne $PropertyBag) {$graphqlInput[ "propertyBag"] = $(ConvertTo-Json -InputObject $PropertyBag )}
 
         $Variables = @{
             input = $graphqlInput
@@ -63,6 +71,90 @@ function New-InventoryCredential
 
     }
 }
+
+function Update-InventoryCredential
+{
+    [CmdletBinding(DefaultParameterSetName="Default")]
+    param(
+        [Parameter(ParameterSetName="Pipeline", Position=0, Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$false)]
+        [PsObject]
+        $InputObject,
+
+        [Parameter(ParameterSetName="Default", Position=0, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [int]
+        $Id,
+
+        [Parameter(ParameterSetName="Default", Position=1, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [String]
+        $Name,
+
+        [Parameter(ParameterSetName="Default", Position=2, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [String]
+        $Description,
+
+        [Parameter(ParameterSetName="Default", Position=3, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [PsObject]
+        $PropertyBag
+
+    )
+    Begin
+    {
+        $startFunction = Get-Date
+        Trace-StartFunction -CommandName $MyInvocation.MyCommand.Name
+    }
+    End
+    {
+        $endFunction = Get-Date
+        Trace-EndFunction -CommandName $MyInvocation.MyCommand.Name -Duration ($endFunction -$startFunction)
+
+    }
+    Process
+    {
+
+        if ($PsCmdlet.ParameterSetName -eq "Pipeline")
+        {
+            $Id            = $InputObject.Id
+            $Name          = $InputObject.Name
+            if (![string]::IsNullOrWhiteSpace($InputObject.Description)) { $Description = $InputObject.Description }
+            if ($null -ne $InputObject.PropertyBag) { $PropertyBag = $InputObject.PropertyBag }
+
+        }
+
+        # Display input properties
+        Trace-Message -Message ("Credential Id : '{0}'" -f $Id) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Credential Name : '{0}'" -f $Name) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Credential Description : '{0}'" -f $Description) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Credential PropertyBag : '{0}'" -f $PropertyBag) -CommandName $MyInvocation.MyCommand.Name
+
+        # Assert Mandatory variables
+        if ([string]::IsNullOrWhiteSpace($Id)) {throw "Id is mandatory"}
+        if ([string]::IsNullOrWhiteSpace($Name)) {throw "Name is mandatory"}
+
+        # Create payload input
+        $graphqlInput = @{
+            id = $Id
+        }
+        if (![string]::IsNullOrWhiteSpace($Description)) {$graphqlInput[ "description"] = $Description}
+        if ($null -ne $PropertyBag) {$graphqlInput[ "propertyBag"] = $(ConvertTo-Json -InputObject $PropertyBag )}
+
+        $Variables = @{
+            id = $Id
+            input = $graphqlInput
+        }
+
+        $command = $script:UpdateCredentialMutation + $script:CredentialDtoFragment + $script:ErrorsFragment
+
+        $result = Invoke-InternalGraphql -Query $command -Variables $Variables -uri $global:ConfigurationUri
+
+        if ($result.updateCredential.errors.Count -gt 0)
+        {
+            throw (ConvertFrom-InternalGraphqlErrors -Errors $result.updateCredential.errors)
+        }
+        $result.updateCredential.data
+
+    }
+}
+
 
 function Get-InventoryCredential
 {

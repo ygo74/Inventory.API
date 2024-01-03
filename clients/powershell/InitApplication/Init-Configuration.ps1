@@ -14,8 +14,18 @@ Write-Host "Load plugins" -ForegroundColor Green
 Write-Host $titleSeparator -ForegroundColor Green
 $configuration.plugins | Foreach-Object {
     Write-Host "`t - plugin $($_.Name) : " -NoNewLine
-    New-InventoryPlugin -Name $_.Name -Code $_.Code -Version $_.Version -Path $_.Path -InventoryCode $_.InventoryCode -verbose
+    $existingPlugin = Get-InventoryPlugin -Code $_.Code
+    if ($null -eq $existingPlugin)
+    {
+        $result = New-InventoryPlugin -InputObject $_
+    }
+    else
+    {
+        $_ | Add-Member -MemberType NoteProperty -Name Id -Value $existingPlugin.id
+        $result = Update-InventoryPlugin -InputObject $_
+    }
     write-Host "Ok"
+    write-Output $result
 }
 
 
@@ -63,4 +73,26 @@ $configuration.Datacenters | Foreach-Object {
     write-Host "Ok"
 }
 
+
+# -----------------------------------------------------------------------------
+# Load Credentials
+# -----------------------------------------------------------------------------
+Write-Host ""
+Write-Host "Load Credentials" -ForegroundColor Green
+Write-Host $titleSeparator -ForegroundColor Green
+$configuration.Credentials | Foreach-Object {
+    Write-Host "`t - credential $($_.Name) : " -NoNewLine
+    $existingCredential = Get-InventoryCredential -Name $_.Name -ErrorAction SilentlyContinue
+    if ($null -eq $existingCredential)
+    {
+        New-InventoryCredential -InputObject $_
+    }
+    else
+    {
+        $_ | Add-Member -MemberType NoteProperty -Name Id -Value $existingCredential.id
+        Update-InventoryCredential -InputObject $_
+    }
+
+    write-Host "Ok"
+}
 

@@ -8,6 +8,27 @@ mutation createCredential(`$input: CreateCredentialRequestInput)
 }
 "@
 
+$script:UpdateCredentialMutation=@"
+mutation updateCredential(`$input: UpdateCredentialRequestInput)
+{
+  updateCredential(input: `$input) {
+   data { ...credentialDto }
+   errors { ...error }
+ }
+}
+"@
+
+$script:RemoveCredentialMutation=@"
+mutation removeCredential(`$input: RemoveCredentialRequestInput)
+{
+  removeCredential(input: `$input) {
+   data { ...credentialDto }
+   errors { ...error }
+ }
+}
+"@
+
+
 $script:GetCredentialByNameQuery=@"
 query getCredential(`$name: String)
 {
