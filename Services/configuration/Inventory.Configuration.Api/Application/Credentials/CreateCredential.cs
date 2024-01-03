@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using AutoMapper;
 using FluentValidation;
+using Google.Protobuf.WellKnownTypes;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Errors;
 using Inventory.Common.Domain.Repository;
@@ -14,6 +15,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,6 +31,7 @@ namespace Inventory.Configuration.Api.Application.Credentials
         public string Description { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public JsonElement PropertyBag { get; set; }
     }
 
     /// <summary>
@@ -71,6 +75,9 @@ namespace Inventory.Configuration.Api.Application.Credentials
 
             // Create entity
             var newEntity = new Credential(request.Name, request.Description);
+
+            var inputPropertyBag = JsonSerializer.Deserialize<Dictionary<string, object>>(request.PropertyBag.ToString(), new System.Text.Json.JsonSerializerOptions());
+            newEntity.SetPropertyBag(inputPropertyBag);
 
             // Add new entity
             var result = await _repository.AddAsync(newEntity, cancellationToken);

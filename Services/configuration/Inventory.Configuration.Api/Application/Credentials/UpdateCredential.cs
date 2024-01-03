@@ -13,6 +13,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,8 +26,11 @@ namespace Inventory.Configuration.Api.Application.Credentials
     public class UpdateCredentialRequest : IRequest<Payload<CredentialDto>>, ICredentialId
     {
         public int Id { get; set; }
+        public string Description { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public JsonElement PropertyBag { get; set; }
+
     }
 
     /// <summary>
@@ -65,6 +70,14 @@ namespace Inventory.Configuration.Api.Application.Credentials
             var entity = await _repository.GetByIdAsync(request.Id, cancellationToken);
             if (null == entity)
                 return Payload<CredentialDto>.Error(new NotFoundError($"Don't find Credential with Id {request.Id}"));
+
+            // Update Properties
+            if (request.Description != null)
+                entity.SetDescription(request.Description);
+
+            var inputPropertyBag = JsonSerializer.Deserialize<Dictionary<string, object>>(request.PropertyBag.ToString(), new System.Text.Json.JsonSerializerOptions());
+            if (inputPropertyBag != null)
+                entity.SetPropertyBag(inputPropertyBag);
 
             // Update entity
             var nbChanges = await _repository.UpdateAsync(entity, cancellationToken);

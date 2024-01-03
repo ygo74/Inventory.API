@@ -21,5 +21,25 @@ namespace Inventory.Configuration.Domain.Models
             PropertyBag = new Dictionary<string, object>();
         }
 
+        public Credential SetPropertyBag(Dictionary<string, Object> propertyBag)
+        {
+            PropertyBag = propertyBag;
+            AddDomainEvent(new Event<Credential>(this, Event<Credential>.EntityAction.Updated));
+            return this;
+        }
+
+        public Credential SetDescription(string description)
+        {
+            var newValue = description;
+            if (string.IsNullOrWhiteSpace(newValue))
+                newValue = null;
+            else
+                newValue = newValue.Trim();
+
+            Description = newValue;
+            AddDomainEvent(new Event<Credential>(this, Event<Credential>.EntityAction.Updated));
+            return this;
+        }
+
     }
 }

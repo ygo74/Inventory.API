@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Collections.Generic;
 using static Inventory.Common.Application.Graphql.Types.ErrorTypes;
 
 namespace Inventory.Configuration.Api.Configuration
@@ -96,6 +97,7 @@ namespace Inventory.Configuration.Api.Configuration
                 .AddType<CreatePluginInputType>()
                 // Credentials
                 .AddType<CredentialType>()
+                .AddType<CreateCredentialRequestType>()
 
                 //.AddMutationConventions(
                 //    new MutationConventionOptions
@@ -110,6 +112,7 @@ namespace Inventory.Configuration.Api.Configuration
                 .BindRuntimeType<DateTime, DateTimeType>()
                 .BindRuntimeType<int, IntType>()
                 .BindRuntimeType<long, LongType>()
+                .BindRuntimeType<IDictionary<string, object>, AnyType>()
                 //.BindRuntimeType<Dictionary<string, bool>, AnyType>()
                 //.AddType<CreateWebHookErrorUnion>()
                 ;
