@@ -70,7 +70,19 @@ namespace Inventory.Configuration.Api.Application.Datacenters.Dtos
         {
             get
             {
-                return d => GetFromDatacenter(d);
+                return d => d.Plugins.Select(p => new DatacenterPluginsDto
+                {
+                    Id = p.Id,
+                    DatacenterId = d.Id,
+                    CredentialName = p.Credential.Name,
+                    CredentialDescription = p.Credential.Description,
+                    CredentialPropertyBag = p.Credential.PropertyBag,
+                    PluginName = p.Plugin.Name,
+                    PluginCode = p.Plugin.Code,
+                    PluginVersion = p.Plugin.Version,
+                    PluginPath = p.Plugin.Path,
+                    PluginEndpointPropertyBag = p.PropertyBag
+                });
             }
         }
 
@@ -80,14 +92,14 @@ namespace Inventory.Configuration.Api.Application.Datacenters.Dtos
             {
                 Id = p.Id,
                 DatacenterId = datacenter.Id,
-                CredentialName = p.Credential.Name,
-                CredentialDescription = p.Credential.Description,
-                CredentialPropertyBag = p.Credential.PropertyBag,
-                PluginName = p.Plugin.Name,
-                PluginCode = p.Plugin.Code,
-                PluginVersion = p.Plugin.Version,
-                PluginPath = p.Plugin.Path,
-                PluginEndpointPropertyBag = p.PropertyBag
+                CredentialName = p.Credential != null ? p.Credential.Name : null,
+                CredentialDescription = p.Credential != null ? p.Credential.Description : null,
+                CredentialPropertyBag = p.Credential != null ? p.Credential.PropertyBag : null,
+                PluginName = p.Plugin != null ? p.Plugin.Name : null,
+                PluginCode = p.Plugin != null ? p.Plugin.Code : null,
+                PluginVersion = p.Plugin != null ? p.Plugin.Version : null,
+                PluginPath = p.Plugin != null ? p.Plugin.Path : null,
+                PluginEndpointPropertyBag = p.Plugin != null ? p.PropertyBag : null
             });
 
         }

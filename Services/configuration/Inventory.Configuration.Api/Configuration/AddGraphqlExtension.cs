@@ -91,7 +91,7 @@ namespace Inventory.Configuration.Api.Configuration
                 // Datacenters
                 .AddType<DatacenterType>()
                 .AddType<CreateDatacenterInputType>()
-                .AddType<CreateDatacenterPayloadType>()
+                //.AddType<DatacenterPayloadType>()
                 // Plugins
                 .AddType<PluginType>()
                 .AddType<CreatePluginInputType>()

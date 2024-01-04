@@ -20,7 +20,8 @@ namespace Inventory.Plugins.Azure
         public static void UseInfrastructureAzureService(this IServiceCollection services)
         {
 
-            services.TryAddEnumerable(services.AddAutoMapper(typeof(ServicesExtension)));
+            //services.TryAddEnumerable(services.AddAutoMapper(typeof(ServicesExtension)));
+            services.AddAutoMapper(typeof(ServicesExtension));
 
             services.AddScoped<AuthenticationTokenService>()
                     .AddScoped<AzSubnetProvider>();

@@ -52,20 +52,22 @@ namespace Inventory.Configuration.Api.Graphql.Types
         }
     }
 
-    public class CreateDatacenterPayloadType : ObjectType<Payload<DatacenterDto>>
-    {
-        protected override void Configure(IObjectTypeDescriptor<Payload<DatacenterDto>> descriptor)
-        {
-            descriptor.Name("CreateDatacenterPayload");
-            descriptor.Field(e => e.Data).Type<DatacenterType>();
-        }
-    }
+    //public class DatacenterPayloadType : ObjectType<Payload<DatacenterDto>>
+    //{
+    //    protected override void Configure(IObjectTypeDescriptor<Payload<DatacenterDto>> descriptor)
+    //    {
+    //        descriptor.Name("DatacenterPayload");
+    //        descriptor.Field(e => e.Data).Type<DatacenterType>();
+    //    }
+    //}
 
     public class DatacenterPluginsType : ObjectType<DatacenterPluginsDto>
     {
         protected override void Configure(IObjectTypeDescriptor<DatacenterPluginsDto> descriptor)
         {
             descriptor.Name("DatacenterPlugins");
+            descriptor.Field(e => e.PluginEndpointPropertyBag).Type<AnyType>();
+            descriptor.Field(e => e.CredentialPropertyBag).Type<AnyType>();
         }
     }
 
