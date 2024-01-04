@@ -93,7 +93,7 @@ namespace Inventory.Configuration.Api.Application.Credentials
 
             // return result
             _logger.LogInformation($"Successfully added Credential '{request.Name}'");
-            return Payload<CredentialDto>.Success(_mapper.Map<CredentialDto>(newEntity));
+            return Payload<CredentialDto>.Success(newEntity.ToCredentialDto());
         }
     }
 

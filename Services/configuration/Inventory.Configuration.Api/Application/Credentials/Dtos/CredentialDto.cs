@@ -31,4 +31,14 @@ namespace Inventory.Configuration.Api.Application.Credentials.Dtos
         }
 
     }
+
+    public static class CredentialExtension
+    {
+        private static Func<Credential, CredentialDto> _credentialToDtoFunc = CredentialDto.Projection.Compile();
+
+        public static CredentialDto ToCredentialDto(this Credential credential)
+        {
+            return _credentialToDtoFunc(credential);
+        }
+    }
 }

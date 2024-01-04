@@ -1,5 +1,4 @@
 ﻿using Ardalis.GuardClauses;
-using AutoMapper;
 using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Errors;
@@ -8,9 +7,7 @@ using Inventory.Configuration.Api.Application.Credentials.Dtos;
 using Inventory.Configuration.Api.Application.Credentials.Services;
 using Inventory.Configuration.Api.Application.Credentials.Validators;
 using Inventory.Configuration.Domain.Models;
-using Inventory.Configuration.Infrastructure;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -50,16 +47,13 @@ namespace Inventory.Configuration.Api.Application.Credentials
     public class UpdateCredentialHanlder : IRequestHandler<UpdateCredentialRequest, Payload<CredentialDto>>
     {
         private readonly ILogger<UpdateCredentialHanlder> _logger;
-        private readonly IMapper _mapper;
         private readonly IAsyncRepository<Credential> _repository;
 
 
-        public UpdateCredentialHanlder(ILogger<UpdateCredentialHanlder> logger, IMapper mapper, IAsyncRepository<Credential> repository)
+        public UpdateCredentialHanlder(ILogger<UpdateCredentialHanlder> logger, IAsyncRepository<Credential> repository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _repository = Guard.Against.Null(repository, nameof(repository));
-
         }
 
         public async Task<Payload<CredentialDto>> Handle(UpdateCredentialRequest request, CancellationToken cancellationToken)
@@ -87,8 +81,7 @@ namespace Inventory.Configuration.Api.Application.Credentials
                 _logger.LogInformation($"Successfully updated Credential with id '{request.Id}'");
 
             // return response
-            var resultDto = _mapper.Map<CredentialDto>(entity);
-            return Payload<CredentialDto>.Success(_mapper.Map<CredentialDto>(entity));
+            return Payload<CredentialDto>.Success(entity.ToCredentialDto());
 
         }
     }

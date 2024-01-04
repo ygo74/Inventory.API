@@ -1,6 +1,4 @@
 ﻿using Ardalis.GuardClauses;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Errors;
@@ -10,13 +8,10 @@ using Inventory.Configuration.Api.Application.Credentials.Dtos;
 using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Domain.Filters;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MR.AspNetCore.Pagination;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Inventory.Configuration.Api.Application.Datacenters.Dtos;
 using System;
 
 namespace Inventory.Configuration.Api.Application.Credentials
@@ -52,18 +47,12 @@ namespace Inventory.Configuration.Api.Application.Credentials
     {
 
         private readonly ILogger<GetCredentialHandler> _logger;
-        private readonly IMapper _mapper;
-        private readonly IPaginationService _paginationService;
         private readonly IGenericQueryStore<Credential> _queryStore;
 
-        public GetCredentialHandler(ILogger<GetCredentialHandler> logger,
-            IMapper mapper, IGenericQueryStore<Credential> queryStore, IPaginationService paginationService)
+        public GetCredentialHandler(ILogger<GetCredentialHandler> logger, IGenericQueryStore<Credential> queryStore)
         {
             _logger = Guard.Against.Null(logger, nameof(logger));
-            _mapper = Guard.Against.Null(mapper, nameof(mapper));
             _queryStore = Guard.Against.Null(queryStore, nameof(queryStore));
-            _paginationService = Guard.Against.Null(paginationService, nameof(paginationService));
-
         }
 
         /// <summary>

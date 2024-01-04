@@ -1,5 +1,4 @@
 ﻿using Ardalis.GuardClauses;
-using AutoMapper;
 using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Errors;
@@ -8,9 +7,7 @@ using Inventory.Configuration.Api.Application.Credentials.Dtos;
 using Inventory.Configuration.Api.Application.Credentials.Services;
 using Inventory.Configuration.Api.Application.Credentials.Validators;
 using Inventory.Configuration.Domain.Models;
-using Inventory.Configuration.Infrastructure;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
@@ -44,14 +41,12 @@ namespace Inventory.Configuration.Api.Application.Credentials
     public class RemoveCredentialHanlder : IRequestHandler<RemoveCredentialRequest, Payload<CredentialDto>>
     {
         private readonly ILogger<RemoveCredentialHanlder> _logger;
-        private readonly IMapper _mapper;
         private readonly IAsyncRepository<Credential> _repository;
 
 
-        public RemoveCredentialHanlder(ILogger<RemoveCredentialHanlder> logger, IMapper mapper, IAsyncRepository<Credential> repository)
+        public RemoveCredentialHanlder(ILogger<RemoveCredentialHanlder> logger, IAsyncRepository<Credential> repository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _repository = Guard.Against.Null(repository, nameof(repository));
 
         }
