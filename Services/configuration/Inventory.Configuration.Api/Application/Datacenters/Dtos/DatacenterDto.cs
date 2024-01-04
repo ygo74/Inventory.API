@@ -70,20 +70,26 @@ namespace Inventory.Configuration.Api.Application.Datacenters.Dtos
         {
             get
             {
-                return d => d.Plugins.Select(p => new DatacenterPluginsDto
-                {
-                    Id = p.Id,
-                    DatacenterId = p.Id,
-                    CredentialName = p.Credential.Name,
-                    CredentialDescription = p.Credential.Description,
-                    CredentialPropertyBag = p.Credential.PropertyBag,
-                    PluginName = p.Plugin.Name,
-                    PluginCode = p.Plugin.Code,
-                    PluginVersion = p.Plugin.Version,
-                    PluginPath = p.Plugin.Path,
-                    PluginEndpointPropertyBag = p.PropertyBag
-                });
+                return d => GetFromDatacenter(d);
             }
+        }
+
+        public static IEnumerable<DatacenterPluginsDto> GetFromDatacenter(Datacenter datacenter)
+        {
+            return datacenter.Plugins.Select(p => new DatacenterPluginsDto 
+            {
+                Id = p.Id,
+                DatacenterId = datacenter.Id,
+                CredentialName = p.Credential.Name,
+                CredentialDescription = p.Credential.Description,
+                CredentialPropertyBag = p.Credential.PropertyBag,
+                PluginName = p.Plugin.Name,
+                PluginCode = p.Plugin.Code,
+                PluginVersion = p.Plugin.Version,
+                PluginPath = p.Plugin.Path,
+                PluginEndpointPropertyBag = p.PropertyBag
+            });
+
         }
 
     }

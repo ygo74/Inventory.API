@@ -47,6 +47,25 @@ namespace Inventory.Configuration.Api.Graphql.Mutations
             return await _mediator.Send(input, cancellationToken);
         }
 
+        public async Task<Payload<IEnumerable<DatacenterPluginsDto>>> SetDataCenterPluginEnpoint(
+            string datacenterCode,
+            string pluginCode,
+            string credentialName,
+            [Service] IMediator _mediator,
+            CancellationToken cancellationToken
+            )
+        {
+
+            var request = new AddDatacenterPluginEndpointRequest
+            {
+                CredentialName = credentialName,
+                PluginCode = pluginCode,
+                DatacenterCode = datacenterCode
+            };
+
+            return await _mediator.Send(request, cancellationToken);
+
+        }
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using AutoMapper;
+using Inventory.Configuration.Domain.Models;
 using Inventory.Networks.Domain.Models;
 using Inventory.Plugins.Azure.Models;
 using Inventory.Plugins.Interfaces;
@@ -36,6 +37,38 @@ namespace Inventory.Plugins.Azure.Services
         public void SetCredential(AzCredential credential)
         {
             _credential = Guard.Against.Null(credential, nameof(credential));
+        }
+
+
+        public void InitCredential(string userName, string description, Dictionary<string, object> propertyBag)
+        {
+            _credential = new AzCredential(userName, description);
+
+            // Read azure authentification informations
+            if (!propertyBag.ContainsKey("azure_secret")) 
+                throw new ArgumentNullException("azure_secret", "azure_secret must be defined in the credential properties");
+
+            if (!propertyBag.ContainsKey("azure_client_id"))
+                throw new ArgumentNullException("azure_client_id", "azure_client_id must be defined in the credential properties");
+
+            if (!propertyBag.ContainsKey("azure_tenant"))
+                throw new ArgumentNullException("azure_tenant", "azure_tenant must be defined in the credential properties");
+
+            if (!propertyBag.ContainsKey("azure_subscription_id"))
+                throw new ArgumentNullException("azure_subscription_id", "azure_subscription_id must be defined in the credential properties");
+
+            var azure_secret = propertyBag["azure_secret"].ToString();
+            var azure_client_id = propertyBag["azure_client_id"].ToString();
+            var azure_tenant = propertyBag["azure_tenant"].ToString();
+            var azure_subscription_id = propertyBag["azure_subscription_id"].ToString();
+
+            _credential.SetAzurePassword(
+                subsscriptionId: Guid.Parse(azure_subscription_id),
+                tenantId: Guid.Parse(azure_tenant),
+                clientId: Guid.Parse(azure_client_id),
+                password: azure_secret
+            );
+
         }
 
         public async Task<List<Subnet>> ListAllAsync()

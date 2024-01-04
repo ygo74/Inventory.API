@@ -28,6 +28,10 @@
       <Private>false</Private>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\configuration\Inventory.Configuration.Domain\Inventory.Configuration.Domain.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </ProjectReference>
     <!--<ProjectReference Include="..\..\..\common\Inventory.Common.Plugins\Inventory.Common.Plugins.csproj">
       <Private>false</Private>
       <ExcludeAssets>runtime</ExcludeAssets>
