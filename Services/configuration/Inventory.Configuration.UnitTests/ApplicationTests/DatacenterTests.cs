@@ -1,10 +1,12 @@
 ﻿using FluentValidation.TestHelper;
 using Inventory.Common.Domain.Repository;
+using Inventory.Configuration.Api.Application.Credentials;
 using Inventory.Configuration.Api.Application.Datacenters;
 using Inventory.Configuration.Api.Application.Datacenters.Dtos;
 using Inventory.Configuration.Api.Application.Datacenters.Validators;
 using Inventory.Configuration.Api.Application.Locations.Services;
 using Inventory.Configuration.Domain.Models;
+using Inventory.Configuration.Infrastructure;
 using Inventory.Configuration.UnitTests.SeedWork;
 using Inventory.Configuration.UnitTests.TestCases;
 using MediatR;
@@ -178,6 +180,62 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
             // manage case null to inform that this field should not be updated
             if (updateDescriptionValue != null) Assert.AreNotEqual(existingDatacenter.Description, result.Data.Description);
         }
+
+
+        [Test]
+        public async Task Should_successfull_get_datacenter_by_id()
+        {
+
+            // Arrange
+            var dbContext = UnitTestsContext.Current.GetService<ConfigurationDbContext>();
+            var foundDatacenter = dbContext.Datacenters.First();
+            var request = new GetDatacenterByIdRequest { Id = foundDatacenter.Id };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(foundDatacenter.Id, result.Data.Id);
+        }
+
+
+        [Test]
+        public async Task Should_successfull_get_datacenter_by_code()
+        {
+
+            // Arrange
+            var dbContext = UnitTestsContext.Current.GetService<ConfigurationDbContext>();
+            var foundDatacenter = dbContext.Datacenters.First();
+            var request = new GetDatacenterByCodeRequest { Code = foundDatacenter.Code };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(foundDatacenter.Code, result.Data.Code);
+        }
+
+        [Test]
+        public async Task Should_successfull_get_datacenter_by_name()
+        {
+
+            // Arrange
+            var dbContext = UnitTestsContext.Current.GetService<ConfigurationDbContext>();
+            var foundDatacenter = dbContext.Datacenters.First();
+            var request = new GetDatacenterByNameRequest { Name = foundDatacenter.Name };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(foundDatacenter.Name, result.Data.Name);
+        }
+
+
+
 
     }
 }
