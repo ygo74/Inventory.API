@@ -1,4 +1,5 @@
 ﻿using Inventory.Common.Application.Dto;
+using Inventory.Configuration.Api.Application.Credentials.Dtos;
 using Inventory.Configuration.Api.Application.Locations;
 using Inventory.Configuration.Domain.Models;
 using System;
@@ -85,24 +86,24 @@ namespace Inventory.Configuration.Api.Application.Datacenters.Dtos
                 });
             }
         }
+    }
 
-        public static IEnumerable<DatacenterPluginsDto> GetFromDatacenter(Datacenter datacenter)
-        {
-            return datacenter.Plugins.Select(p => new DatacenterPluginsDto 
-            {
-                Id = p.Id,
-                DatacenterId = datacenter.Id,
-                CredentialName = p.Credential != null ? p.Credential.Name : null,
-                CredentialDescription = p.Credential != null ? p.Credential.Description : null,
-                CredentialPropertyBag = p.Credential != null ? p.Credential.PropertyBag : null,
-                PluginName = p.Plugin != null ? p.Plugin.Name : null,
-                PluginCode = p.Plugin != null ? p.Plugin.Code : null,
-                PluginVersion = p.Plugin != null ? p.Plugin.Version : null,
-                PluginPath = p.Plugin != null ? p.Plugin.Path : null,
-                PluginEndpointPropertyBag = p.Plugin != null ? p.PropertyBag : null
-            });
+    public static class DatacenterExtensions
+    {
+        private static Func<Datacenter, IEnumerable<DatacenterPluginsDto>> _ToDatacenterPluginsDtoCollection = DatacenterPluginsDto.Projection.Compile();
+        private static Func<Datacenter, DatacenterDto> _ToDatacenterDto = DatacenterDto.Projection.Compile();
 
+
+        public static IEnumerable<DatacenterPluginsDto> ToDatacenterPLugingsDtoCollection(this Datacenter datacenter) 
+        { 
+            return _ToDatacenterPluginsDtoCollection(datacenter);
+        }
+
+        public static DatacenterDto ToDatacenterDto(this Datacenter datacenter) 
+        { 
+            return _ToDatacenterDto(datacenter);
         }
 
     }
+
 }

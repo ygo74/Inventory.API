@@ -1,9 +1,7 @@
 ﻿using Ardalis.GuardClauses;
-using AutoMapper;
 using FluentValidation;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
-using Inventory.Common.Application.Errors;
 using Inventory.Common.Application.Validators;
 using Inventory.Common.Domain.Filters;
 using Inventory.Common.Domain.Repository;
@@ -13,7 +11,6 @@ using Inventory.Configuration.Api.Application.Datacenters.Validators;
 using Inventory.Configuration.Api.Application.Locations.Services;
 using Inventory.Configuration.Domain.Filters;
 using Inventory.Configuration.Domain.Models;
-using Inventory.Configuration.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -59,15 +56,14 @@ namespace Inventory.Configuration.Api.Application.Datacenters
     {
 
         private readonly ILogger<UpdateDatacenterHanlder> _logger;
-        private readonly IMapper _mapper;
         private readonly IAsyncRepository<Datacenter> _dcRepository;
         private readonly IAsyncRepository<Location> _locationRepository;
 
-        public UpdateDatacenterHanlder(ILogger<UpdateDatacenterHanlder> logger, IMapper mapper, 
-                                       IAsyncRepository<Datacenter> dcRepository, IAsyncRepository<Location> locationRepository)
+        public UpdateDatacenterHanlder(ILogger<UpdateDatacenterHanlder> logger, 
+                                       IAsyncRepository<Datacenter> dcRepository,
+                                       IAsyncRepository<Location> locationRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _dcRepository = Guard.Against.Null(dcRepository, nameof(dcRepository));
             _locationRepository = Guard.Against.Null(locationRepository, nameof(locationRepository));
             
@@ -91,8 +87,6 @@ namespace Inventory.Configuration.Api.Application.Datacenters
                 datacenter.SetDatacenterType(datacenterType);
             }
 
-
-
             // Update location
             if (!string.IsNullOrWhiteSpace(request.RegionCode) && !string.IsNullOrWhiteSpace(request.CountryCode) &&
                     !string.IsNullOrWhiteSpace(request.CityCode))
@@ -113,7 +107,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
             if (changes > 0)
                 _logger.LogInformation("Updated datacenter '{0}'", request.Id);
 
-            return Payload<DatacenterDto>.Success(_mapper.Map<DatacenterDto>(datacenter));
+            return Payload<DatacenterDto>.Success(datacenter.ToDatacenterDto());
         }
     }
 }

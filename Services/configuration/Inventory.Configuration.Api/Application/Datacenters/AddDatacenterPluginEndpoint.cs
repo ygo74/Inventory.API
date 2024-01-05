@@ -4,13 +4,11 @@ using Inventory.Common.Application.Errors;
 using Inventory.Common.Domain.Filters;
 using Inventory.Common.Domain.Repository;
 using Inventory.Configuration.Api.Application.Datacenters.Dtos;
-using Inventory.Configuration.Api.Application.Plugins.Dtos;
 using Inventory.Configuration.Domain.Filters;
 using Inventory.Configuration.Domain.Models;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -87,7 +85,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
 
             // return datacenter with plugin endpoint
-            return Payload<IEnumerable<DatacenterPluginsDto>>.Success(DatacenterPluginsDto.GetFromDatacenter(datacenter));
+            return Payload<IEnumerable<DatacenterPluginsDto>>.Success(datacenter.ToDatacenterPLugingsDtoCollection());
 
         }
     }

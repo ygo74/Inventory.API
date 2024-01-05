@@ -11,8 +11,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Inventory.Configuration.Infrastructure;
 
 namespace Inventory.Configuration.Api.Application.Datacenters
 {
@@ -30,14 +28,11 @@ namespace Inventory.Configuration.Api.Application.Datacenters
     {
         private readonly ILogger<GetPluginsByDatacenterHandlers> _logger;
         private readonly IGenericQueryStore<Datacenter> _queryStore;
-        private readonly IDbContextFactory<ConfigurationDbContext> _dbContextFactory;
 
-        public GetPluginsByDatacenterHandlers(ILogger<GetPluginsByDatacenterHandlers> logger, IGenericQueryStore<Datacenter> queryStore,
-            IDbContextFactory<ConfigurationDbContext> dbContextFactory)
+        public GetPluginsByDatacenterHandlers(ILogger<GetPluginsByDatacenterHandlers> logger, IGenericQueryStore<Datacenter> queryStore)
         {
             _logger = Guard.Against.Null(logger, nameof(logger));
             _queryStore = Guard.Against.Null(queryStore, nameof(queryStore));
-            _dbContextFactory = Guard.Against.Null(dbContextFactory, nameof(dbContextFactory));
         }
 
         public async Task<List<DatacenterPluginsDto>> Handle(GetPluginsByDatacenterIdRequest request, CancellationToken cancellationToken)
@@ -53,26 +48,6 @@ namespace Inventory.Configuration.Api.Application.Datacenters
                                                                               ManyProjection: DatacenterPluginsDto.Projection,   
                                                                               orderBy: q => q.OrderBy(e => e.Id),
                                                                               cancellationToken: cancellationToken);
-            using var dbContext = _dbContextFactory.CreateDbContext();
-
-            //var result = await dbContext.Datacenters
-            //    .Where(e => request.DatacenterIds.Contains(e.Id))
-            //    .SelectMany(p => p.Plugins
-            //        .Select(e => new DatacenterPluginsDto
-            //        {
-            //            Id = e.Id,
-            //            DatacenterId = p.Id,
-            //            CredentialName = e.Credential.Name,
-            //            CredentialDescription = e.Credential.Description,
-            //            CredentialPropertyBag = e.Credential.PropertyBag,
-            //            PluginName = e.Plugin.Name,
-            //        }))
-            //    .ToListAsync(cancellationToken);
-
-            //var result = await dbContext.Datacenters
-            //    .Where(e => request.DatacenterIds.Contains(e.Id))
-            //    .SelectMany(DatacenterPluginsDto.Projection)
-            //    .ToListAsync(cancellationToken);
 
             return result.ToList();
         }

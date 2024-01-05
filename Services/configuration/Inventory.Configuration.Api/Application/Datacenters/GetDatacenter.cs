@@ -1,6 +1,4 @@
 ﻿using Ardalis.GuardClauses;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
 using Inventory.Common.Application.Errors;
@@ -9,9 +7,7 @@ using Inventory.Common.Domain.Repository;
 using Inventory.Configuration.Api.Application.Datacenters.Dtos;
 using Inventory.Configuration.Domain.Filters;
 using Inventory.Configuration.Domain.Models;
-using Inventory.Configuration.Infrastructure;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MR.AspNetCore.Pagination;
 using System.Linq;
@@ -57,17 +53,15 @@ namespace Inventory.Configuration.Api.Application.Datacenters
     {
 
         private readonly ILogger<DatacenterQueriesHandler> _logger;
-        private readonly IMapper _mapper;
         private readonly IPaginationService _paginationService;
         private readonly IGenericQueryStore<Datacenter> _queryStore;
 
         public DatacenterQueriesHandler(ILogger<DatacenterQueriesHandler> logger,
-            IMapper mapper, IDbContextFactory<ConfigurationDbContext> factory, IPaginationService paginationService,
+            IPaginationService paginationService,
             IGenericQueryStore<Datacenter> queryStore)
         {
 
             _logger = Guard.Against.Null(logger, nameof(logger));
-            _mapper = Guard.Against.Null(mapper, nameof(mapper));
             _paginationService = Guard.Against.Null(paginationService, nameof(paginationService));
             _queryStore = Guard.Against.Null(queryStore, nameof(queryStore));
 
@@ -95,7 +89,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
             // return datacenter
             _logger.LogInformation("Successfully Get Datacenter by Id {0}", request.Id);
-            return Payload<DatacenterDto>.Success(_mapper.Map<DatacenterDto>(datacenter));
+            return Payload<DatacenterDto>.Success(datacenter);
         }
 
         /// <summary>
@@ -111,7 +105,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
             _logger.LogInformation("Start Get Datacenter by Name {0}", request.Name);
 
             // Create filter
-            var filter = ExpressionFilterFactory.Create<Inventory.Configuration.Domain.Models.Datacenter>()
+            var filter = ExpressionFilterFactory.Create<Datacenter>()
                                                 .WithName(request.Name);
 
             // Retrieve entity
@@ -143,7 +137,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
             //var query = dbContext.Datacenters.AsNoTracking();
 
             // Filtering data
-            var filter = request.GetConfigurationEntityFilter<Inventory.Configuration.Domain.Models.Datacenter, DatacenterDto>()
+            var filter = request.GetConfigurationEntityFilter<Datacenter, DatacenterDto>()
                                 .WithInventoryCode(request.InventoryCode);  
 
             //if (null != filter.Predicate)
@@ -154,7 +148,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
                 source: _queryStore.GetQuery(filter),
                 builderAction: b => b.Ascending(e => e.Name).Ascending(e => e.Id),
                 getReferenceAsync: async id => await _queryStore.GetByIdAsync(int.Parse(id)),
-                map: q => q.ProjectTo<DatacenterDto>(_mapper.ConfigurationProvider),
+                map: q => q.Select(DatacenterDto.Projection),
                 queryModel: new KeysetQueryModel
                 {
                     After = request.Pagination.After,
@@ -186,14 +180,18 @@ namespace Inventory.Configuration.Api.Application.Datacenters
         public async Task<Payload<DatacenterDto>> Handle(GetDatacenterByCodeRequest request, CancellationToken cancellationToken)
         {
             // Create filter
-            var filter = ExpressionFilterFactory.Create<Inventory.Configuration.Domain.Models.Datacenter>()
+            var filter = ExpressionFilterFactory.Create<Datacenter>()
                                                 .WithCode(request.Code);
 
             // Retrieve entity
             var datacenter = await _queryStore.FirstOrDefaultAsync<DatacenterDto>(filter);
 
             if (null == datacenter)
-                return Payload<DatacenterDto>.Error(new NotFoundError($"Don't find Datacenter with Code {request.Code}"));
+            {
+                var errorMessage = $"Don't find Datacenter with Code {request.Code}";
+                _logger.LogInformation(errorMessage);
+                return Payload<DatacenterDto>.Error(new NotFoundError(errorMessage));
+            }
 
             return Payload<DatacenterDto>.Success(datacenter);
         }

@@ -98,6 +98,24 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
             Assert.AreEqual(foundCredential.Id, result.Data.Id);
         }
 
+        [Test]
+        public async Task Should_successfull_get_credentials()
+        {
+            // Arrange
+            var request = new GetCredentialsRequest
+            {
+                Name = CredentialSeed.ADMINISTRATOR
+            };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result.Errors);
+            Assert.IsTrue(result.TotalCount > 0);
+            Assert.AreEqual(result.TotalCount, result.Data.Count);
+        }
 
         [TestCase("Test credential","Test credential description")]
         public async Task Should_successfull_create_credential_with_valid_values(string name, string description)
@@ -128,7 +146,9 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
             {
                 Id = existingCredential.Id,
                 Username = "newName",
-                Password = "xxx"
+                Password = "xxx",
+                Description = "Test",
+                PropertyBag = System.Text.Json.JsonDocument.Parse("{\"a\": 1}").RootElement
             };
 
             // Act
