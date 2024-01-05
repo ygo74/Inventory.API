@@ -102,8 +102,14 @@ namespace Inventory.Configuration.Api.Application.Datacenters
             _logger.LogInformation("Start adding datacenter '{0}' with code '{1}'", request.Name, request.Code);
 
             // Create datacenter
-            var newEntity = new Datacenter(request.Code, request.Name, DatacenterType.Cloud, request.InventoryCode,
-                                                        startDate: request.ValidFrom, endDate: request.ValidTo);
+            var newEntity = new Datacenter(code: request.Code,
+                                           name: request.Name,
+                                           dataCenterType: DatacenterType.Cloud, 
+                                           inventoryCode: request.InventoryCode,
+                                           description: request.Description,
+                                           deprecated: request.Deprecated, 
+                                           startDate: request.ValidFrom, 
+                                           endDate: request.ValidTo);
 
             // Find location and add it to the datacenter
             var locationFilter = ExpressionFilterFactory.Create<Location>()

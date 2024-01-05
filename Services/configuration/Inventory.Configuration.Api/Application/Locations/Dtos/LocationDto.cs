@@ -93,4 +93,32 @@ namespace Inventory.Configuration.Api.Application.Locations.Dtos
             }
         }
     }
+
+
+    public static class LocationExtensions
+    {
+        private static Func<Location, LocationWithDatacentersDto> _toLocationWithDatacentersDto = LocationWithDatacentersDto.Projection.Compile();
+        private static Func<Datacenter, LocationDatacenterDto> _toLocationDatacenterDto = LocationDatacenterDto.Projection.Compile();
+        private static Func<Location, LocationDto> _toLocationDto = LocationDto.Projection.Compile();
+
+        public static LocationDto ToLocationDto(this Location location)
+        {
+            return _toLocationDto(location);
+        }
+
+        public static LocationDatacenterDto ToLocationDatacenterDto(this Datacenter datacenter)
+        {
+            return _toLocationDatacenterDto(datacenter);
+        }
+
+        public static LocationWithDatacentersDto ToLocationWithDatacentersDto(this Location location)
+        {
+            return _toLocationWithDatacentersDto(location);
+        }
+
+    }
+
+
+
+
 }

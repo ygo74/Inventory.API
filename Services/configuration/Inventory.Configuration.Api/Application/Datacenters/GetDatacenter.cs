@@ -125,6 +125,32 @@ namespace Inventory.Configuration.Api.Application.Datacenters
         }
 
         /// <summary>
+        /// Get datacenter by code
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="System.NotImplementedException"></exception>
+        public async Task<Payload<DatacenterDto>> Handle(GetDatacenterByCodeRequest request, CancellationToken cancellationToken)
+        {
+            // Create filter
+            var filter = ExpressionFilterFactory.Create<Datacenter>()
+                                                .WithCode(request.Code);
+
+            // Retrieve entity
+            var datacenter = await _queryStore.FirstOrDefaultAsync<DatacenterDto>(filter);
+
+            if (null == datacenter)
+            {
+                var errorMessage = $"Don't find Datacenter with Code {request.Code}";
+                _logger.LogInformation(errorMessage);
+                return Payload<DatacenterDto>.Error(new NotFoundError(errorMessage));
+            }
+
+            return Payload<DatacenterDto>.Success(datacenter);
+        }
+
+        /// <summary>
         /// Get Datacenters
         /// </summary>
         /// <param name="request"></param>
@@ -170,30 +196,5 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
         }
 
-        /// <summary>
-        /// Get datacenter by code
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        /// <exception cref="System.NotImplementedException"></exception>
-        public async Task<Payload<DatacenterDto>> Handle(GetDatacenterByCodeRequest request, CancellationToken cancellationToken)
-        {
-            // Create filter
-            var filter = ExpressionFilterFactory.Create<Datacenter>()
-                                                .WithCode(request.Code);
-
-            // Retrieve entity
-            var datacenter = await _queryStore.FirstOrDefaultAsync<DatacenterDto>(filter);
-
-            if (null == datacenter)
-            {
-                var errorMessage = $"Don't find Datacenter with Code {request.Code}";
-                _logger.LogInformation(errorMessage);
-                return Payload<DatacenterDto>.Error(new NotFoundError(errorMessage));
-            }
-
-            return Payload<DatacenterDto>.Success(datacenter);
-        }
     }
 }

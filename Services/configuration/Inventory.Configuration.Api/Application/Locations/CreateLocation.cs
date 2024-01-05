@@ -80,13 +80,11 @@ namespace Inventory.Configuration.Api.Application.Locations
     {
 
         private readonly ILogger<CreateLocationHanlder> _logger;
-        private readonly IMapper _mapper;
         private readonly IAsyncRepository<Location> _repository;
 
-        public CreateLocationHanlder(ILogger<CreateLocationHanlder> logger, IMapper mapper, IAsyncRepository<Location> repository)
+        public CreateLocationHanlder(ILogger<CreateLocationHanlder> logger, IAsyncRepository<Location> repository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _repository = Guard.Against.Null(repository, nameof(repository));
         }
 
@@ -100,8 +98,8 @@ namespace Inventory.Configuration.Api.Application.Locations
         {
             _logger.LogInformation($"Start adding Location '{request.Name}' with City code '{request.CityCode}', Country code '{request.CountryCode}'");
 
-            var newEntity = new Domain.Models.Location(request.Name, request.CountryCode, request.CityCode, request.RegionCode, request.InventoryCode,
-                                                        request.Description, request.Deprecated, request.ValidFrom, request.ValidTo);
+            var newEntity = new Location(request.Name, request.CountryCode, request.CityCode, request.RegionCode, request.InventoryCode,
+                                         request.Description, request.Deprecated, request.ValidFrom, request.ValidTo);
 
             // Add entity
             var result = await _repository.AddAsync(newEntity, cancellationToken);
@@ -112,12 +110,9 @@ namespace Inventory.Configuration.Api.Application.Locations
                 return Payload<LocationDto>.Error(new GenericApiError(errorMessage));
             }
 
-            // Map response
-            var resultDto = _mapper.Map<LocationDto>(newEntity);
-
             // return result
             _logger.LogInformation("Successfully added Location '{0}' with City code '{1}', Country code '{2}'", request.Name, request.CityCode, request.CountryCode);
-            return Payload<LocationDto>.Success(resultDto);
+            return Payload<LocationDto>.Success(newEntity.ToLocationDto());
 
         }
 

@@ -58,13 +58,11 @@ namespace Inventory.Configuration.Api.Application.Credentials
     public class CreateCredentialHanlder : IRequestHandler<CreateCredentialRequest, Payload<CredentialDto>>
     {
         private readonly ILogger<CreateCredentialHanlder> _logger;
-        private readonly IMapper _mapper;
         private readonly IAsyncRepository<Credential> _repository;
 
-        public CreateCredentialHanlder(ILogger<CreateCredentialHanlder> logger, IMapper mapper, IAsyncRepository<Credential> repository)
+        public CreateCredentialHanlder(ILogger<CreateCredentialHanlder> logger, IAsyncRepository<Credential> repository)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _logger = Guard.Against.Null(logger, nameof(logger));
             _repository = Guard.Against.Null(repository, nameof(repository));
 
         }
