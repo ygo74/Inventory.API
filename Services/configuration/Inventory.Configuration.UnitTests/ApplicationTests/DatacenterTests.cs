@@ -234,6 +234,50 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
             Assert.AreEqual(foundDatacenter.Name, result.Data.Name);
         }
 
+        [Test]
+        public async Task Should_successfull_get_datacenter_plugin_endpoints()
+        {
+            // Arrange
+            var dbContext = UnitTestsContext.Current.GetService<ConfigurationDbContext>();
+            var datacenterIds = dbContext.Datacenters.Select<Datacenter, int>(e => e.Id).ToList();
+            var request = new GetPluginsByDatacenterIdRequest
+            {
+                DatacenterIds = datacenterIds
+            };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsNotEmpty(result);
+        }
+
+        [Test]
+        public async Task Should_successfull_set_datacenter_plugin_endpoints()
+        {
+            // Arrange
+            var dbContext = UnitTestsContext.Current.GetService<ConfigurationDbContext>();
+            var datacenter = dbContext.Datacenters.First(e => e.Code == DataCenterSeed.DATACENTER_PARIS_CODE);
+            var plugin = dbContext.Plugins.First(e => e.Code == PluginSeed.EFFICIENTIP_INVENTORY);
+            var credential = dbContext.Credentials.First(e => e.Name == CredentialSeed.TO_BE_DELETED);
+
+            var request = new AddDatacenterPluginEndpointRequest
+            {
+                DatacenterCode = datacenter.Code,
+                CredentialName = credential.Name,
+                PluginCode = plugin.Code
+            };
+
+            // Act
+            var result = await _mediator.Send(request);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result.Errors);
+            Assert.IsNotEmpty(result.Data);
+        }
+
 
 
 

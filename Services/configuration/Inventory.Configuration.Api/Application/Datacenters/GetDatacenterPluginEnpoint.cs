@@ -14,9 +14,6 @@ using System.Linq;
 
 namespace Inventory.Configuration.Api.Application.Datacenters
 {
-    public class GetDatacenterPluginEnpoint
-    {
-    }
 
     public class GetPluginsByDatacenterIdRequest : IRequest<List<DatacenterPluginsDto>>
     {

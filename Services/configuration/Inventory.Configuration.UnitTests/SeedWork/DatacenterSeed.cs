@@ -10,6 +10,16 @@ namespace Inventory.Configuration.UnitTests.SeedWork
 {
     public static class DataCenterSeed
     {
+
+        public const string DATACENTER_PARIS_CODE = "EMEA-FR-PARIS";
+        public const string DATACENTER_PARIS_NAME = "Paris";
+        public const string DATACENTER_PARIS_INVENTORY_CODE = "dc.paris";
+
+        public const string DATACENTER_LONDON_CODE = "EMEA-UK-LDN";
+        public const string DATACENTER_LONDON_NAME = "London";
+        public const string DATACENTER_LONDON_INVENTORY_CODE = "dc.london";
+
+
         public static IEnumerable<Datacenter> Get()
         {
 
@@ -24,11 +34,23 @@ namespace Inventory.Configuration.UnitTests.SeedWork
             var adminCred = dbContext.Credentials.First(e => e.Name == CredentialSeed.ADMINISTRATOR);
 
 
-            yield return new Datacenter("EMEA-FR-PARIS", "France", DatacenterType.OnPremise, "dc.paris", "Main datacenter")
+            yield return new Datacenter(
+                code: DATACENTER_PARIS_CODE, 
+                name: DATACENTER_PARIS_NAME, 
+                dataCenterType: DatacenterType.OnPremise,
+                inventoryCode: DATACENTER_PARIS_INVENTORY_CODE, 
+                description: "Main datacenter"
+                )
                 .SetLocation(parisLocation)
                 .AddPluginEndpoint(AzPlugin, adminCred);
 
-            yield return new Datacenter("EMEA-UK-LDN", "United Kingdom", DatacenterType.OnPremise, "dc.london")
+            yield return new Datacenter(
+                code: DATACENTER_LONDON_CODE,
+                name: DATACENTER_LONDON_NAME,
+                dataCenterType: DatacenterType.OnPremise,
+                inventoryCode: DATACENTER_LONDON_INVENTORY_CODE,
+                description: "DRP datacenter"            
+                )
                 .SetLocation(LondonLocation)
                 .AddPluginEndpoint(AzPlugin, adminCred);
 
