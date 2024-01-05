@@ -16,6 +16,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters.Dtos
         public string Name { get; set; }
         public string Description { get; set; }
         public string DatacenterType { get; set; }
+        public int    LocationId { get; set; }
         public string LocationName { get; set; }
         public string LocationCountryCode { get; set; }
         public string LocationCityCode { get; set; }
@@ -32,6 +33,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters.Dtos
                     Name = d.Name,
                     Description = d.Description,
                     DatacenterType = d.DataCenterType.ToString(),
+                    LocationId = d.Location.Id,
                     LocationName = d.Location.Name,
                     LocationCountryCode = d.Location.CountryCode,
                     LocationCityCode = d.Location.CityCode,

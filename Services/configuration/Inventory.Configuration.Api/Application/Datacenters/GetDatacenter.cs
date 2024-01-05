@@ -10,6 +10,7 @@ using Inventory.Configuration.Domain.Models;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using MR.AspNetCore.Pagination;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,19 +38,31 @@ namespace Inventory.Configuration.Api.Application.Datacenters
         public string Code { get; set; }
     }
 
-
 #nullable enable
+    /// <summary>
+    /// Find datacenters
+    /// </summary>
     public class GetDatacenterRequest : QueryConfigurationCursorPaginationRequest<DatacenterDto>
     {
         public string? InventoryCode { get; set; }
     }
 #nullable disable
 
+    /// <summary>
+    /// Get datacenter by locations' id
+    /// </summary>
+    public class GetDatacenterByLocationIdsRequest : IRequest<List<DatacenterDto>>
+    {
+        public IEnumerable<int> LocationIds { get; set; }
+    }
+
 
     public class DatacenterQueriesHandler : IRequestHandler<GetDatacenterByIdRequest, Payload<DatacenterDto>>,
                                             IRequestHandler<GetDatacenterByNameRequest, Payload<DatacenterDto>>,
                                             IRequestHandler<GetDatacenterByCodeRequest, Payload<DatacenterDto>>,
-                                            IRequestHandler<GetDatacenterRequest, CursorPaginationdPayload<DatacenterDto>>
+                                            IRequestHandler<GetDatacenterRequest, CursorPaginationdPayload<DatacenterDto>>,
+                                            IRequestHandler<GetDatacenterByLocationIdsRequest, List<DatacenterDto>>
+
     {
 
         private readonly ILogger<DatacenterQueriesHandler> _logger;
@@ -196,5 +209,19 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
         }
 
+        public async Task<List<DatacenterDto>> Handle(GetDatacenterByLocationIdsRequest request, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Get datacenters for location ids : {0}", string.Join(", ", request.LocationIds));
+
+            // Create filter
+            var filter = ExpressionFilterFactory.Create<Datacenter>()
+                                                .ForMultipleLocations(request.LocationIds);
+
+            // Retrieve entity
+            var datacenters = await _queryStore.GetByCriteriaAsync<DatacenterDto>(filter, DatacenterDto.Projection);
+
+            return datacenters.ToList();
+
+        }
     }
 }

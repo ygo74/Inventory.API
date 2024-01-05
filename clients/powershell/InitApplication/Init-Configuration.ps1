@@ -14,7 +14,7 @@ Write-Host "Load plugins" -ForegroundColor Green
 Write-Host $titleSeparator -ForegroundColor Green
 $configuration.plugins | Foreach-Object {
     Write-Host "`t - plugin $($_.Name) : " -NoNewLine
-    $existingPlugin = Get-InventoryPlugin -Code $_.Code
+    $existingPlugin = Get-InventoryPlugin -Code $_.Code -ErrorAction SilentlyContinue
     if ($null -eq $existingPlugin)
     {
         $result = New-InventoryPlugin -InputObject $_
@@ -40,15 +40,16 @@ $configuration.locations | Foreach-Object {
     $existingLocation = Get-InventoryLocation -Name $_.Name -ErrorAction SilentlyContinue
     if ($null -eq $existingLocation)
     {
-        New-InventoryLocation -InputObject $_
+        $result = New-InventoryLocation -InputObject $_
     }
     else
     {
         $_ | Add-Member -MemberType NoteProperty -Name Id -Value $existingLocation.id
-        Update-InventoryLocation -InputObject $_
+        $result = Update-InventoryLocation -InputObject $_
     }
 
     write-Host "Ok"
+    write-Output $result
 }
 
 # -----------------------------------------------------------------------------
@@ -62,15 +63,16 @@ $configuration.Datacenters | Foreach-Object {
     $existingDatacenter = Get-InventoryDatacenter -Name $_.Name -ErrorAction SilentlyContinue
     if ($null -eq $existingDatacenter)
     {
-        New-InventoryDatacenter -InputObject $_
+        $result = New-InventoryDatacenter -InputObject $_
     }
     else
     {
         $_ | Add-Member -MemberType NoteProperty -Name Id -Value $existingDatacenter.id
-        Update-InventoryLocation -InputObject $_
+        $result = Update-InventoryLocation -InputObject $_
     }
 
     write-Host "Ok"
+    write-Output $result
 }
 
 
@@ -85,14 +87,15 @@ $configuration.Credentials | Foreach-Object {
     $existingCredential = Get-InventoryCredential -Name $_.Name -ErrorAction SilentlyContinue
     if ($null -eq $existingCredential)
     {
-        New-InventoryCredential -InputObject $_
+        $result = New-InventoryCredential -InputObject $_
     }
     else
     {
         $_ | Add-Member -MemberType NoteProperty -Name Id -Value $existingCredential.id
-        Update-InventoryCredential -InputObject $_
+        $result = Update-InventoryCredential -InputObject $_
     }
 
     write-Host "Ok"
+    write-Output $result
 }
 

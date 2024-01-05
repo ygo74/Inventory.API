@@ -88,6 +88,7 @@ namespace Inventory.Configuration.Api.Configuration
                 .AddType<BaseErrorInterfaceType>()
                 // Locations
                 .AddType<GetLocationRequestType>()
+                .AddType<LocationType>()
                 // Datacenters
                 .AddType<DatacenterType>()
                 .AddType<CreateDatacenterInputType>()

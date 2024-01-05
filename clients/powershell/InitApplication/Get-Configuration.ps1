@@ -24,11 +24,19 @@ $plugins = @($pluginsDefinition | % {New-Object -TypeName psobject -Property $_}
 $locationsDefinition = @(
     [Ordered]@{
         Name = "Paris"
-        Description = "Paris Datacenter On premises"
+        Description = "Paris city"
         CountryCode = "FR"
         CityCode = "PAR"
         RegionCode = "EMEA"
-        InventoryCode = "emea.fr.par"}
+        InventoryCode = "emea.fr.par"},
+    [Ordered]@{
+            Name = "London"
+            Description = "London city"
+            CountryCode = "UK"
+            CityCode = "LDN"
+            RegionCode = "EMEA"
+            InventoryCode = "emea.uk.ldn"}
+
 )
 
 $locations = @($locationsDefinition | % {New-Object -TypeName psobject -Property $_})
@@ -76,9 +84,24 @@ $CredentialDefinitions = @(
 
 $crdentials = @($CredentialDefinitions | % {New-Object -TypeName psobject -Property $_})
 
+# -----------------------------------------------------------------------------
+# Datacenter's plugin endpoints
+# -----------------------------------------------------------------------------
+$datacenterPluginEndpointsDefinition = @(
+    [Ordered]@{
+        DatacenterCode = "AZR-FR-CENTRAL"
+        CredentialName = "Azure Credential"
+        PluginCode     = "Azure.Plugin"
+    }
+)
+
+$datacenterPluginEndpoints = @($datacenterPluginEndpointsDefinition | % {New-Object -TypeName psobject -Property $_})
+
+
 return @{
     Plugins = $plugins
     Locations = $locations
     Datacenters = $datacenters
     Credentials = $crdentials
+    DatacenterPluginEndpoints = $datacenterPluginEndpoints
 }

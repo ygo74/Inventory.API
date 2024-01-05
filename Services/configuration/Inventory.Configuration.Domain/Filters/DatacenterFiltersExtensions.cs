@@ -45,5 +45,11 @@ namespace Inventory.Configuration.Domain.Filters
             return filter.And(e => ids.Contains(e.Id));
         }
 
+        public static IExpressionFilter<Datacenter> ForMultipleLocations(this IExpressionFilter<Datacenter> filter, IEnumerable<int> ids)
+        {
+            if (ids == null || ids.Count() == 0) return filter;
+            return filter.And(e => e.Location != null && ids.Contains(e.Location.Id));
+        }
+
     }
 }
