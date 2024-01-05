@@ -17,6 +17,16 @@ mutation updateDatacenter(`$input: UpdateDatacenterRequestInput)
 }
 "@
 
+$script:SetDatacenterPluginEndpointMutation=@"
+mutation setDataCenterPluginEnpoint(`$input: SetDatacenterPluginEndpointRequestInput)
+{
+  setDataCenterPluginEnpoint(input: `$input) {
+    data { ... DatacenterPlugins }
+    errors { ... error }
+  }
+}
+"@
+
 
 $script:GetDatacenterByNameQuery=@"
 query getDatacenter(`$name: String)
@@ -84,5 +94,20 @@ fragment DatacenterDto on DatacenterDto {
   createdBy
   lastModified
   lastModifiedBy
+}
+"@
+
+$script:DatacenterPluginsDtoFragment = @"
+fragment DatacenterPlugins on DatacenterPlugins {
+  id
+  datacenterId
+  credentialName
+  credentialDescription
+  credentialPropertyBag
+  pluginName
+  pluginCode
+  pluginVersion
+  pluginPath
+  pluginEndpointPropertyBag
 }
 "@

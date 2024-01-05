@@ -99,3 +99,16 @@ $configuration.Credentials | Foreach-Object {
     write-Output $result
 }
 
+# -----------------------------------------------------------------------------
+# Set Datacenter plugin endpoints
+# -----------------------------------------------------------------------------
+Write-Host ""
+Write-Host "Set Datacenter plugin endpoints" -ForegroundColor Green
+Write-Host $titleSeparator -ForegroundColor Green
+$configuration.DatacenterPluginEndpoints | Foreach-Object {
+    Write-Host "`t - Datacenter $($_.DatacenterCode) : " -NoNewLine
+    Set-InventoryDatacenterPluginEndpoint -InputObject $_
+
+    write-Host "Ok"
+    write-Output $result
+}

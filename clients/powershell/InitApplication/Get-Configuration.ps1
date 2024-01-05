@@ -92,6 +92,7 @@ $datacenterPluginEndpointsDefinition = @(
         DatacenterCode = "AZR-FR-CENTRAL"
         CredentialName = "Azure Credential"
         PluginCode     = "Azure.Plugin"
+        Action         = "ADD"
     }
 )
 

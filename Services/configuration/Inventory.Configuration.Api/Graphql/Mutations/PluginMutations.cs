@@ -26,17 +26,11 @@ namespace Inventory.Configuration.Api.Graphql.Mutations
         }
 
         public async Task<Payload<PluginDto>> UpdatePlugin(
-            int id, Optional<string> path,
+            UpdatePluginRequest input,
             [Service] IMediator _mediator,
             CancellationToken cancellationToken
             )
         {
-            var input = new UpdatePluginRequest
-            {
-                Id = id,
-                Path = path
-            };
-
             return await _mediator.Send(input, cancellationToken);
         }
 

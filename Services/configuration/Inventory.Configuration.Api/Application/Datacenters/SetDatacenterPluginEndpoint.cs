@@ -14,26 +14,34 @@ using System.Threading.Tasks;
 
 namespace Inventory.Configuration.Api.Application.Datacenters
 {
-    public class AddDatacenterPluginEndpointRequest : IRequest<Payload<IEnumerable<DatacenterPluginsDto>>>
+    public class SetDatacenterPluginEndpointRequest : IRequest<Payload<IEnumerable<DatacenterPluginsDto>>>
     {
+
+        public enum PluginEndpointAction
+        {
+            Add,
+            Remove
+        }
+
         public string DatacenterCode { get; set; }
         public string CredentialName { get; set; }
         public string PluginCode { get; set; }
+        public PluginEndpointAction Action { get; set; }
     }
 
-    public class AddDatacenterPluginEndpointHandler : IRequestHandler<AddDatacenterPluginEndpointRequest, Payload<IEnumerable<DatacenterPluginsDto>>>
+    public class SetDatacenterPluginEndpointHandler : IRequestHandler<SetDatacenterPluginEndpointRequest, Payload<IEnumerable<DatacenterPluginsDto>>>
     {
 
         private readonly IAsyncRepository<Datacenter> _datacenterRepository;
         private readonly IAsyncRepository<Credential> _credentialRepository;
         private readonly IAsyncRepository<Plugin> _pluginRepository;
-        private readonly ILogger<AddDatacenterPluginEndpointHandler> _logger;
+        private readonly ILogger<SetDatacenterPluginEndpointHandler> _logger;
 
 
-        public AddDatacenterPluginEndpointHandler(IAsyncRepository<Datacenter> datacenterRepository,
+        public SetDatacenterPluginEndpointHandler(IAsyncRepository<Datacenter> datacenterRepository,
                                                   IAsyncRepository<Credential> credentialRepository,
                                                   IAsyncRepository<Plugin> pluginRepository,
-                                                  ILogger<AddDatacenterPluginEndpointHandler> logger)
+                                                  ILogger<SetDatacenterPluginEndpointHandler> logger)
         {
             _datacenterRepository = Guard.Against.Null(datacenterRepository, nameof(datacenterRepository));
             _credentialRepository = Guard.Against.Null(credentialRepository, nameof(credentialRepository));
@@ -41,7 +49,7 @@ namespace Inventory.Configuration.Api.Application.Datacenters
             _logger = Guard.Against.Null(logger, nameof(logger));
         }
 
-        public async Task<Payload<IEnumerable<DatacenterPluginsDto>>> Handle(AddDatacenterPluginEndpointRequest request, CancellationToken cancellationToken)
+        public async Task<Payload<IEnumerable<DatacenterPluginsDto>>> Handle(SetDatacenterPluginEndpointRequest request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Start Manage Plugin {0} endpoint with credential {1} for datacenter {2}", request.PluginCode, request.CredentialName, request.DatacenterCode);
 
@@ -75,13 +83,23 @@ namespace Inventory.Configuration.Api.Application.Datacenters
                 return Payload<IEnumerable<DatacenterPluginsDto>>.Error(new NotFoundError(errorMessage));
             }
 
-            // Add plugin endpoint
-            datacenter.AddPluginEndpoint(plugin, credential);
+            if (request.Action == SetDatacenterPluginEndpointRequest.PluginEndpointAction.Add)
+            {
+                // Add plugin endpoint
+                datacenter.AddPluginEndpoint(plugin, credential);
+            }
+            else
+            {
+                // Add plugin endpoint
+                datacenter.RemovePluginEndpoint(plugin, credential);
+            }
 
             // Save entity
             var nbChanges = await _datacenterRepository.UpdateAsync(datacenter, cancellationToken: cancellationToken);
             if (nbChanges > 0)
-                _logger.LogInformation("Succefully added plugin {0} endpoint with credential {1} for datacenter {2}", request.PluginCode, request.CredentialName, request.DatacenterCode);
+                _logger.LogInformation("Succefully {0} plugin {1} endpoint with credential {2} for datacenter {3}", 
+                    request.Action,
+                    request.PluginCode, request.CredentialName, request.DatacenterCode);
 
 
             // return datacenter with plugin endpoint

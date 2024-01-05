@@ -262,7 +262,7 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
             var plugin = dbContext.Plugins.First(e => e.Code == PluginSeed.EFFICIENTIP_INVENTORY);
             var credential = dbContext.Credentials.First(e => e.Name == CredentialSeed.TO_BE_DELETED);
 
-            var request = new AddDatacenterPluginEndpointRequest
+            var request = new SetDatacenterPluginEndpointRequest
             {
                 DatacenterCode = datacenter.Code,
                 CredentialName = credential.Name,

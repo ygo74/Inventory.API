@@ -287,6 +287,95 @@ function Update-InventoryDatacenter
     }
 }
 
+function Set-InventoryDatacenterPluginEndpoint
+{
+    [CmdletBinding(DefaultParameterSetName="Default")]
+    param(
+        [Parameter(ParameterSetName="Pipeline", Position=0, Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$false)]
+        [PsObject]
+        $InputObject,
+
+        [Parameter(ParameterSetName="Default", Position=0, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [string]
+        $DatacenterCode,
+
+        [Parameter(ParameterSetName="Default", Position=1, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [String]
+        $CredentialName,
+
+        [Parameter(ParameterSetName="Default", Position=2, Mandatory=$true, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [String]
+        $PluginCode,
+
+        [Parameter(ParameterSetName="Default", Position=3, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Switch]
+        $Remove
+
+    )
+
+    Begin
+    {
+        $startFunction = Get-Date
+        Trace-StartFunction -CommandName $MyInvocation.MyCommand.Name
+    }
+    End
+    {
+        $endFunction = Get-Date
+        Trace-EndFunction -CommandName $MyInvocation.MyCommand.Name -Duration ($endFunction -$startFunction)
+
+    }
+    Process
+    {
+
+        if ($PsCmdlet.ParameterSetName -eq "Pipeline")
+        {
+            $DatacenterCode  = $InputObject.DatacenterCode
+            $CredentialName  = $InputObject.CredentialName
+            $PluginCode      = $InputObject.PluginCode
+            $PipelineAction  = $InputObject.Action
+        }
+
+        # Manage action
+        $Action = "ADD"
+        if ($Remove -or $PipelineAction -eq "REMOVE") {$Action = "REMOVE"}
+
+        # Display input properties
+        Trace-Message -Message ("Datacenter Code : '{0}'" -f $DatacenterCode) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Plugin Code : '{0}'" -f $PluginCode) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Credential Name : '{0}'" -f $CredentialName) -CommandName $MyInvocation.MyCommand.Name
+        Trace-Message -Message ("Plugin endpoint action : '{0}'" -f $Action) -CommandName $MyInvocation.MyCommand.Name
+
+        # Assert Mandatory variables
+        if ([string]::IsNullOrWhiteSpace($DatacenterCode)) {throw "DatacenterCode is mandatory"}
+        if ([string]::IsNullOrWhiteSpace($PluginCode)) {throw "PluginCode is mandatory"}
+        if ([string]::IsNullOrWhiteSpace($CredentialName)) {throw "CredentialName is mandatory"}
+
+
+        # Create payload input
+        $graphqlInput = @{
+            datacenterCode = $DatacenterCode
+            pluginCode = $PluginCode
+            credentialName = $CredentialName
+            action = $Action
+        }
+
+        $Variables = @{
+            input = $graphqlInput
+        }
+
+        $command = $script:SetDatacenterPluginEndpointMutation + $script:DatacenterPluginsDtoFragment + $script:ErrorsFragment
+
+        $result = Invoke-InternalGraphql -Query $command -Variables $Variables -uri $global:ConfigurationUri
+
+        if ($result.setDataCenterPluginEnpoint.errors.Count -gt 0)
+        {
+            throw (ConvertFrom-InternalGraphqlErrors -Errors $result.setDataCenterPluginEnpoint.errors)
+        }
+        $result.setDataCenterPluginEnpoint.data
+
+    }
+}
+
 
 function Get-InventoryDatacenter
 {
