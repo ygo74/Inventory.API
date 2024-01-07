@@ -103,7 +103,6 @@ fragment DatacenterPlugins on DatacenterPlugins {
   datacenterId
   credentialName
   credentialDescription
-  credentialPropertyBag
   pluginName
   pluginCode
   pluginVersion

@@ -16,7 +16,8 @@ namespace Inventory.Configuration.Api.Graphql.Types
     {
         protected override void Configure(IObjectTypeDescriptor<CreateCredentialRequest> descriptor)
         {
-            descriptor.Field(e => e.PropertyBag).Type<AnyType>();
+            //descriptor.Field(e => e.PropertyBag).Type<AnyType>();
+            descriptor.Ignore(e => e.PropertyBag);
         }
     }
 }

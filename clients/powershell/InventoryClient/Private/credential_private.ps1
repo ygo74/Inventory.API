@@ -68,7 +68,6 @@ fragment credentialDto on CredentialDto
     id
     name
     description
-    propertyBag
     created
     createdBy
     lastModified
