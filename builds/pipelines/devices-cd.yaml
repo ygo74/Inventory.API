@@ -38,9 +38,9 @@ resources:
           - refs/heads/release?/*
           - release?/*
           - master
-          - feature/*
-          - feature/devices/*
-          - topic/devices/*
+          # - feature/*
+          # - feature/devices/*
+          # - topic/devices/*
 
 stages:
   - template: ./templates/service-deploy-cd.yaml
