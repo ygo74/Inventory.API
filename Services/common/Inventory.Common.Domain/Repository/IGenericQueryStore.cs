@@ -29,7 +29,6 @@ namespace Inventory.Common.Domain.Repository
 
         Task<IEnumerable<TDtoEntity>> ListAllAsync<TDtoEntity>(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
                                                                Expression<Func<T, TDtoEntity>> Projection = null,
-                                                               Expression<Func<T, IEnumerable<TDtoEntity>>> ManyProjection = null,
                                                                int? offset = null, int? limit = null,
                                                                CancellationToken cancellationToken = default,
                                                                params Expression<Func<T, object>>[] includes) where TDtoEntity : class;
