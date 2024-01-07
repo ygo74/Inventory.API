@@ -10,7 +10,7 @@ namespace Inventory.Plugins.Interfaces
         string Name { get; }
         string Description { get; }
 
-        //void InitCredential(string userName, string description, Dictionary<string, object> propertyBag);
+        void InitCredential(string userName, string description, Dictionary<string, object> propertyBag);
         Task<List<Subnet>> ListAllAsync();
     }
 }

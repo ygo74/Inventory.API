@@ -1,8 +1,12 @@
 ﻿using HotChocolate.Types;
 using Inventory.Common.Application.Core;
+using Inventory.Common.Application.Plugins;
 using Inventory.Configuration.Api.Application.Datacenters;
 using Inventory.Configuration.Api.Application.Datacenters.Dtos;
+using Inventory.Networks.Domain.Models;
+using Inventory.Plugins.Interfaces;
 using MediatR;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Inventory.Configuration.Api.Graphql.Types
@@ -40,6 +44,18 @@ namespace Inventory.Configuration.Api.Graphql.Types
                     return await loader.LoadAsync(datacenter.Id);
                 });
 
+
+            descriptor.Field("subnets")
+                .Resolve<List<Subnet>>(async (ctx, cancellationToken) =>
+                {
+                    var datacenter = ctx.Parent<DatacenterDto>();
+                    var request = new GetDatacenterSubnetsRequest
+                    {
+                        DatacenterCode = datacenter.Code
+                    };
+                    return await ctx.Service<IMediator>().Send(request, cancellationToken);
+                });
+
         }
     }
 
@@ -67,7 +83,8 @@ namespace Inventory.Configuration.Api.Graphql.Types
         {
             descriptor.Name("DatacenterPlugins");
             descriptor.Field(e => e.PluginEndpointPropertyBag).Type<AnyType>();
-            descriptor.Field(e => e.CredentialPropertyBag).Type<AnyType>();
+            //descriptor.Field(e => e.CredentialPropertyBag).Type<AnyType>();
+            descriptor.Ignore(e => e.CredentialPropertyBag);
         }
     }
 
