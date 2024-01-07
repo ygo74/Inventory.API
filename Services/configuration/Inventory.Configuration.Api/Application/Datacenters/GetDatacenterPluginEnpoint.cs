@@ -41,10 +41,10 @@ namespace Inventory.Configuration.Api.Application.Datacenters
                             .ForMultipleDatacenter(request.DatacenterIds);
 
             // Execute the query
-            var result = await _queryStore.GetByCriteriaAsync<DatacenterPluginsDto>(criteria: filter,
-                                                                              ManyProjection: DatacenterPluginsDto.Projection,   
-                                                                              orderBy: q => q.OrderBy(e => e.Id),
-                                                                              cancellationToken: cancellationToken);
+            var result = await _queryStore.GetByCriteriaWithManySelectAsync<DatacenterPluginsDto>(criteria: filter,
+                                                                                    Projection: DatacenterPluginsDto.Projection,   
+                                                                                    orderBy: q => q.OrderBy(e => e.Id),
+                                                                                    cancellationToken: cancellationToken);
 
             return result.ToList();
         }

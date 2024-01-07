@@ -69,6 +69,12 @@ namespace Inventory.Common.Infrastructure.Database
         #endregion
 
 
+        /// <summary>
+        /// Get entity by id
+        /// </summary>
+        /// <param name="id">Entity's id</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns></returns>
         public async Task<T> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Set<T>()
@@ -77,6 +83,14 @@ namespace Inventory.Common.Infrastructure.Database
                                     .FirstOrDefaultAsync(cancellationToken);
         }
 
+        /// <summary>
+        /// Get entity by Id with projection
+        /// </summary>
+        /// <typeparam name="TDtoEntity"></typeparam>
+        /// <param name="id">Entity's id</param>
+        /// <param name="Projection">Query projection</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns></returns>
         public Task<TDtoEntity> GetByIdAsync<TDtoEntity>(int id, 
                                                         Expression<Func<T, TDtoEntity>> Projection = null,
                                                         CancellationToken cancellationToken = default) where TDtoEntity : class
@@ -98,44 +112,46 @@ namespace Inventory.Common.Infrastructure.Database
         }
 
 
+        /// <summary>
+        /// Get first or default entity according the criteria
+        /// </summary>
+        /// <param name="criteria">Query's criteria</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <param name="includes">Additional includes</param>
+        /// <returns></returns>
         public async Task<T> FirstOrDefaultAsync(IExpressionFilter<T> criteria = null,
                                                 CancellationToken cancellationToken = default,
                                                 params Expression<Func<T, object>>[] includes)
         {
-            var query = _dbContext.Set<T>()
-                               .AsNoTracking();
 
-            if (criteria is not null && criteria.Predicate is not null)
-            {
-                query = query.Where(criteria.Predicate);
-            }
-
-            if (includes != null)
-            {
-                query = includes.Aggregate(query,
-                                             (current, include) => current.Include(include));
-            }
+            // get query
+            var query = GetQuery(
+                criteria: criteria,
+                includes: includes
+            );
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
 
+        /// <summary>
+        /// Get first or default entity with projection according the criteria
+        /// </summary>
+        /// <param name="criteria">Query's criteria</param>
+        /// <param name="Projection">Query projection</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <param name="includes">Additional includes</param>
+        /// <returns></returns>
         public async Task<TDtoEntity> FirstOrDefaultAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
                                                                       Expression<Func<T, TDtoEntity>> Projection = null,
                                                                       CancellationToken cancellationToken = default,
                                                                       params Expression<Func<T, object>>[] includes) where TDtoEntity : class
         {
-            var query = _dbContext.Set<T>()
-                               .AsNoTracking();
 
-            if (criteria is not null && criteria.Predicate is not null)
-            {
-                query = query.Where(criteria.Predicate);
-            }
-
-            if (includes != null)
-            {
-                query = includes.Aggregate(query, (current, include) => current.Include(include));
-            }
+            // get query
+            var query = GetQuery(
+                criteria: criteria,
+                includes: includes
+            );
 
             if (Projection != null)
             {
@@ -157,13 +173,36 @@ namespace Inventory.Common.Infrastructure.Database
             return GetByCriteriaAsync<TDtoEntity>(criteria: null,
                                                   orderBy: orderBy,
                                                   Projection: Projection,
-                                                  ManyProjection: ManyProjection,
                                                   offset: offset,
                                                   limit: limit,
                                                   cancellationToken: cancellationToken,
                                                   includes: includes);
         }
 
+        public Task<IEnumerable<TDtoEntity>> ListAllWithManyAsync<TDtoEntity>(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                                                      Expression<Func<T, IEnumerable<TDtoEntity>>> Projection = null,
+                                                                      int? offset = null, int? limit = null,
+                                                                      CancellationToken cancellationToken = default,
+                                                                      params Expression<Func<T, object>>[] includes) where TDtoEntity : class
+        {
+            return GetByCriteriaWithManySelectAsync<TDtoEntity>(criteria: null,
+                                                  orderBy: orderBy,
+                                                  Projection: Projection,
+                                                  offset: offset,
+                                                  limit: limit,
+                                                  cancellationToken: cancellationToken,
+                                                  includes: includes);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="orderBy"></param>
+        /// <param name="offset"></param>
+        /// <param name="limit"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="includes"></param>
+        /// <returns></returns>
         public Task<IEnumerable<T>> ListAllAsync(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
                                                  int? offset = null, int? limit = null,
                                                  CancellationToken cancellationToken = default,
@@ -177,56 +216,85 @@ namespace Inventory.Common.Infrastructure.Database
                                       includes: includes);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TDtoEntity"></typeparam>
+        /// <param name="criteria"></param>
+        /// <param name="Projection"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="offset"></param>
+        /// <param name="limit"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="includes"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<TDtoEntity>> GetByCriteriaAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
                                                                                   Expression<Func<T, TDtoEntity>> Projection = null,
-                                                                                  Expression<Func<T, IEnumerable<TDtoEntity>>> ManyProjection = null,
                                                                                   Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
                                                                                   int? offset = null, int? limit = null,
                                                                                   CancellationToken cancellationToken = default,
                                                                                   params Expression<Func<T, object>>[] includes) where TDtoEntity : class
         {
-            var query = _dbContext.Set<T>()
-                                  .AsNoTracking();
 
-            if (criteria is not null && criteria.Predicate is not null)
-            {
-                query = query.Where(criteria.Predicate);
-            }
-
-            if (includes != null)
-            {
-                query = includes.Aggregate(query,
-                          (current, include) => current.Include(include));
-            }
-
-            if (orderBy != null)
-            {
-                query = orderBy(query);
-            }
-
-            if (offset.HasValue)
-            {
-                query = query.Skip(offset.Value);
-            }
-
-            if (limit.HasValue)
-            {
-                query = query.Take(limit.Value);
-            }
+            // get query
+            var query = GetQuery(
+                criteria: criteria,
+                orderBy: orderBy,
+                offset: offset,
+                limit: limit,
+                includes: includes
+            );
 
             // return the child projection if it is not null
             if (Projection != null)
             {
-                return await query.Select<T, TDtoEntity>(Projection).ToListAsync();
-            }
-            else if (ManyProjection != null)
-            {
-                return await query.SelectMany<T, TDtoEntity>(ManyProjection).ToListAsync();
+                return await query.Select<T, TDtoEntity>(Projection).ToListAsync(cancellationToken);
             }
 
             // return the default query projection
             return await query.ProjectTo<TDtoEntity>(_mapper.ConfigurationProvider)
-                        .ToListAsync();
+                        .ToListAsync(cancellationToken);
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TDtoEntity"></typeparam>
+        /// <param name="criteria"></param>
+        /// <param name="Projection"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="offset"></param>
+        /// <param name="limit"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="includes"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TDtoEntity>> GetByCriteriaWithManySelectAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
+                                                                                  Expression<Func<T, IEnumerable<TDtoEntity>>> Projection = null,
+                                                                                  Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                                                                  int? offset = null, int? limit = null,
+                                                                                  CancellationToken cancellationToken = default,
+                                                                                  params Expression<Func<T, object>>[] includes) where TDtoEntity : class
+        {
+
+            // get query
+            var query = GetQuery(
+                criteria: criteria,
+                orderBy: orderBy,
+                offset: offset,
+                limit: limit,
+                includes: includes
+            );
+
+            // return the child projection if it is not null
+            if (Projection != null)
+            {
+                return await query.SelectMany<T, TDtoEntity>(Projection).ToListAsync(cancellationToken);
+            }
+
+            // return the default query projection
+            return await query.ProjectTo<TDtoEntity>(_mapper.ConfigurationProvider)
+                        .ToListAsync(cancellationToken);
 
         }
 
@@ -241,40 +309,25 @@ namespace Inventory.Common.Infrastructure.Database
         /// <param name="includes">The related entities to include in the query.</param>
         /// <returns>The list of entities.</returns>
         /// <summary>
-        public async Task<IEnumerable<T>> GetByCriteriaAsync(IExpressionFilter<T> criteria = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, int? offset = null, int? limit = null, CancellationToken cancellationToken = default, params Expression<Func<T, object>>[] includes)
+        public async Task<IEnumerable<T>> GetByCriteriaAsync(IExpressionFilter<T> criteria = null,
+                                                             Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                                             int? offset = null, int? limit = null,
+                                                             CancellationToken cancellationToken = default,
+                                                             params Expression<Func<T, object>>[] includes)
         {
-            var query = _dbContext.Set<T>()
-                                  .AsNoTracking();
+            // get query
+            var query = GetQuery(
+                criteria: criteria,
+                orderBy: orderBy,
+                offset: offset,
+                limit: limit,
+                includes: includes
+            );
 
-            if (criteria is not null && criteria.Predicate is not null)
-            {
-                query = query.Where(criteria.Predicate);
-            }
-
-            if (includes != null)
-            {
-                query = includes.Aggregate(query,
-                          (current, include) => current.Include(include));
-            }
-
-            if (orderBy != null)
-            {
-                query = orderBy(query);
-            }
-
-            if (offset.HasValue)
-            {
-                query = query.Skip(offset.Value);
-            }
-
-            if (limit.HasValue)
-            {
-                query = query.Take(limit.Value);
-            }
-
-            return await query.ToListAsync();
+            return await query.ToListAsync(cancellationToken);
         }
 
+        /// <summary>
         /// Retrieves a queryable object based on the specified criteria, ordering, offset, and limit.
         /// </summary>
         /// <param name="criteria">The expression filter criteria.</param>
@@ -284,7 +337,10 @@ namespace Inventory.Common.Infrastructure.Database
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="includes">The related entities to include in the query.</param>
         /// <returns>The queryable object.</returns>
-        public IQueryable<T> GetQuery(IExpressionFilter<T> criteria = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, int? offset = null, int? limit = null, CancellationToken cancellationToken = default, params Expression<Func<T, object>>[] includes)
+        public IQueryable<T> GetQuery(IExpressionFilter<T> criteria = null, 
+                                      Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, 
+                                      int? offset = null, int? limit = null, 
+                                      params Expression<Func<T, object>>[] includes)
         {
             var query = _dbContext.Set<T>()
                                   .AsNoTracking();
@@ -342,5 +398,6 @@ namespace Inventory.Common.Infrastructure.Database
 
             return await query.AnyAsync(cancellationToken);
         }
+
     }
 }

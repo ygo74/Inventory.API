@@ -34,6 +34,13 @@ namespace Inventory.Common.Domain.Repository
                                                                CancellationToken cancellationToken = default,
                                                                params Expression<Func<T, object>>[] includes) where TDtoEntity : class;
 
+        Task<IEnumerable<TDtoEntity>> ListAllWithManyAsync<TDtoEntity>(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                                               Expression<Func<T, IEnumerable<TDtoEntity>>> Projection = null,
+                                                               int? offset = null, int? limit = null,
+                                                               CancellationToken cancellationToken = default,
+                                                               params Expression<Func<T, object>>[] includes) where TDtoEntity : class;
+
+
         Task<IEnumerable<T>> ListAllAsync(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
                                           int? offset = null, int? limit = null,
                                           CancellationToken cancellationToken = default,
@@ -41,7 +48,13 @@ namespace Inventory.Common.Domain.Repository
 
         Task<IEnumerable<TDtoEntity>> GetByCriteriaAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
                                                                      Expression<Func<T, TDtoEntity>> Projection = null,
-                                                                     Expression<Func<T, IEnumerable<TDtoEntity>>> ManyProjection = null,
+                                                                     Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                                                     int? offset = null, int? limit = null,
+                                                                     CancellationToken cancellationToken = default,
+                                                                     params Expression<Func<T, object>>[] includes) where TDtoEntity : class;
+
+        Task<IEnumerable<TDtoEntity>> GetByCriteriaWithManySelectAsync<TDtoEntity>(IExpressionFilter<T> criteria = null,
+                                                                     Expression<Func<T, IEnumerable<TDtoEntity>>> Projection = null,
                                                                      Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
                                                                      int? offset = null, int? limit = null,
                                                                      CancellationToken cancellationToken = default,
@@ -56,7 +69,6 @@ namespace Inventory.Common.Domain.Repository
         IQueryable<T> GetQuery(IExpressionFilter<T> criteria = null,
                                Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
                                int? offset = null, int? limit = null,
-                               CancellationToken cancellationToken = default,
                                params Expression<Func<T, object>>[] includes);
 
 

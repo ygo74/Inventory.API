@@ -44,9 +44,9 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
             // Read the datacenter plugins
             var filter = ExpressionFilterFactory.Create<Datacenter>().WithCode(request.DatacenterCode);
-            var datacenterPLugins = await _queryStore.GetByCriteriaAsync<DatacenterPluginsDto>(
+            var datacenterPLugins = await _queryStore.GetByCriteriaWithManySelectAsync<DatacenterPluginsDto>(
                 criteria: filter,
-                ManyProjection: DatacenterPluginsDto.Projection
+                Projection: DatacenterPluginsDto.Projection
             );
 
             var datacenter = _queryStore.GetQuery(
