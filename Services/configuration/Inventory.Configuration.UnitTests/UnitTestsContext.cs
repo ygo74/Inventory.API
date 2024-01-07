@@ -65,7 +65,7 @@ namespace Inventory.Configuration.UnitTests
             services.AddPagination();
 
             // Applications
-            services.AddSingleton<PluginResolver>();
+            services.AddSingleton<IPluginResolver, PluginResolver>();
             services.AddScoped<PluginService>();
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<ICredentialService, CredentialService>();

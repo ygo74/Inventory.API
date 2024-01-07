@@ -1,5 +1,9 @@
-﻿using FluentValidation.TestHelper;
+﻿using Castle.Core.Logging;
+using Elasticsearch.Net.Specification.IndicesApi;
+using FluentValidation.TestHelper;
+using Inventory.Common.Application.Plugins;
 using Inventory.Common.Domain.Repository;
+using Inventory.Common.Infrastructure.Database;
 using Inventory.Configuration.Api.Application.Credentials;
 using Inventory.Configuration.Api.Application.Datacenters;
 using Inventory.Configuration.Api.Application.Datacenters.Dtos;
@@ -9,14 +13,18 @@ using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
 using Inventory.Configuration.UnitTests.SeedWork;
 using Inventory.Configuration.UnitTests.TestCases;
+using Inventory.Networks.Domain.Models;
+using Inventory.Plugins.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Inventory.Configuration.UnitTests.ApplicationTests
@@ -279,7 +287,54 @@ namespace Inventory.Configuration.UnitTests.ApplicationTests
         }
 
 
+        [Test]
+        public async Task Should_successfull_get_datacenter_subnets()
+        {
+            // Arrange
+            var logger = UnitTestsContext.Current.GetService<ILogger<GetDatacenterSubnetsHandler>>();
+            var queryStore = UnitTestsContext.Current.GetService<IGenericQueryStore<Datacenter>>();
+            var pluginResolverMock = new Mock<IPluginResolver>();
+            pluginResolverMock.Setup(x => x.GetService<ISubnetProvider>("Azure.Inventory")).Returns(new TestSubnetProvider());
+            var handler = new GetDatacenterSubnetsHandler(logger, queryStore, pluginResolverMock.Object);
+
+            // Create request
+            var request = new GetDatacenterSubnetsRequest
+            {
+                DatacenterCode = DataCenterSeed.DATACENTER_PARIS_CODE
+            };
+
+            // Act
+            var result = await handler.Handle(request, default(CancellationToken));
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsNotEmpty(result);
+
+
+        }
+
+        public class TestSubnetProvider : ISubnetProvider
+        {
+            public string Name => "TestSubnetProvider";
+
+            public string Description => "TestSubnetProvider";
+
+            public void InitCredential(string userName, string description, Dictionary<string, object> propertyBag)
+            {
+                
+            }
+
+            public async Task<List<Subnet>> ListAllAsync()
+            {
+                var allSubnets = new List<Subnet>()
+                {
+                    new Subnet("10.8.0.0/14", "network_1", Name)
+                };
+
+                return await Task.FromResult(allSubnets);
+            }
+        }
 
 
     }
-}
+    }

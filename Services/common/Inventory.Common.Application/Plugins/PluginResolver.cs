@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Common.Application.Plugins
 {
-    public class PluginResolver : IDisposable, IAsyncDisposable
+    public class PluginResolver : IPluginResolver, IDisposable, IAsyncDisposable
     {
         private readonly ILogger<PluginResolver> _logger;
         private ServiceProvider _serviceProvider;

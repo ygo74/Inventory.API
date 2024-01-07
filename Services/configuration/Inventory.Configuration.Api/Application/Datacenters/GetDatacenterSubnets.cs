@@ -29,9 +29,9 @@ namespace Inventory.Configuration.Api.Application.Datacenters
 
         private readonly ILogger<GetDatacenterSubnetsHandler> _logger;
         private readonly IGenericQueryStore<Datacenter> _queryStore;
-        private readonly PluginResolver _pluginResolver;
+        private readonly IPluginResolver _pluginResolver;
 
-        public GetDatacenterSubnetsHandler(ILogger<GetDatacenterSubnetsHandler> logger, IGenericQueryStore<Datacenter> queryStore, PluginResolver pluginResolver)
+        public GetDatacenterSubnetsHandler(ILogger<GetDatacenterSubnetsHandler> logger, IGenericQueryStore<Datacenter> queryStore, IPluginResolver pluginResolver)
         {
             _logger = Guard.Against.Null(logger, nameof(logger));
             _queryStore = Guard.Against.Null(queryStore, nameof(queryStore));
