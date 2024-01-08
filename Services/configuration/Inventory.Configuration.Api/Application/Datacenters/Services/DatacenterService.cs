@@ -17,10 +17,10 @@ namespace Inventory.Configuration.Api.Application.Datacenters.Services
     {
         private readonly IDbContextFactory<ConfigurationDbContext> _factory;
         private readonly ILogger<DatacenterService> _logger;
-        private readonly PluginResolver _pluginResolver;
+        private readonly IPluginResolver _pluginResolver;
 
         // add constructor with IDbContextFactory<ConfigurationDbContext> and ILogger<DatacenterService>
-        public DatacenterService(IDbContextFactory<ConfigurationDbContext> factory, ILogger<DatacenterService> logger, PluginResolver pluginResolver)
+        public DatacenterService(IDbContextFactory<ConfigurationDbContext> factory, ILogger<DatacenterService> logger, IPluginResolver pluginResolver)
         {
             // add GuardClauses to store factory and logger
             _factory = Guard.Against.Null(factory, nameof(factory));

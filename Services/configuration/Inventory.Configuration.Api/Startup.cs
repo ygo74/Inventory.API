@@ -86,7 +86,7 @@ namespace Inventory.Configuration.Api
             services.AddPagination();
 
             // Application
-            services.AddSingleton<PluginResolver>();
+            services.AddSingleton<IPluginResolver, PluginResolver>();
             //services.AddSingleton<PluginResolver>(sp =>
             //{
             //    var logger = sp.GetService<ILogger<PluginResolver>>();

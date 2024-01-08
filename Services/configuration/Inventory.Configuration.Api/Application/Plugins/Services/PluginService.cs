@@ -21,13 +21,13 @@ namespace Inventory.Configuration.Api.Application.Plugins.Services
     {
         private readonly IMapper _mapper;
         private readonly ILogger<PluginService> _logger;
-        private readonly PluginResolver _pluginResolver;
+        private readonly IPluginResolver _pluginResolver;
         private readonly IDbContextFactory<ConfigurationDbContext> _factory;
         private readonly IConfiguration _configuration;
 
         public PluginService(IDbContextFactory<ConfigurationDbContext> factory, 
                              IConfiguration configuration, 
-                             IMapper mapper, ILogger<PluginService> logger, PluginResolver pluginResolver)
+                             IMapper mapper, ILogger<PluginService> logger, IPluginResolver pluginResolver)
         {
             _factory = Guard.Against.Null(factory, nameof(factory));
             _mapper = Guard.Against.Null(mapper, nameof(mapper));
