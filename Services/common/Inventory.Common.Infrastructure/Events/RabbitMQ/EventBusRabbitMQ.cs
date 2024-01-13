@@ -19,22 +19,16 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
 {
     public class EventBusRabbitMQ : IEventBus, IDisposable
     {
-        const string BROKER_NAME = "eshop_event_bus";
-        //const string AUTOFAC_SCOPE_NAME = "eshop_event_bus";
-
         private readonly IRabbitMQPersistentConnection _persistentConnection;
         private readonly ILogger<EventBusRabbitMQ> _logger;
         private readonly IEventBusSubscriptionsManager _subsManager;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IConfiguration _configuration;
-        private readonly int _retryCount;
+        private readonly RabbitMQConfiguration _configuration;
 
         private IModel _consumerChannel;
-        private string _queueName;
 
         public EventBusRabbitMQ(IRabbitMQPersistentConnection persistentConnection, ILogger<EventBusRabbitMQ> logger,
-            IServiceProvider serviceProvider, IEventBusSubscriptionsManager subsManager, IConfiguration configuration,
-            string queueName = null, int retryCount = 5
+            IServiceProvider serviceProvider, IEventBusSubscriptionsManager subsManager, RabbitMQConfiguration configuration
             )
         {
             _persistentConnection = persistentConnection ?? throw new ArgumentNullException(nameof(persistentConnection));
@@ -42,13 +36,11 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
             _subsManager = subsManager ?? new InMemoryEventBusSubscriptionsManager();
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
-            if (!configuration.GetValue<bool>("PublishIntegrationEvent"))
+            if (!configuration.IsEnabled)
                 return;
 
-            _queueName = queueName;
             _consumerChannel = CreateConsumerChannel();
             _serviceProvider = serviceProvider;
-            _retryCount = retryCount;
             _subsManager.OnEventRemoved += SubsManager_OnEventRemoved;
         }
 
@@ -61,13 +53,12 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
 
             using (var channel = _persistentConnection.CreateModel())
             {
-                channel.QueueUnbind(queue: _queueName,
-                    exchange: BROKER_NAME,
+                channel.QueueUnbind(queue: _configuration.QueueName,
+                    exchange: _configuration.ExchangeName,
                     routingKey: eventName);
 
                 if (_subsManager.IsEmpty)
                 {
-                    _queueName = string.Empty;
                     _consumerChannel.Close();
                 }
             }
@@ -75,7 +66,7 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
 
         public void Publish<T>(T @event, string eventName=null) where T : IntegrationEvent
         {
-            if (!_configuration.GetValue<bool>("PublishIntegrationEvent"))
+            if (!_configuration.IsEnabled)
                 return;
 
             if (!_persistentConnection.IsConnected)
@@ -85,7 +76,7 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
 
             var policy = RetryPolicy.Handle<BrokerUnreachableException>()
                 .Or<SocketException>()
-                .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
+                .WaitAndRetry(_configuration.RetryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
                 {
                     _logger.LogWarning(ex, "Could not publish event: {EventId} after {Timeout}s ({ExceptionMessage})", @event.Id, $"{time.TotalSeconds:n1}", ex.Message);
                 });
@@ -99,7 +90,7 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
             {
                 _logger.LogTrace("Declaring RabbitMQ exchange to publish event: {EventId}", @event.Id);
 
-                channel.ExchangeDeclare(exchange: BROKER_NAME, type: "direct");
+                channel.ExchangeDeclare(exchange: _configuration.ExchangeName, type: _configuration.ExchangeType);
 
                 //var message = JsonConvert.SerializeObject(@event);
                 var message = JsonSerializer.Serialize(@event);
@@ -113,7 +104,7 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
                     _logger.LogTrace("Publishing event to RabbitMQ: {EventId}", @event.Id);
 
                     channel.BasicPublish(
-                        exchange: BROKER_NAME,
+                        exchange: _configuration.ExchangeName,
                         routingKey: eventName,
                         mandatory: true,
                         basicProperties: properties,
@@ -125,7 +116,7 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
         public void SubscribeDynamic<TH>(string eventName)
             where TH : IDynamicIntegrationEventHandler
         {
-            if (!_configuration.GetValue<bool>("PublishIntegrationEvent"))
+            if (!_configuration.IsEnabled)
                 return;
 
             _logger.LogInformation("Subscribing to dynamic event {EventName} with {EventHandler}", eventName, typeof(TH).GetGenericTypeName());
@@ -139,7 +130,7 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            if (!_configuration.GetValue<bool>("PublishIntegrationEvent"))
+            if (!_configuration.IsEnabled)
                 return;
 
             if (string.IsNullOrEmpty(eventName))
@@ -165,8 +156,8 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
 
                 using (var channel = _persistentConnection.CreateModel())
                 {
-                    channel.QueueBind(queue: _queueName,
-                                      exchange: BROKER_NAME,
+                    channel.QueueBind(queue: _configuration.QueueName,
+                                      exchange: _configuration.ExchangeName,
                                       routingKey: eventName);
                 }
             }
@@ -210,7 +201,7 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
                 consumer.Received += Consumer_Received;
 
                 _consumerChannel.BasicConsume(
-                    queue: _queueName,
+                    queue: _configuration.QueueName,
                     autoAck: false,
                     consumer: consumer);
             }
@@ -256,10 +247,10 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
 
             var channel = _persistentConnection.CreateModel();
 
-            channel.ExchangeDeclare(exchange: BROKER_NAME,
-                                    type: "direct");
+            channel.ExchangeDeclare(exchange: _configuration.ExchangeName,
+                                    type: _configuration.ExchangeType);
 
-            channel.QueueDeclare(queue: _queueName,
+            channel.QueueDeclare(queue: _configuration.QueueName,
                                  durable: true,
                                  exclusive: false,
                                  autoDelete: false,
@@ -302,15 +293,18 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
                     else
                     {
                         //var handler = scope.ResolveOptional(subscription.HandlerType);
-                        var handler = _serviceProvider.GetService(subscription.HandlerType);
-                        if (handler == null) continue;
-                        var eventType = _subsManager.GetEventTypeByName(eventName);
-                        //var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
-                        var integrationEvent = JsonSerializer.Deserialize(message, eventType);
-                        var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+                        using (var scope = _serviceProvider.CreateScope())
+                        {
+                            var handler = scope.ServiceProvider.GetService(subscription.HandlerType);
+                            if (handler == null) continue;
+                            var eventType = _subsManager.GetEventTypeByName(eventName);
+                            //var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
+                            var integrationEvent = JsonSerializer.Deserialize(message, eventType);
+                            var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
 
-                        await Task.Yield();
-                        await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { integrationEvent });
+                            await Task.Yield();
+                            await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { integrationEvent });
+                        }
                     }
                 }
             }

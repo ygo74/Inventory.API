@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
@@ -15,34 +16,33 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
         public static IServiceCollection AddRabbitMQService(
            this IServiceCollection services, IConfiguration configuration)
         {
+
+            // read RabbitMQ configuration from appsettings.json
+            services.Configure<RabbitMQConfiguration>(configuration.GetSection(RabbitMQConfiguration.SectionName));
+
             services.AddSingleton<IRabbitMQPersistentConnection>(sp =>
             {
                 var logger = sp.GetRequiredService<ILogger<DefaultRabbitMQPersistentConnection>>();
-
+                
+                var rabbitMQConfig = sp.GetRequiredService<IOptions<RabbitMQConfiguration>>().Value;
 
                 var factory = new ConnectionFactory()
                 {
-                    HostName = configuration["EventBusConnection"],
+                    HostName = rabbitMQConfig.HostName,
                     DispatchConsumersAsync = true
                 };
 
-                if (!string.IsNullOrEmpty(configuration["EventBusUserName"]))
+                if (!string.IsNullOrWhiteSpace(rabbitMQConfig.UserName))
                 {
-                    factory.UserName = configuration["EventBusUserName"];
+                    factory.UserName = rabbitMQConfig.UserName;
                 }
 
-                if (!string.IsNullOrEmpty(configuration["EventBusPassword"]))
+                if (!string.IsNullOrWhiteSpace(rabbitMQConfig.Password))
                 {
-                    factory.Password = configuration["EventBusPassword"];
+                    factory.Password = rabbitMQConfig.Password;
                 }
 
-                var retryCount = 5;
-                if (!string.IsNullOrEmpty(configuration["EventBusRetryCount"]))
-                {
-                    retryCount = int.Parse(configuration["EventBusRetryCount"]);
-                }
-
-                return new DefaultRabbitMQPersistentConnection(factory, logger, retryCount);
+                return new DefaultRabbitMQPersistentConnection(factory, logger, rabbitMQConfig.RetryCount);
             });
 
             services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
@@ -54,19 +54,9 @@ namespace Inventory.Common.Infrastructure.Events.RabbitMQ
                 var logger = sp.GetRequiredService<ILogger<EventBusRabbitMQ>>();
                 var eventBusSubcriptionsManager = sp.GetRequiredService<IEventBusSubscriptionsManager>();
 
-                var retryCount = 5;
-                if (!string.IsNullOrEmpty(configuration["EventBusRetryCount"]))
-                {
-                    retryCount = int.Parse(configuration["EventBusRetryCount"]);
-                }
+                var rabbitMQConfig = sp.GetRequiredService<IOptions<RabbitMQConfiguration>>().Value;
 
-                var subscriptionClientName = "default";
-                if (!string.IsNullOrEmpty(configuration["SubscriptionClientName"]))
-                {
-                    subscriptionClientName = configuration["SubscriptionClientName"];
-                }
-
-                return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager, configuration, subscriptionClientName, retryCount);
+                return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager, rabbitMQConfig);
             }); 
             
 

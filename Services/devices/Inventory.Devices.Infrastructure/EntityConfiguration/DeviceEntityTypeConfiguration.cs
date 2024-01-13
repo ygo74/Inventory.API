@@ -21,6 +21,11 @@ namespace Inventory.Devices.Infrastructure.EntityConfiguration
 
             builder.HasIndex(e => e.Hostname).IsUnique();
 
+            // add discriminator for child classes
+            builder.HasDiscriminator<string>(e => e.DeviceType)
+                .HasValue<Server>(nameof(Server))
+                .HasValue<VirtualServer>(nameof(VirtualServer))
+                .HasValue<NetworkSwitch>(nameof(NetworkSwitch));
 
             builder.Property(e => e.PropertyBag)
                 .HasConversion(

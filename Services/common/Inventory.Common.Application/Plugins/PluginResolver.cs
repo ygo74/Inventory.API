@@ -1,6 +1,7 @@
-﻿using Inventory.Common.Plugins;
+﻿using Ardalis.GuardClauses;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,21 +12,81 @@ using System.Threading.Tasks;
 
 namespace Inventory.Common.Application.Plugins
 {
-    public class PluginResolver
+    public class PluginResolver : IPluginResolver, IDisposable, IAsyncDisposable
     {
-        //private readonly ILogger<PluginResolver> _logger;
+        private readonly ILogger<PluginResolver> _logger;
+        private ServiceProvider _serviceProvider;
+        private readonly ServiceCollection _serviceCollection;
 
-        //public PluginResolver(ILogger<PluginResolver> logger)
-        public PluginResolver()
+        public PluginResolver(ILogger<PluginResolver> logger)
         {
-            //_logger = Guard.Against.Null(logger, nameof(logger));
+            _logger = Guard.Against.Null(logger, nameof(logger));
+            _serviceCollection = new ServiceCollection();
+        }
+
+        #region IDisposable, IAsyncDisposable
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await DisposeAsyncCore().ConfigureAwait(false);
+            Dispose(disposing: false);
+#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
+            GC.SuppressFinalize(this);
+#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _serviceProvider?.Dispose();
+            }
+        }
+
+        protected virtual async ValueTask DisposeAsyncCore()
+        {
+            if (_serviceProvider is not null)
+            {
+                await _serviceProvider.DisposeAsync().ConfigureAwait(false);
+            }
+        }
+
+
+        #endregion
+
+
+        private ServiceProvider ServiceProvider 
+        { 
+            get 
+            { 
+                if (_serviceProvider == null)
+                {
+                    _serviceProvider = _serviceCollection.BuildServiceProvider();
+                }
+                return _serviceProvider; 
+            } 
+        }
+
+        public T GetService<T>(string pluginKey) where T : class
+        {
+            return this.ServiceProvider.GetKeyedService<T>(pluginKey);
         }
 
         public Assembly LoadPlugin(string path)
         {
+            if (!System.IO.File.Exists(path))
+            {
+                _logger.LogWarning("Assembly with path {0} doesn't exist", path);
+                return null;
+            }
+
             //Log.Information("Load assembly from file {0}", path);
             PluginLoadContext loadContext = new PluginLoadContext(path);
-
             return loadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(path)));
         }
 
@@ -68,6 +129,11 @@ namespace Inventory.Common.Application.Plugins
             return commands;
         }
 
+        public void RegisterIntegrationsFromAssembly<T>(string pluginKey, IConfiguration configuration, Assembly assembly)
+        {
+            RegisterIntegrationsFromAssembly<T>(pluginKey, _serviceCollection, configuration, assembly);
+        }
+
         /// <summary>
         /// Based on https://docs.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support#create-the-plugin-interfaces
         /// with alterations to support injecting settings
@@ -76,9 +142,14 @@ namespace Inventory.Common.Application.Plugins
         /// <param name="services"></param>
         /// <param name="configuration"></param>
         /// <param name="assembly"></param>
-        public void RegisterIntegrationsFromAssembly<T>(IServiceCollection services, IConfiguration configuration, Assembly assembly)
+        private void RegisterIntegrationsFromAssembly<T>(string pluginKey, IServiceCollection services, IConfiguration configuration, Assembly assembly)
         {
-            foreach (var type in assembly.GetTypes())
+
+            // Configureservices from plugin's startup
+            UsePluginStartup(assembly, services);
+
+            var pluginTypes = assembly.GetTypes().Where(e => typeof(T).IsAssignableFrom(e));
+            foreach (var type in pluginTypes)
             {
                 // Register all classes that implement the IIntegration interface
                 if (typeof(T).IsAssignableFrom(type))
@@ -87,14 +158,16 @@ namespace Inventory.Common.Application.Plugins
                     // instance. If this would be a Controller or something else with clearly defined
                     // scope that is not the lifetime of the application, use AddScoped.
                     //services.AddSingleton(typeof(T), type);
-                    services.AddScoped(typeof(T), type);
+                    //services.AddScoped(typeof(T), type);
+                    services.AddKeyedScoped(typeof(T), pluginKey, type);
+
                 }
 
-                if (typeof(IPluginFactory).IsAssignableFrom(type))
-                {
-                    var plugin = Activator.CreateInstance(type) as IPluginFactory;
-                    plugin?.Configure(services);
-                }
+                //if (typeof(IPluginFactory).IsAssignableFrom(type))
+                //{
+                //    var plugin = Activator.CreateInstance(type) as IPluginFactory;
+                //    plugin?.Configure(services);
+                //}
 
                 //// Register all classes that implement the ISettings interface
                 //if (typeof(ISettings).IsAssignableFrom(type))
@@ -114,6 +187,40 @@ namespace Inventory.Common.Application.Plugins
                 //    services.AddSingleton(type, settings);
                 //}
             }
+        }
+
+        /// <summary>
+        /// Call the ConfigureServices method from startup class in the Plugin
+        /// </summary>
+        /// <param name="assembly"></param>
+        private void UsePluginStartup(Assembly assembly, IServiceCollection services) 
+        {
+            // Search Startup class to configure services before added the Integration classes
+            var startupType = assembly.GetTypes()
+                .FirstOrDefault(t => t.Name == "Startup");
+
+            if (startupType != null)
+            {
+                var configureServicesMethod = startupType.GetMethod("ConfigureServices");
+
+                if (configureServicesMethod != null)
+                {
+                    // Créer une instance de la classe de configuration du plugin
+                    var instance = Activator.CreateInstance(startupType);
+
+                    // Appeler la méthode de configuration du service du plugin
+                    configureServicesMethod.Invoke(instance, new object[] { services });
+                }
+                else
+                {
+                    _logger.LogInformation("No method 'ConfigureServices' in the startup class of plugin {0}", assembly.FullName);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("No startup class in the plugin {0}", assembly.FullName);
+            }
+
         }
 
     }

@@ -2,15 +2,14 @@
 using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
-using Inventory.Configuration.Api.Application.Plugin;
 using MediatR;
 using System.Threading.Tasks;
 using System.Threading;
-using System;
 using Inventory.Configuration.Api.Application.Locations;
 using Inventory.Common.Application.Graphql.Extensions;
 using System.Linq;
 using Inventory.Common.Application.Core;
+using Inventory.Configuration.Api.Application.Locations.Dtos;
 
 namespace Inventory.Configuration.Api.Graphql.Queries
 {
@@ -65,6 +64,14 @@ namespace Inventory.Configuration.Api.Graphql.Queries
 
 //# nullable disable
 
+        /// <summary>
+        /// Get location by ID
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="ctx"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<Payload<LocationDto>> GetLocation([Service] IMediator mediator,
             CancellationToken cancellationToken, IResolverContext ctx,
             int id)
@@ -79,6 +86,14 @@ namespace Inventory.Configuration.Api.Graphql.Queries
             return result;
         }
 
+        /// <summary>
+        /// Get location by Name
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="ctx"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public async Task<Payload<LocationDto>> GetLocationByName([Service] IMediator mediator,
             CancellationToken cancellationToken, IResolverContext ctx,
             string name)

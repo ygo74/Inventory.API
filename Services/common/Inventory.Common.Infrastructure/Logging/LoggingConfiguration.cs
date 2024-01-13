@@ -20,8 +20,8 @@ namespace Inventory.Common.Infrastructure.Logging
             var logstashUrl = configuration["Serilog:LogstashgUrl"];
             return new LoggerConfiguration()
                 .MinimumLevel.Verbose()
-                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", Serilog.Events.LogEventLevel.Information)
-                    //.WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Verbose)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", Serilog.Events.LogEventLevel.Debug)
+                //.WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Verbose)
                 .Enrich.WithProperty("ApplicationContext", appName)
                 .Enrich.FromLogContext()
                 .Enrich.WithEnvironmentName()
@@ -31,6 +31,7 @@ namespace Inventory.Common.Infrastructure.Logging
                 .WriteTo.Seq(string.IsNullOrWhiteSpace(seqServerUrl) ? "http://seq" : seqServerUrl)
                 //.WriteTo.Http(string.IsNullOrWhiteSpace(logstashUrl) ? "http://logstash:8080" : logstashUrl)
                 .WriteTo.Elasticsearch(ConfigureElasticSink(configuration, environment))
+                .WriteTo.Debug()
                 .ReadFrom.Configuration(configuration);
         }
 

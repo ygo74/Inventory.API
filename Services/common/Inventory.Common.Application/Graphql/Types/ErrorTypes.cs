@@ -1,5 +1,5 @@
 ﻿using HotChocolate.Types;
-using Inventory.Common.Application.Core;
+using Inventory.Common.Application.Errors;
 using Inventory.Common.Application.Exceptions;
 using Inventory.Common.Application.Users;
 using System;
@@ -26,7 +26,7 @@ namespace Inventory.Common.Application.Graphql.Types
             protected override void Configure(IInterfaceTypeDescriptor<IApiError> descriptor)
             {
                 descriptor.Name("ApiError");
-                descriptor.Field(e => e.message).Type<StringType>();
+                descriptor.Field(e => e.Message).Type<StringType>();
             }
         }
 

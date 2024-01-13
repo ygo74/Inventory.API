@@ -3,11 +3,9 @@ using HotChocolate.AspNetCore.Extensions;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
-using Inventory.Common.Application.Core;
-using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Application.Errors;
 using Inventory.Common.Application.Graphql;
 using Inventory.Common.Application.Users;
-using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Api.Graphql.Mutations;
 using Inventory.Configuration.Api.Graphql.Queries;
 using Inventory.Configuration.Api.Graphql.Types;
@@ -19,10 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using static Inventory.Common.Application.Graphql.Types.ErrorTypes;
-using static Inventory.Configuration.Api.Graphql.Mutations.PluginMutations;
 
 namespace Inventory.Configuration.Api.Configuration
 {
@@ -85,6 +80,7 @@ namespace Inventory.Configuration.Api.Configuration
                     .AddTypeExtension<DatacenterMutations>()
                     .AddTypeExtension<PluginMutations>()
                     .AddTypeExtension<LocationMutations>()
+                    .AddTypeExtension<CredentialMutations>()
                 .AddType<GenericApiError>()
                 .AddType<ValidationError>()
                 .AddType<UnAuthorisedError>()
@@ -92,15 +88,17 @@ namespace Inventory.Configuration.Api.Configuration
                 .AddType<BaseErrorInterfaceType>()
                 // Locations
                 .AddType<GetLocationRequestType>()
+                .AddType<LocationType>()
                 // Datacenters
                 .AddType<DatacenterType>()
                 .AddType<CreateDatacenterInputType>()
-                .AddType<CreateDatacenterPayloadType>()
+                //.AddType<DatacenterPayloadType>()
                 // Plugins
                 .AddType<PluginType>()
                 .AddType<CreatePluginInputType>()
                 // Credentials
                 .AddType<CredentialType>()
+                .AddType<CreateCredentialRequestType>()
 
                 //.AddMutationConventions(
                 //    new MutationConventionOptions
@@ -115,6 +113,7 @@ namespace Inventory.Configuration.Api.Configuration
                 .BindRuntimeType<DateTime, DateTimeType>()
                 .BindRuntimeType<int, IntType>()
                 .BindRuntimeType<long, LongType>()
+                .BindRuntimeType<IDictionary<string, object>, AnyType>()
                 //.BindRuntimeType<Dictionary<string, bool>, AnyType>()
                 //.AddType<CreateWebHookErrorUnion>()
                 ;

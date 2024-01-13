@@ -1,12 +1,13 @@
 ﻿using Ardalis.GuardClauses;
 using AutoMapper;
 using FluentValidation;
-using GreenDonut;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
-using Inventory.Common.Application.Exceptions;
-using Inventory.Common.Application.Validators;
-using Inventory.Configuration.Api.Application.Plugin;
+using Inventory.Common.Application.Errors;
+using Inventory.Common.Domain.Repository;
+using Inventory.Configuration.Api.Application.Locations.Dtos;
+using Inventory.Configuration.Api.Application.Locations.Services;
+using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -27,9 +28,8 @@ namespace Inventory.Configuration.Api.Application.Locations
     public class DeleteLocationValidator : AbstractValidator<DeleteLocationRequest>
     {
 
-        public DeleteLocationValidator(LocationService service)
+        public DeleteLocationValidator(ILocationService service)
         {
-
 
             RuleFor(e => e.Id).Cascade(CascadeMode.Stop)
                 .NotNull()
@@ -50,13 +50,13 @@ namespace Inventory.Configuration.Api.Application.Locations
 
         private readonly ILogger<DeleteLocationHanlder> _logger;
         private readonly IMapper _mapper;
-        private readonly IDbContextFactory<ConfigurationDbContext> _factory;
+        private readonly IAsyncRepository<Location> _repository;
 
-        public DeleteLocationHanlder(ILogger<DeleteLocationHanlder> logger, IMapper mapper, IDbContextFactory<ConfigurationDbContext> factory)
+        public DeleteLocationHanlder(ILogger<DeleteLocationHanlder> logger, IMapper mapper, IAsyncRepository<Location> repository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _factory = Guard.Against.Null(factory, nameof(factory));
+            _repository = Guard.Against.Null(repository, nameof(repository));
         }
 
         /// <summary>
@@ -69,33 +69,23 @@ namespace Inventory.Configuration.Api.Application.Locations
         {
             _logger.LogInformation($"Start deleting Location '{request.Id}'");
 
-            bool success = false;
-            try
+            // Find entity
+            var location = await _repository.GetByIdAsync(request.Id, cancellationToken);
+
+            if (null == location)
+                return Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Id {request.Id}"));
+
+            // delete location
+            var changes = await _repository.DeleteAsync(location, cancellationToken);
+            if (changes <= 0)
             {
-                // Find entity
-                await using var dbContext = _factory.CreateDbContext();
-                var location = await dbContext.Locations.FindAsync(request.Id);
-
-                if (null == location)
-                    return Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Id {request.Id}"));
-
-                // delete location
-                dbContext.Locations.Remove(location);
-                var changes = await dbContext.SaveChangesAsync(cancellationToken);
-
-                if (changes <= 0)
-                    return Payload<LocationDto>.Error();
-
-                success = true;
-                return Payload<LocationDto>.Success(default(LocationDto));
+                var errorMessage = "Error when deleting Location '{request.Id}'";
+                _logger.LogInformation(errorMessage);
+                return Payload<LocationDto>.Error(new GenericApiError(errorMessage));
             }
-            finally
-            {
-                if (success)
-                    _logger.LogInformation($"Successfully deleting Location '{request.Id}'");
-                else
-                    _logger.LogInformation($"Error when deleting Location '{request.Id}'");
-            }
+
+            _logger.LogInformation($"Successfully deleted Location '{request.Id}'");
+            return Payload<LocationDto>.Success(default(LocationDto));
         }
     }
 }

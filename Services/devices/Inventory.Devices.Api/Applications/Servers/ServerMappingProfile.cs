@@ -11,7 +11,12 @@ namespace Inventory.Devices.Api.Applications.Servers
     {
         public ServerMappingProfile()
         {
-            CreateMap<Server, ServerDto>();
+            CreateMap<Server, ServerDto>()
+               .ForMember(dest => dest.DatacenterName, opt => opt.MapFrom(src => src.DataCenter.Name))
+               .ForMember(dest => dest.OperatingSystemFamily, opt => opt.MapFrom(src => src.OperatingSystem.Family))
+               .ForMember(dest => dest.OperatingSystemModel, opt => opt.MapFrom(src => src.OperatingSystem.Model))
+               .ForMember(dest => dest.OperatingSystemVersion, opt => opt.MapFrom(src => src.OperatingSystem.Version));
+
             CreateMap<CreateServer.Command, Server>();
         }
     }

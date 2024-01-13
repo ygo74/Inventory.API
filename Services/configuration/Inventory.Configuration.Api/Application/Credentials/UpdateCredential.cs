@@ -1,15 +1,17 @@
 ﻿using Ardalis.GuardClauses;
-using AutoMapper;
 using FluentValidation;
 using Inventory.Common.Application.Core;
-using Inventory.Common.Application.Exceptions;
-using Inventory.Configuration.Api.Application.Locations;
+using Inventory.Common.Application.Errors;
+using Inventory.Common.Domain.Repository;
+using Inventory.Configuration.Api.Application.Credentials.Dtos;
+using Inventory.Configuration.Api.Application.Credentials.Services;
+using Inventory.Configuration.Api.Application.Credentials.Validators;
 using Inventory.Configuration.Domain.Models;
-using Inventory.Configuration.Infrastructure;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,11 +20,14 @@ namespace Inventory.Configuration.Api.Application.Credentials
     /// <summary>
     /// Update credential request
     /// </summary>
-    public class UpdateCredentialRequest : IRequest<Payload<CredentialDto>>
+    public class UpdateCredentialRequest : IRequest<Payload<CredentialDto>>, ICredentialId
     {
         public int Id { get; set; }
+        public string Description { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public JsonElement PropertyBag { get; set; }
+
     }
 
     /// <summary>
@@ -30,14 +35,9 @@ namespace Inventory.Configuration.Api.Application.Credentials
     /// </summary>
     public class UpdateCredentialRequestValidator : AbstractValidator<UpdateCredentialRequest>
     {
-        public UpdateCredentialRequestValidator(CredentialService service)
+        public UpdateCredentialRequestValidator(ICredentialService service)
         {
-            RuleFor(e => e.Id).Cascade(CascadeMode.Stop)
-                .NotNull()
-                .NotEmpty()
-                .GreaterThan(0)
-                .WithMessage("{PropertyName} is mandatory")
-                .MustAsync(service.CredentialExists).WithMessage("Credential with {PropertyName} {PropertyValue} doesn't exists in the database");
+            Include(new CredentialExistByIdValidator(service));
         }
     }
 
@@ -47,47 +47,42 @@ namespace Inventory.Configuration.Api.Application.Credentials
     public class UpdateCredentialHanlder : IRequestHandler<UpdateCredentialRequest, Payload<CredentialDto>>
     {
         private readonly ILogger<UpdateCredentialHanlder> _logger;
-        private readonly IMapper _mapper;
-        private readonly IDbContextFactory<ConfigurationDbContext> _factory;
+        private readonly IAsyncRepository<Credential> _repository;
 
-        public UpdateCredentialHanlder(ILogger<UpdateCredentialHanlder> logger, IMapper mapper, IDbContextFactory<ConfigurationDbContext> factory)
+
+        public UpdateCredentialHanlder(ILogger<UpdateCredentialHanlder> logger, IAsyncRepository<Credential> repository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _factory = Guard.Against.Null(factory, nameof(factory));
-
+            _repository = Guard.Against.Null(repository, nameof(repository));
         }
 
         public async Task<Payload<CredentialDto>> Handle(UpdateCredentialRequest request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Start updating Credential with id '{request.Id}'");
 
-            bool success = false;
-            try
+            // Find entity
+            var entity = await _repository.GetByIdAsync(request.Id, cancellationToken);
+            if (null == entity)
+                return Payload<CredentialDto>.Error(new NotFoundError($"Don't find Credential with Id {request.Id}"));
+
+            // Update Properties
+            if (request.Description != null)
+                entity.SetDescription(request.Description);
+
+            if (request.PropertyBag.ValueKind != JsonValueKind.Null && request.PropertyBag.ValueKind != JsonValueKind.Undefined)
             {
-                // Find entity
-                await using var dbContext = _factory.CreateDbContext();
-                var entity = await dbContext.Credentials.FindAsync(new object[] { request.Id }, cancellationToken);
-
-                if (null == entity)
-                    return Payload<CredentialDto>.Error(new NotFoundError($"Don't find Credential with Id {request.Id}"));
-
-                // Updat entity
-                var nbChanges = await dbContext.SaveChangesAsync(cancellationToken);
-
-                // Map response
-                var resultDto = _mapper.Map<CredentialDto>(entity);
-
-                success = true;
-                return Payload<CredentialDto>.Success(resultDto);
+                var inputPropertyBag = JsonSerializer.Deserialize<Dictionary<string, object>>(request.PropertyBag.ToString(), new System.Text.Json.JsonSerializerOptions());
+                entity.SetPropertyBag(inputPropertyBag);
             }
-            finally
-            {
-                if (success)
-                    _logger.LogInformation($"Successfully updating Credential with id '{request.Id}'");
-                else
-                    _logger.LogInformation($"Error when updating Credential '{request.Id}'");
-            }
+
+            // Update entity
+            var nbChanges = await _repository.UpdateAsync(entity, cancellationToken);
+            if (nbChanges > 0)
+                _logger.LogInformation($"Successfully updated Credential with id '{request.Id}'");
+
+            // return response
+            return Payload<CredentialDto>.Success(entity.ToCredentialDto());
+
         }
     }
 

@@ -31,7 +31,7 @@ steps:
     inputs:
       command: custom
       custom: 'tool '
-      arguments: install dotnet-ef -g
+      arguments: install dotnet-ef -g --version 7.0.15
 
   - script: echo "##vso[task.prependpath]$HOME/.dotnet/tools"
     displayName: 'Update PATH'
@@ -53,11 +53,12 @@ steps:
         --startup-project ${{ parameters.projectPath }}
         --project ${{ parameters.infrastructureProjectPath }}
 
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: SQLScripts'
-    inputs:
-      PathtoPublish: $(Build.ArtifactStagingDirectory)/${{ parameters.serviceName }}.sql
-      ArtifactName: SQLScripts
+  - ${{ if or(not(or(startsWith(variables['Build.SourceBranch'],'refs/heads/feature/'), startsWith(variables['Build.SourceBranch'],'refs/heads/topic/'), startsWith(variables['Build.SourceBranch'],'refs/heads/hotfix/'))), and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master'))) }}:
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: SQLScripts'
+      inputs:
+        PathtoPublish: $(Build.ArtifactStagingDirectory)/${{ parameters.serviceName }}.sql
+        ArtifactName: SQLScripts
 
   # - task: UniversalPackages@0
   #   displayName: 'Publish Artifact: SQLScripts'

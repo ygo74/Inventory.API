@@ -1,28 +1,25 @@
 ﻿using Ardalis.GuardClauses;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
-using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Application.Errors;
 using Inventory.Common.Domain.Filters;
-using Inventory.Configuration.Api.Application.Locations;
-using Inventory.Configuration.Api.Application.Plugin;
+using Inventory.Common.Domain.Repository;
+using Inventory.Configuration.Api.Application.Credentials.Dtos;
 using Inventory.Configuration.Domain.Models;
-using Inventory.Configuration.Infrastructure;
+using Inventory.Configuration.Domain.Filters;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MR.AspNetCore.Pagination;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System;
 
 namespace Inventory.Configuration.Api.Application.Credentials
 {
     /// <summary>
     /// Get credential by Id
     /// </summary>
-    public class GetCredentialById : IRequest<Payload<CredentialDto>>
+    public class GetCredentialByIdRequest : IRequest<Payload<CredentialDto>>
     {
         public int Id { get; set; }
     }
@@ -30,7 +27,7 @@ namespace Inventory.Configuration.Api.Application.Credentials
     /// <summary>
     /// Get credential by Name
     /// </summary>
-    public class GetCredentialByName : IRequest<Payload<CredentialDto>>
+    public class GetCredentialByNameRequest : IRequest<Payload<CredentialDto>>
     {
         public string Name { get; set; }
     }
@@ -38,30 +35,24 @@ namespace Inventory.Configuration.Api.Application.Credentials
     /// <summary>
     /// Get credentials
     /// </summary>
-    public class GetCredentialsRequest : QueryEntityCursorPaginationRequest<CredentialDto>
+    public class GetCredentialsRequest : QueryEntityOffsetPaginationRequest<CredentialDto>
     {
         public string Name { get; set; }
     }
 
 
-    public class GetCredentialHandler : IRequestHandler<GetCredentialById, Payload<CredentialDto>>,
-                                        IRequestHandler<GetCredentialByName, Payload<CredentialDto>>,
-                                        IRequestHandler<GetCredentialsRequest, CursorPaginationdPayload<CredentialDto>>
+    public class GetCredentialHandler : IRequestHandler<GetCredentialByIdRequest, Payload<CredentialDto>>,
+                                        IRequestHandler<GetCredentialByNameRequest, Payload<CredentialDto>>,
+                                        IRequestHandler<GetCredentialsRequest, OffsetPaginationPayload<CredentialDto>>
     {
 
         private readonly ILogger<GetCredentialHandler> _logger;
-        private readonly IMapper _mapper;
-        private readonly IDbContextFactory<ConfigurationDbContext> _factory;
-        private readonly IPaginationService _paginationService;
+        private readonly IGenericQueryStore<Credential> _queryStore;
 
-        public GetCredentialHandler(ILogger<GetCredentialHandler> logger,
-            IMapper mapper, IDbContextFactory<ConfigurationDbContext> factory, IPaginationService paginationService)
+        public GetCredentialHandler(ILogger<GetCredentialHandler> logger, IGenericQueryStore<Credential> queryStore)
         {
             _logger = Guard.Against.Null(logger, nameof(logger));
-            _mapper = Guard.Against.Null(mapper, nameof(mapper));
-            _factory = Guard.Against.Null(factory, nameof(factory));
-            _paginationService = Guard.Against.Null(paginationService, nameof(paginationService));
-
+            _queryStore = Guard.Against.Null(queryStore, nameof(queryStore));
         }
 
         /// <summary>
@@ -70,28 +61,23 @@ namespace Inventory.Configuration.Api.Application.Credentials
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<Payload<CredentialDto>> Handle(GetCredentialById request, CancellationToken cancellationToken)
+        public async Task<Payload<CredentialDto>> Handle(GetCredentialByIdRequest request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Start getting credential with id : {0}", request.Id);
-            bool success = false;
-            try
+
+            // retrieve entity
+            var credential = await _queryStore.GetByIdAsync<CredentialDto>(request.Id, CredentialDto.Projection);
+
+            if (null == credential)
             {
-                await using var dbContext = _factory.CreateDbContext();
-
-                var credential = await dbContext.Credentials.FindAsync(request.Id);
-
-                if (null == credential)
-                    Payload<CredentialDto>.Error(new NotFoundError($"Don't find credential with Id {request.Id}"));
-
-                return Payload<CredentialDto>.Success(_mapper.Map<CredentialDto>(credential));
+                var errorMessage = $"Don't find credential with Id {request.Id}";
+                _logger.LogInformation(errorMessage);
+                return Payload<CredentialDto>.Error(new NotFoundError(errorMessage));
             }
-            finally
-            {
-                if (success)
-                    _logger.LogInformation("Successfully get credential with id {0}", request.Id);
-                else
-                    _logger.LogWarning("Unable to get credential with id {0}", request.Id);
-            }
+
+            _logger.LogInformation("Successfully get credential with id {0}", request.Id);
+            return Payload<CredentialDto>.Success(credential);
+
         }
 
         /// <summary>
@@ -100,78 +86,63 @@ namespace Inventory.Configuration.Api.Application.Credentials
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<Payload<CredentialDto>> Handle(GetCredentialByName request, CancellationToken cancellationToken)
+        public async Task<Payload<CredentialDto>> Handle(GetCredentialByNameRequest request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Start getting credential with name : {0}", request.Name);
-            bool success = false;
-            try
+
+            // Create filter
+            var filter = ExpressionFilterFactory.Create<Credential>()
+                                                .WithName(request.Name);
+
+            // retrieve entity
+            var credential = await _queryStore.FirstOrDefaultAsync<CredentialDto>(filter, CredentialDto.Projection);
+
+            if (null == credential)
             {
-                await using var dbContext = _factory.CreateDbContext();
-
-                var credential = await dbContext.Credentials.FirstOrDefaultAsync(e => e.Name == request.Name);
-
-                if (null == credential)
-                    Payload<CredentialDto>.Error(new NotFoundError($"Don't find credential with Name {request.Name}"));
-
-                return Payload<CredentialDto>.Success(_mapper.Map<CredentialDto>(credential));
+                var errorMessage = $"Don't find credential with Name {request.Name}";
+                _logger.LogInformation(errorMessage);
+                return Payload<CredentialDto>.Error(new NotFoundError(errorMessage));
             }
-            finally
-            {
-                if (success)
-                    _logger.LogInformation("Successfully get credential with Name {0}", request.Name);
-                else
-                    _logger.LogWarning("Unable to get credential with Name {0}", request.Name);
-            }
+
+            // return credential
+            _logger.LogInformation("Successfully get credential with name {0}", request.Name);
+            return Payload<CredentialDto>.Success(credential);
+
         }
 
-        public async Task<CursorPaginationdPayload<CredentialDto>> Handle(GetCredentialsRequest request, CancellationToken cancellationToken)
+        public async Task<OffsetPaginationPayload<CredentialDto>> Handle(GetCredentialsRequest request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Start getting credential");
-            bool success = false;
-            try
+            _logger.LogInformation("Start searching credential");
+
+            // Filtering data
+            var filter = ExpressionFilterFactory.Create<Credential>()
+                                                .WithName(request.Name);
+
+
+            // Count number of total elements
+            var countEntities = await _queryStore.CountAsync(filter, cancellationToken);
+
+            // Retrieve entities
+            var result = await _queryStore.GetByCriteriaAsync<CredentialDto>(
+                criteria: filter,
+                orderBy: q => q.OrderBy(e => e.Id),
+                Projection: CredentialDto.Projection,
+                offset: request.Pagination.Skip,
+                limit: request.Pagination.Size                
+            );
+
+            // return offset pagination payload
+            _logger.LogInformation("End searching credentials");
+            var page = (int)Math.Ceiling((double)request.Pagination.Skip / request.Pagination.Size);
+            return new OffsetPaginationPayload<CredentialDto>
             {
-                await using var dbContext = _factory.CreateDbContext();
+                TotalCount = countEntities,
+                Data = result.ToList(),
+                Page = page == 0 ? 1 : page,
+                PageSize = request.Pagination.Size,
+                PageCount = (int)Math.Ceiling(Decimal.Divide(countEntities, request.Pagination.Size))
+            };
 
-                var query = dbContext.Credentials.AsQueryable();
-
-                // Filtering data
-                var filter = ExpressionFilterFactory.Create<Credential>();
-
-                if (null != filter.Predicate)
-                    query = query.Where(filter.Predicate);
-
-                var result = await _paginationService.KeysetPaginateAsync(
-                    source: query,
-                    builderAction: b => b.Ascending(e => e.Id),
-                    getReferenceAsync: async id => await dbContext.Credentials.FindAsync(int.Parse(id)),
-                    map: q => q.ProjectTo<CredentialDto>(_mapper.ConfigurationProvider),
-                    queryModel: new KeysetQueryModel
-                    {
-                        After = request.Pagination.After,
-                        Before = request.Pagination.Before,
-                        Size = request.Pagination.Size
-                    }
-                );
-
-                success = true;
-                return new CursorPaginationdPayload<CredentialDto>
-                {
-                    TotalCount = result.TotalCount,
-                    Data = result.Data,
-                    HasNext = result.HasNext,
-                    HasPrevious = result.HasPrevious,
-                    StartCursor = result.Data.Count > 0 ? result.Data[0].Id.ToString() : string.Empty,
-                    EndCursor = result.Data.Count > 0 ? result.Data[result.Data.Count - 1].Id.ToString() : string.Empty,
-                };
-
-            }
-            finally
-            {
-                if (success)
-                    _logger.LogInformation("Successfully get credentials");
-                else
-                    _logger.LogWarning("Unable to get credentials");
-            }
         }
     }
 

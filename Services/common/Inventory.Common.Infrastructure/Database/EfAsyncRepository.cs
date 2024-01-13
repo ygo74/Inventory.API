@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Inventory.Common.Infrastructure.Database
 {
-    public class EfAsyncRepository<DB,T> : RepositoryBase<T>, IAsyncRepository<T>, IAsyncDisposable, IDisposable where DB : DbContext,IUnitOfWork where T : class
+    public class EfAsyncRepository<DB,T> : RepositoryBase<T>, IAsyncRepositoryWithSpecification<T>, IAsyncDisposable, IDisposable where DB : DbContext,IUnitOfWork where T : class
     {
         protected readonly DB _dbContext;
         protected readonly IDbContextFactory<DB> _dbContextFactory;

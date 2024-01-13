@@ -22,6 +22,8 @@ using HotChocolate;
 using HotChocolate.Execution;
 using System.Threading.Tasks;
 using Inventory.Common.Domain.Interfaces;
+using Inventory.Devices.Domain.Interfaces;
+using System.Diagnostics;
 
 namespace Inventory.Devices.UnitTests
 {
@@ -63,15 +65,21 @@ namespace Inventory.Devices.UnitTests
             });
 
             serviceCollection.AddMemoryCache();
-            serviceCollection.AddLogging();
+            serviceCollection.AddLogging(builder =>
+            {
+                builder.AddDebug().AddConsole();
+            });
 
             // Database
             serviceCollection.AddEntityFrameworkInMemoryDatabase().AddDbContext<ServerDbContext>((sp, options) =>
             {
-                options.UseInMemoryDatabase("in-memory").UseInternalServiceProvider(sp);
+                options.UseInMemoryDatabase("in-memory").UseInternalServiceProvider(sp)
+                        .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
+                        .LogTo(message => Debug.WriteLine(message), new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information);
             });
 
-            serviceCollection.AddScoped(typeof(IAsyncRepository<>), typeof(DevicesRepository<>));
+            serviceCollection.AddScoped(typeof(IAsyncRepositoryWithSpecification<>), typeof(DevicesRepository<>));
+            serviceCollection.AddScoped(typeof(IDeviceQueryStore), typeof(DeviceQueryStore));
 
             // MediatR
             serviceCollection.AddMediatR(typeof(Inventory.Devices.Api.Startup));
@@ -142,7 +150,7 @@ namespace Inventory.Devices.UnitTests
 
         public IMediator GetMediator() => _serviceProvider.GetService<IMediator>();
 
-        public IAsyncRepository<T> GetAsyncRepository<T>() where T : class => _serviceProvider.GetService<IAsyncRepository<T>>();
+        public IAsyncRepositoryWithSpecification<T> GetAsyncRepository<T>() where T : class => _serviceProvider.GetService<IAsyncRepositoryWithSpecification<T>>();
 
 
         public async Task<IRequestExecutor> GetExecutor() => await serviceCollection.AddGraphQL().BuildRequestExecutorAsync();
@@ -157,7 +165,7 @@ namespace Inventory.Devices.UnitTests
             // Credentials
 
             // servers
-            //dbContext.Devices.AddRange(ServerSeed.Get());
+            dbContext.Servers.AddRange(ServerSeed.Get());
 
             dbContext.SaveChanges();
 

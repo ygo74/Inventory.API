@@ -8,6 +8,8 @@ namespace Inventory.Common.Application.Dto
 {
     public abstract class ConfigurationEntityDto : AuditEntityDto
     {
+
+        public string InventoryCode { get; set; }
         public bool Deprecated { get; set; }
 
         public DateTime StartDate { get; set; }

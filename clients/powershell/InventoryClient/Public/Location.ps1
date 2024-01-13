@@ -340,61 +340,45 @@ function Find-InventoryLocation
 {
     [CmdletBinding(DefaultParameterSetName="Default")]
     param(
-        [Parameter(ParameterSetName="Default", Position=0, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="next", Position=0, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="previous", Position=0, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Position=0, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
         [String]
         $RegionCode,
 
-        [Parameter(ParameterSetName="Default", Position=1, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="next", Position=1, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="previous", Position=1, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Position=1, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
         [String]
         $CountryCode,
 
-        [Parameter(ParameterSetName="Default", Position=2, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="next", Position=2, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="previous", Position=2, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Position=2, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
         [String]
         $CityCode,
 
-        [Parameter(ParameterSetName="Default", Position=3, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="next", Position=3, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="previous", Position=3, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Position=3, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
         [DateTime]
         $ValidFrom,
 
-        [Parameter(ParameterSetName="Default", Position=4, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="next", Position=4, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="previous", Position=4, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Position=4, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
         [DateTime]
         $ValidTo,
 
-        [Parameter(ParameterSetName="Default", Position=5, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="next", Position=5, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="previous", Position=5, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Position=5, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
         [switch]
         $IncludeAllEntities,
 
-        [Parameter(ParameterSetName="Default", Position=6, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="next", Position=6, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="previous", Position=6, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Position=6, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
         [switch]
         $IncludeDeprecated,
 
-        [Parameter(ParameterSetName="next", Position=7, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Position=7, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
+        [Int]
+        $Limit,
+
+        [Parameter(ParameterSetName="next", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
         [string]
         $After,
 
-        [Parameter(ParameterSetName="previous", Position=7, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName="previous", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
         [string]
-        $Before,
-
-        [Parameter(ParameterSetName="next", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Parameter(ParameterSetName="previous", Position=8, Mandatory=$false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$true)]
-        [Int]
-        $Limit
-
+        $Before
 
     )
 
@@ -420,6 +404,7 @@ function Find-InventoryLocation
         Trace-Message -Message ("Location Include deprecated : {0}" -f $IncludeDeprecated) -CommandName $MyInvocation.MyCommand.Name
         Trace-Message -Message ("Location Include All        : {0}" -f $IncludeAllEntities) -CommandName $MyInvocation.MyCommand.Name
 
+        # Query
         $query = @{}
         if (![string]::IsNullOrWhiteSpace($RegionCode)) {$query[ "regionCode"] = $RegionCode}
         if (![string]::IsNullOrWhiteSpace($CountryCode)) {$query[ "countryCode"] = $CountryCode}
@@ -434,20 +419,25 @@ function Find-InventoryLocation
             query = $query
         }
 
+        # Pagination
         if ($PsCmdlet.ParameterSetName -ne "Default")
         {
             if ($PsCmdlet.ParameterSetName -eq "next")
             {
                 Trace-Message -Message ("Forward pagination for {0} items, after '{1}'" -f $Limit, $after ) -CommandName $MyInvocation.MyCommand.Name
-                $Variables[ "first" ] = $Limit
+                if ($Limit -gt 0) { $Variables[ "first" ] = $Limit }
                 if (![string]::IsNullOrWhiteSpace($After)) { $Variables[ "after" ] = $After }
             }
             else
             {
                 Trace-Message -Message ("Backward pagination for {0} items, before '{1}'" -f $Limit, $Before ) -CommandName $MyInvocation.MyCommand.Name
-                $Variables[ "last" ] = $Limit
+                if ($Limit -gt 0) { $Variables[ "last" ] = $Limit }
                 if (![string]::IsNullOrWhiteSpace($Before)) { $Variables[ "before" ] = $Before }
             }
+        }
+        else
+        {
+            if ($Limit -gt 0) { $Variables[ "first" ] = $Limit }
         }
 
 

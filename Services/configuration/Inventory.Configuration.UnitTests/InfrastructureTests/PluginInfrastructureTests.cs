@@ -19,11 +19,11 @@ namespace Inventory.Configuration.UnitTests.InfrastructureTests
             var repo = UnitTestsContext.Current.GetAsyncRepository<Plugin>();
 
             // Act
-            var plugins = await repo.ListAsync();
+            var plugins = await repo.ListAllAsync();
 
             // Assert
             Assert.IsNotNull(plugins);
-            Assert.IsTrue(plugins.Count > 0);
+            Assert.IsNotEmpty(plugins);
 
         }
     }

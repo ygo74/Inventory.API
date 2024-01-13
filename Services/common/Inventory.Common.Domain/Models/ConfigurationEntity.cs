@@ -54,5 +54,10 @@ namespace Inventory.Common.Domain.Models
             Deprecated = value;
         }
 
+        public void SetInventoryCode(string inventoryCode)
+        {
+            InventoryCode = Guard.Against.NullOrWhiteSpace(inventoryCode, nameof(inventoryCode));
+        }
+
     }
 }

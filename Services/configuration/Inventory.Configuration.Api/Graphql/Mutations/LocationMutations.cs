@@ -2,11 +2,8 @@
 using HotChocolate.Types;
 using Inventory.Common.Application.Core;
 using Inventory.Configuration.Api.Application.Locations;
-using Inventory.Configuration.Api.Application.Plugin;
+using Inventory.Configuration.Api.Application.Locations.Dtos;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 

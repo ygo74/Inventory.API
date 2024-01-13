@@ -1,13 +1,13 @@
 ﻿using Ardalis.GuardClauses;
-using AutoMapper;
 using FluentValidation;
 using Inventory.Common.Application.Core;
-using Inventory.Common.Application.Exceptions;
-using Inventory.Configuration.Api.Application.Locations;
+using Inventory.Common.Application.Errors;
+using Inventory.Common.Domain.Repository;
+using Inventory.Configuration.Api.Application.Credentials.Dtos;
+using Inventory.Configuration.Api.Application.Credentials.Services;
+using Inventory.Configuration.Api.Application.Credentials.Validators;
 using Inventory.Configuration.Domain.Models;
-using Inventory.Configuration.Infrastructure;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
@@ -18,7 +18,7 @@ namespace Inventory.Configuration.Api.Application.Credentials
     /// <summary>
     /// Remove Credential Request
     /// </summary>
-    public class RemoveCredentialRequest : IRequest<Payload<CredentialDto>>
+    public class RemoveCredentialRequest : IRequest<Payload<CredentialDto>>, ICredentialId
     {
         public int Id { get; set; }
     }
@@ -28,14 +28,9 @@ namespace Inventory.Configuration.Api.Application.Credentials
     /// </summary>
     public class RemoveCredentialRequestValidator : AbstractValidator<RemoveCredentialRequest>
     {
-        public RemoveCredentialRequestValidator(CredentialService service) 
+        public RemoveCredentialRequestValidator(ICredentialService service)
         {
-            RuleFor(e => e.Id).Cascade(CascadeMode.Stop)
-                .NotNull()
-                .NotEmpty()
-                .GreaterThan(0)
-                .WithMessage("{PropertyName} is mandatory")
-                .MustAsync(service.CredentialExists).WithMessage("Credential with {PropertyName} {PropertyValue} doesn't exists in the database");
+            Include(new CredentialExistByIdValidator(service));
         }
     }
 
@@ -46,14 +41,13 @@ namespace Inventory.Configuration.Api.Application.Credentials
     public class RemoveCredentialHanlder : IRequestHandler<RemoveCredentialRequest, Payload<CredentialDto>>
     {
         private readonly ILogger<RemoveCredentialHanlder> _logger;
-        private readonly IMapper _mapper;
-        private readonly IDbContextFactory<ConfigurationDbContext> _factory;
+        private readonly IAsyncRepository<Credential> _repository;
 
-        public RemoveCredentialHanlder(ILogger<RemoveCredentialHanlder> logger, IMapper mapper, IDbContextFactory<ConfigurationDbContext> factory)
+
+        public RemoveCredentialHanlder(ILogger<RemoveCredentialHanlder> logger, IAsyncRepository<Credential> repository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _factory = Guard.Against.Null(factory, nameof(factory));
+            _repository = Guard.Against.Null(repository, nameof(repository));
 
         }
 
@@ -61,30 +55,18 @@ namespace Inventory.Configuration.Api.Application.Credentials
         {
             _logger.LogInformation($"Start removing Credential with id '{request.Id}'");
 
-            bool success = false;
-            try
-            {
-                // Find entity
-                await using var dbContext = _factory.CreateDbContext();
-                var entity = await dbContext.Credentials.FindAsync(new object[] { request.Id }, cancellationToken);
+            // Find entity
+            var entity = await _repository.GetByIdAsync(request.Id, cancellationToken);
+            if (null == entity)
+                return Payload<CredentialDto>.Error(new NotFoundError($"Don't find Credential with Id {request.Id}"));
 
-                if (null == entity)
-                    return Payload<CredentialDto>.Error(new NotFoundError($"Don't find Credential with Id {request.Id}"));
+            // Remove entity            
+            var nbChanges = await _repository.DeleteAsync(entity, cancellationToken);
+            if (nbChanges > 0)
+                _logger.LogInformation($"Successfully removed Credential with id '{request.Id}'");
 
-                // Remove entity
-                dbContext.Credentials.Remove(entity);
-                await dbContext.SaveChangesAsync(cancellationToken);
-
-                success = true;
-                return Payload<CredentialDto>.Success(default(CredentialDto));
-            }
-            finally
-            {
-                if (success)
-                    _logger.LogInformation($"Successfully removing Credential with id '{request.Id}'");
-                else
-                    _logger.LogInformation($"Error when removing Credential '{request.Id}'");
-            }
+            // return result
+            return Payload<CredentialDto>.Success(default(CredentialDto));
         }
     }
 

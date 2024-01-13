@@ -1,11 +1,6 @@
-﻿using Inventory.Configuration.Api.Application.Plugin;
+﻿using Inventory.Configuration.Api.Application.Plugins;
 using Inventory.Configuration.UnitTests.SeedWork;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Inventory.Configuration.UnitTests.TestCases
 {
@@ -17,10 +12,10 @@ namespace Inventory.Configuration.UnitTests.TestCases
             yield return new CreatePluginRequest() { Name = "TEST-XX", Code = "TEST-XX" };
         }
 
-        internal static IEnumerable GetPluginsByCode()
+        internal static IEnumerable GetPluginsByCodeAndName()
         {
-            yield return new GetPluginRequest() { Code = PluginSeed.AZURE_INVENTORY };
-            yield return new GetPluginRequest() { Code = PluginSeed.EFFICIENTIP_INVENTORY };
+            yield return new GetPluginRequest() { Code = PluginSeed.AZURE_INVENTORY, Name = PluginSeed.AZURE_INVENTORY };
+            yield return new GetPluginRequest() { Code = PluginSeed.EFFICIENTIP_INVENTORY, Name = PluginSeed.EFFICIENTIP_INVENTORY };
         }
 
     }

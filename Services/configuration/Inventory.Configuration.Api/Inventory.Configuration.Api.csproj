@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <UserSecretsId>a0485e78-f98f-48b4-9baf-a74b86b108fd</UserSecretsId>
+    <!--<UserSecretsId>a0485e78-f98f-48b4-9baf-a74b86b108fd</UserSecretsId>-->
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
+    <UserSecretsId>4a133001-36e0-4464-a150-9401189fc873</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -37,5 +38,11 @@
     <None Update="$(MSBuildProjectDirectory)\__resources__\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Application\Locations\Events\" />
+    <Folder Include="Application\Locations\Validators\" />
+    <Folder Include="Application\Plugins\Events\" />
   </ItemGroup>
 </Project>

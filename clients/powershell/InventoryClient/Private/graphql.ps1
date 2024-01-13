@@ -9,6 +9,15 @@ fragment pageInfo on PageInfo
 }
 "@
 
+$script:CollectionSegmentInfo=@"
+fragment pageInfo on CollectionSegmentInfo
+{
+  hasNextPage
+  hasPreviousPage
+}
+"@
+
+
 $script:ErrorsFragment=@"
 fragment error on ApiError
 {

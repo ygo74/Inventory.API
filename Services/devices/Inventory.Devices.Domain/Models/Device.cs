@@ -8,8 +8,12 @@ using System.Threading.Tasks;
 
 namespace Inventory.Devices.Domain.Models
 {
-    public class Device : AuditEntity
+    public abstract class Device : AuditEntity
     {
+
+        // Device type
+        public string DeviceType { get; protected set; }
+
         public string Hostname { get; protected set; }
         public string DnsDomain { get; protected set; }
         public string SubnetIP { get; protected set; }
@@ -30,6 +34,11 @@ namespace Inventory.Devices.Domain.Models
             DnsDomain = Guard.Against.Null(dnsDomain, nameof(dnsDomain));
             SubnetIP = Guard.Against.Null(subnetIP, nameof(subnetIP));
 
+        }
+
+        public void SetDataCenter(int dataCenterId)
+        {
+            DataCenterId = dataCenterId;
         }
 
     }

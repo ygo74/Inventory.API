@@ -3,9 +3,11 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
-using Inventory.Common.Application.Exceptions;
+using Inventory.Common.Application.Errors;
 using Inventory.Common.Domain.Filters;
-using Inventory.Configuration.Api.Application.Plugin;
+using Inventory.Common.Domain.Repository;
+using Inventory.Configuration.Api.Application.Datacenters.Dtos;
+using Inventory.Configuration.Api.Application.Locations.Dtos;
 using Inventory.Configuration.Domain.Filters;
 using Inventory.Configuration.Domain.Models;
 using Inventory.Configuration.Infrastructure;
@@ -42,16 +44,16 @@ namespace Inventory.Configuration.Api.Application.Locations
 
         private readonly ILogger<LocationQueriesHandler> _logger;
         private readonly IMapper _mapper;
-        private readonly IDbContextFactory<ConfigurationDbContext> _factory;
+        private readonly IGenericQueryStore<Location> _queryStore;
         private readonly IPaginationService _paginationService;
 
         public LocationQueriesHandler(ILogger<LocationQueriesHandler> logger,
-            IMapper mapper, IDbContextFactory<ConfigurationDbContext> factory, IPaginationService paginationService)
+            IMapper mapper, IGenericQueryStore<Location> queryStore, IPaginationService paginationService)
         {
 
             _logger = Guard.Against.Null(logger, nameof(logger));
             _mapper = Guard.Against.Null(mapper, nameof(mapper));
-            _factory = Guard.Against.Null(factory, nameof(factory));
+            _queryStore = Guard.Against.Null(queryStore, nameof(queryStore));
             _paginationService = Guard.Against.Null(paginationService, nameof(paginationService));
 
         }
@@ -65,14 +67,13 @@ namespace Inventory.Configuration.Api.Application.Locations
         /// <exception cref="System.NotImplementedException"></exception>
         public async Task<Payload<LocationDto>> Handle(GetLocationByIdRequest request, CancellationToken cancellationToken)
         {
-            await using var dbContext = _factory.CreateDbContext();
-
-            var location = await dbContext.Locations.FindAsync(request.Id);
+            // Retrieve entity
+            var location = await _queryStore.GetByIdAsync<LocationDto>(request.Id);
 
             if (null == location)
-                Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Id {request.Id}"));
+                return Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Id {request.Id}"));
 
-            return Payload<LocationDto>.Success(_mapper.Map<LocationDto>(location));
+            return Payload<LocationDto>.Success(location);
 
         }
 
@@ -86,16 +87,17 @@ namespace Inventory.Configuration.Api.Application.Locations
         /// <exception cref="System.NotImplementedException"></exception>
         public async Task<Payload<LocationDto>> Handle(GetLocationByNameRequest request, CancellationToken cancellationToken)
         {
-            await using var dbContext = _factory.CreateDbContext();
+            // Create filter
+            var filter = ExpressionFilterFactory.Create<Location>()
+                                                .WithName(request.Name);   
 
-            var filter = ExpressionFilterFactory.Create<Location>();
-            filter = filter.WithName(request.Name);
-            var location = await dbContext.Locations.FirstOrDefaultAsync(filter.Predicate);
+            // Retrieve entity
+            var location = await _queryStore.FirstOrDefaultAsync<LocationDto>(filter, LocationDto.Projection);
 
             if (null == location)
-                Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Name {request.Name}"));
+                return Payload<LocationDto>.Error(new NotFoundError($"Don't find Location with Name {request.Name}"));
 
-            return Payload<LocationDto>.Success(_mapper.Map<LocationDto>(location));
+            return Payload<LocationDto>.Success(location);
 
         }
 
@@ -107,23 +109,17 @@ namespace Inventory.Configuration.Api.Application.Locations
         /// <returns></returns>
         public async Task<CursorPaginationdPayload<LocationDto>> Handle(GetLocationRequest request, CancellationToken cancellationToken)
         {
-            await using var dbContext = _factory.CreateDbContext();
-            var query = dbContext.Locations.AsQueryable().AsNoTracking();
-
             // Filtering data
-            var filter = request.GetConfigurationEntityFilter<Location, LocationDto>();
-            if (!string.IsNullOrWhiteSpace(request.CityCode))    { filter = filter.WithCityCode(request.CityCode); }
-            if (!string.IsNullOrWhiteSpace(request.CountryCode)) { filter = filter.WithCountryCode(request.CountryCode); }
-            if (!string.IsNullOrWhiteSpace(request.RegionCode))  { filter = filter.WithRegionCode(request.RegionCode); }
-
-            if (null != filter.Predicate)
-                query = query.Where(filter.Predicate);
+            var filter = request.GetConfigurationEntityFilter<Location, LocationDto>()
+                            .WithCityCode(request.CityCode)
+                            .WithCountryCode(request.CountryCode)
+                            .WithRegionCode(request.RegionCode); 
 
 
             var result = await _paginationService.KeysetPaginateAsync(
-                source: query,
+                source: _queryStore.GetQuery(filter),
                 builderAction: b => b.Ascending(e => e.RegionCode).Ascending(e => e.CountryCode).Ascending(e => e.CityCode).Ascending(e => e.Id),
-                getReferenceAsync: async id => await dbContext.Locations.FindAsync(int.Parse(id)),
+                getReferenceAsync: async id => await _queryStore.GetByIdAsync(int.Parse(id)),
                 map: q => q.ProjectTo<LocationDto>(_mapper.ConfigurationProvider),
                 queryModel: new KeysetQueryModel
                 {

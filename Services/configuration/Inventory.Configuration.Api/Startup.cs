@@ -25,12 +25,17 @@ using System.Threading.Tasks;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Resources;
 using System.Diagnostics;
-using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Common.Application.Plugins;
-using Inventory.Configuration.Api.Application.Locations;
-using Inventory.Configuration.Api.Application.Credentials;
 using Inventory.Common.Infrastructure.Http;
 using Inventory.Common.Domain.Interfaces;
+using Inventory.Common.Infrastructure.Database;
+using Inventory.Plugins.Interfaces;
+using Inventory.Configuration.Api.Application.Datacenters.Services;
+using Inventory.Configuration.Api.Application.Locations.Services;
+using Inventory.Configuration.Api.Application.Plugins.Services;
+using Inventory.Configuration.Api.Application.Credentials.Services;
+using Microsoft.EntityFrameworkCore;
+using HotChocolate.Utilities;
 
 namespace Inventory.Configuration.Api
 {
@@ -59,6 +64,8 @@ namespace Inventory.Configuration.Api
 
             // Add database
             services.AddCustomDbContext(Configuration, Environment);
+            services.AddScoped(typeof(IAsyncRepositoryWithSpecification<>), typeof(ConfigurationRepositoryWithSpec<>));
+            services.AddTransient(typeof(IGenericQueryStore<>), typeof(ConfigurationQueryStore<>));
             services.AddScoped(typeof(IAsyncRepository<>), typeof(ConfigurationRepository<>));
 
             // Add Graphql
@@ -79,15 +86,45 @@ namespace Inventory.Configuration.Api
             services.AddPagination();
 
             // Application
-            services.AddSingleton<PluginResolver>();
+            services.AddSingleton<IPluginResolver, PluginResolver>();
+            //services.AddSingleton<PluginResolver>(sp =>
+            //{
+            //    var logger = sp.GetService<ILogger<PluginResolver>>();
+
+            //    var pluginResolver = new PluginResolver(logger);
+            //    var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net6.0\Inventory.Plugins.Azure.dll");
+            //    pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(Configuration, assembly);
+
+            //    //// Get all active plugins
+            //    //var pluginService = sp.GetService<PluginService>();
+            //    //var plugins = pluginService.GetAllActivePlugins().GetAwaiter().GetResult()
+            //    //                           .Where(e => !string.IsNullOrWhiteSpace(e.Path));
+
+            //    //foreach (var plugin in plugins)
+            //    //{
+            //    //    //var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net6.0\Inventory.Plugins.Azure.dll");
+            //    //    var assembly = pluginResolver.LoadPlugin(plugin.Path);
+            //    //    pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(Configuration, assembly);
+            //    //}
+            //    return pluginResolver;
+            //});
             services.AddScoped<PluginService>();
-            services.AddScoped<LocationService>();
-            services.AddScoped<CredentialService>();
+            services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<IDatacenterService, DatacenterService>();
+            services.AddScoped<ICredentialService, CredentialService>();
 
             // Http hosting
             services.UseHttpHostingConfigurationServices(Configuration);
 
             services.AddControllers();
+
+            // test
+            //var pluginResolver = new PluginResolver();
+            //var assembly = pluginResolver.LoadPlugin(@"D:\devel\github\ansible_inventory\Services\plugins\Azure\Inventory.Plugins.Azure\bin\Debug\net6.0\Inventory.Plugins.Azure.dll");
+
+            //pluginResolver.RegisterIntegrationsFromAssembly<ISubnetProvider>(services, Configuration, assembly);
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -110,6 +147,27 @@ namespace Inventory.Configuration.Api
                 endpoints.MapControllers();
                 endpoints.MapGraphQLEndpoint();
             });
+
+            UsePluginConfigurationsFromDatabase(app);
+        }
+
+        private void UsePluginConfigurationsFromDatabase(IApplicationBuilder app)
+        {
+
+            // Get all active plugins
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var pluginService = scope.ServiceProvider.GetService<PluginService>();
+
+                var plugins = pluginService.GetAllActivePlugins().GetAwaiter().GetResult();
+
+                foreach (var plugin in plugins)
+                {
+                    pluginService.RegisterPlugin(plugin);
+                }
+
+            }
+
 
         }
 

@@ -1,8 +1,8 @@
 ﻿using HotChocolate;
 using HotChocolate.Types;
 using Inventory.Common.Application.Core;
-using Inventory.Configuration.Api.Application.Plugin;
 using Inventory.Configuration.Api.Application.Plugins;
+using Inventory.Configuration.Api.Application.Plugins.Dtos;
 using MediatR;
 using System;
 using System.Collections.Generic;

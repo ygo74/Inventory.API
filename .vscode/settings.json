@@ -1,3 +1,4 @@
 {
-    "ansible.python.interpreterPath": "c:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python37-32\\python.exe"
+    "ansible.python.interpreterPath": "c:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python37-32\\python.exe",
+    "FSharp.suggestGitignore": false
 }

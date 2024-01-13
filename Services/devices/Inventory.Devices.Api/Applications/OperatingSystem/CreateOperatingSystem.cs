@@ -55,11 +55,11 @@ namespace Inventory.Devices.Api.Applications.OperatingSystem
         public class Handler : IRequestHandler<Command2, Payload<OperatingSystemDto>>
         {
 
-            private readonly IAsyncRepository<Inventory.Devices.Domain.Models.OperatingSystem> _repository;
+            private readonly IAsyncRepositoryWithSpecification<Inventory.Devices.Domain.Models.OperatingSystem> _repository;
             private readonly ILogger<Handler> _logger;
             private readonly IMapper _mapper;
 
-            public Handler(IAsyncRepository<Inventory.Devices.Domain.Models.OperatingSystem> repository, ILogger<Handler> logger, IMapper mapper)
+            public Handler(IAsyncRepositoryWithSpecification<Inventory.Devices.Domain.Models.OperatingSystem> repository, ILogger<Handler> logger, IMapper mapper)
             {
                 _repository = repository ?? throw new ArgumentNullException(nameof(repository));
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));

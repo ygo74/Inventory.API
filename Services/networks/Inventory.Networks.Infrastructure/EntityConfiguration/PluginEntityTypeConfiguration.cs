@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Inventory.Networks.Infrastructure.EntityConfiguration
 {
-    internal class PluginEntityTypeConfiguration : IEntityTypeConfiguration<Plugin>
+    internal class PluginEntityTypeConfiguration : IEntityTypeConfiguration<NetworkPlugin>
     {
-        public void Configure(EntityTypeBuilder<Plugin> builder)
+        public void Configure(EntityTypeBuilder<NetworkPlugin> builder)
         {
             builder.ToView("Plugin");
             builder.HasKey(e => e.Code);

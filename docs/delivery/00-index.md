@@ -31,10 +31,21 @@ Delivery an application to its execution environment has also to tackle some con
 - ✅ [AKS deployed](https://ygo74.github.io/azure/04-aks/00-index.html)
 - ✅ Azure Devops Services account
 
+## Requirements
+
+{: .important-title }
+> Development team requirements
+>
+> - Git Repository : one mono repository for all services
+> - Branching strategy : Microsoft release flow
+> - Build : each service has its own build and delivery process
+> - Container image : container image can be updated without rebuild servie
+
 ## Sources
 
 - <https://learn.microsoft.com/en-us/azure/architecture/microservices/ci-cd-kubernetes>{:target="_blank"}
 - <https://learn.microsoft.com/en-us/azure/architecture/solution-ideas/articles/dev-test-microservice>{:target="_blank"}
+- <https://learn.microsoft.com/en-us/devops/develop/how-microsoft-develops-devops?source=recommendations>{:target="_blank"}
 
 
 https://learn.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#system-variables-devops-services

@@ -4,9 +4,13 @@ using FluentValidation;
 using HotChocolate;
 using Inventory.Common.Application.Core;
 using Inventory.Common.Application.Dto;
+using Inventory.Common.Application.Errors;
 using Inventory.Common.Application.Exceptions;
 using Inventory.Common.Application.Validators;
 using Inventory.Common.Domain.Repository;
+using Inventory.Configuration.Api.Application.Datacenters.Dtos;
+using Inventory.Configuration.Api.Application.Plugins.Dtos;
+using Inventory.Configuration.Api.Application.Plugins.Services;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -15,7 +19,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Inventory.Configuration.Api.Application.Plugin
+namespace Inventory.Configuration.Api.Application.Plugins
 {
     /// <summary>
     /// Create plugin request
@@ -84,26 +88,24 @@ namespace Inventory.Configuration.Api.Application.Plugin
         {
             _logger.LogInformation($"Start adding Plugin '{request.Name}' with code '{request.Code}'");
 
-            bool success = false;
-            try
-            {
-                var newEntity = new Domain.Models.Plugin(request.Name, request.Code, request.Version, request.InventoryCode, request.Deprecated, request.ValidFrom, request.ValidTo);
-                newEntity.SetPath(request.Path);
+            var newEntity = new Domain.Models.Plugin(request.Name, request.Code, request.Version, request.InventoryCode, 
+                                                     request.Deprecated, request.ValidFrom, request.ValidTo);
+            newEntity.SetPath(request.Path);
 
-                // Add entity
-                var result = await _repository.AddAsync(newEntity, cancellationToken);
-
-                // Map response
-                success = true;
-                return Payload<PluginDto>.Success(_pluginService.GetPluginDto(result));
-            }
-            finally
+            // Add entity
+            var result = await _repository.AddAsync(newEntity, cancellationToken);
+            if (result == 0)
             {
-                if (success)
-                    _logger.LogInformation($"Successfully adding Plugin '{request.Name}' with Code '{request.Code}' and version '{request.Version}'");
-                else
-                    _logger.LogInformation($"Error when adding Plugin '{request.Name}' with Code '{request.Code}' and version '{request.Version}'");
+                var errorMessage = $"Error when adding Plugin '{request.Name}' with code '{request.Code}'";
+                return Payload<PluginDto>.Error(new GenericApiError(errorMessage));
             }
+
+            // Register the plugin for direct usage
+            _pluginService.RegisterPlugin(newEntity);
+
+            // return result
+            _logger.LogInformation("Successfully added plugin '{0}' with code '{1}'", request.Name, request.Code);
+            return Payload<PluginDto>.Success(_pluginService.GetPluginDto(newEntity));
 
         }
     }

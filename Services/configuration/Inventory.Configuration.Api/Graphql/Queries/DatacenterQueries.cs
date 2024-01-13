@@ -12,18 +12,105 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Inventory.Configuration.Api.Application.Datacenter;
+using Inventory.Configuration.Api.Application.Datacenters;
+using MediatR;
+using System.Threading;
+using Inventory.Common.Application.Core;
+using HotChocolate.Types.Pagination;
+using Inventory.Common.Application.Graphql.Extensions;
+using Inventory.Configuration.Api.Application.Datacenters.Dtos;
 
 namespace Inventory.Configuration.Api.Graphql.Queries
 {
     [ExtendObjectType(OperationTypeNames.Query)]
     public class DatacenterQueries
     {
-        [UseFiltering]
-        public Task<List<DatacenterDto>> GetDatacenters([Service] IAsyncRepository<Datacenter> _repository, [Service] IMapper mapper, IResolverContext ctx)
+        /// <summary>
+        /// Get Datacenter by Id
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="ctx"></param>
+        /// <param name="id">Datacenter's id</param>
+        /// <returns></returns>
+        public async Task<Payload<DatacenterDto>> GetDatacenter([Service] IMediator mediator,
+            CancellationToken cancellationToken, IResolverContext ctx,
+            int id)
         {
-            return Task.FromResult(mapper.Map<List<DatacenterDto>>(_repository.ListAsync()));
+
+            var request = new GetDatacenterByIdRequest
+            {
+                Id = id
+            };
+
+            var result = await mediator.Send(request, cancellationToken);
+            return result;
         }
+
+        /// <summary>
+        /// Get Datacenter by Name
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="ctx"></param>
+        /// <param name="name">Datacenter's name</param>
+        /// <returns></returns>
+        public async Task<Payload<DatacenterDto>> GetDatacenterByName([Service] IMediator mediator,
+            CancellationToken cancellationToken, IResolverContext ctx,
+            string name)
+        {
+
+            var request = new GetDatacenterByNameRequest
+            {
+                Name = name
+            };
+
+            var result = await mediator.Send(request, cancellationToken);
+            return result;
+        }
+
+        /// <summary>
+        /// Get Datacenter by Code
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="ctx"></param>
+        /// <param name="name">Datacenter's name</param>
+        /// <returns></returns>
+        public async Task<Payload<DatacenterDto>> GetDatacenterByCode([Service] IMediator mediator,
+            CancellationToken cancellationToken, IResolverContext ctx,
+            string code)
+        {
+
+            var request = new GetDatacenterByCodeRequest
+            {
+                Code = code
+            };
+
+            var result = await mediator.Send(request, cancellationToken);
+            return result;
+        }
+
+
+
+        [UsePaging(DefaultPageSize = 100)]
+        public async Task<Connection<DatacenterDto>> GetDatacenters([Service] IMediator mediator,
+                                                                    CancellationToken cancellationToken, IResolverContext ctx,
+                                                                    GetDatacenterRequest request = null)
+        {
+
+            if (request == null) { request = new GetDatacenterRequest(); }
+            request.Pagination = ctx.GetCursorPaggingRequest();
+
+            var result = await mediator.Send(request, cancellationToken);
+            var edges = result.Data.Select(e => new Edge<DatacenterDto>(e, e.Id.ToString())).ToList();
+
+            var pageInfo = new ConnectionPageInfo(result.HasNext, result.HasPrevious, result.StartCursor, result.EndCursor);
+
+            var connection = new Connection<DatacenterDto>(edges, pageInfo, result.TotalCount);
+            return connection;
+        }
+
 
         [UsePaging]
         [UseProjection]

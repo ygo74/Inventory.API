@@ -37,9 +37,9 @@ resources:
           - release/configuration/v*
           - refs/release/configuration/v*
           - master
-          - feature/*
-          - feature/configuration/*
-          - topic/configuration/*
+          # - feature/*
+          # - feature/configuration/*
+          # - topic/configuration/*
 
 stages:
   - template: ./templates/service-deploy-cd.yaml

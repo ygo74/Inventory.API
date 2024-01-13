@@ -1,37 +1,22 @@
 ﻿using Inventory.Configuration.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Inventory.Common.Domain.Repository;
-using Inventory.Common.Infrastructure.Database;
-using Inventory.Common.Application.Behaviors;
-using FluentValidation;
-using AutoMapper;
-using Microsoft.Extensions.Logging;
-using Inventory.Configuration.Domain.Models;
-using Inventory.Common.Application.Users;
 using Inventory.Common.UnitTests;
 using Inventory.Common.Infrastructure.Telemetry;
-using Microsoft.Extensions.Configuration;
-using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Inventory.Common.Infrastructure.Events.RabbitMQ;
 using Inventory.Common.Infrastructure.Events;
 using Inventory.Common.UnitTests.Events;
 using Inventory.Common.Application.Plugins;
-using Inventory.Configuration.Api.Application.Plugin;
-using Inventory.Common.Infrastructure.Logging;
-using Inventory.Configuration.Api.Application.Locations;
-using Inventory.Configuration.Api.Application.Credentials;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using MR.AspNetCore.Pagination;
 using Inventory.Common.Domain.Interfaces;
+using Inventory.Configuration.Api.Application.Datacenters.Services;
+using Inventory.Configuration.Api.Application.Plugins.Services;
+using Inventory.Configuration.Api.Application.Locations.Services;
+using Inventory.Configuration.Api.Application.Credentials.Services;
+using Inventory.Common.Domain.Models;
 
 namespace Inventory.Configuration.UnitTests
 {
@@ -57,7 +42,6 @@ namespace Inventory.Configuration.UnitTests
             services.AddTelemetryService(Configuration, out sourceName);
 
             // Database
-            services.AddScoped(typeof(IAsyncRepository<>), typeof(ConfigurationRepository<>));
             services.AddEntityFrameworkInMemoryDatabase().AddDbContext<ConfigurationDbContext>((sp, options) =>
             {
                 options.UseInMemoryDatabase("in-memory").UseInternalServiceProvider(sp);
@@ -69,6 +53,9 @@ namespace Inventory.Configuration.UnitTests
                 options.EnableSensitiveDataLogging(true);
 
             });
+            services.AddScoped(typeof(IAsyncRepositoryWithSpecification<>), typeof(ConfigurationRepositoryWithSpec<>));
+            services.AddScoped(typeof(IGenericQueryStore<>), typeof(ConfigurationQueryStore<>));
+            services.AddScoped(typeof(IAsyncRepository<>), typeof(ConfigurationRepository<>));
 
 
             //pagination
@@ -78,10 +65,11 @@ namespace Inventory.Configuration.UnitTests
             services.AddPagination();
 
             // Applications
-            services.AddSingleton<PluginResolver>();
+            services.AddSingleton<IPluginResolver, PluginResolver>();
             services.AddScoped<PluginService>();
-            services.AddScoped<LocationService>();
-            services.AddScoped<CredentialService>();
+            services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<ICredentialService, CredentialService>();
+            services.AddScoped<IDatacenterService, DatacenterService>();
 
 
             // Unit tests specific configuration
@@ -99,7 +87,9 @@ namespace Inventory.Configuration.UnitTests
 
         public IMediator GetMediator() => GetService<IMediator>();
         public ConfigurationDbContext DbContext => GetService<ConfigurationDbContext>();
-        public IAsyncRepository<T> GetAsyncRepository<T>() where T : class => GetService<IAsyncRepository<T>>();
+        public IAsyncRepository<T> GetAsyncRepository<T>() where T : Entity => GetService<IAsyncRepository<T>>();
+        public IGenericQueryStore<T> GetGenericStore<T>() where T : Entity => GetService<IGenericQueryStore<T>>();
+
 
     }
 }

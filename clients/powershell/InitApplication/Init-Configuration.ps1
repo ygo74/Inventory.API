@@ -6,17 +6,27 @@ $configuration = . $scriptPath
 
 $titleSeparator = "".PadRight(80,"=")
 
-# # -----------------------------------------------------------------------------
-# # Load plugins
-# # -----------------------------------------------------------------------------
-# Write-Host ""
-# Write-Host "Load plugins" -ForegroundColor Green
-# Write-Host $titleSeparator -ForegroundColor Green
-# $configuration.plugins | Foreach-Object {
-#     Write-Host "`t - plugin $($_.Name) : " -NoNewLine
-#     New-InventoryPlugin -Name $_.Name -Code $_.Code -Version $_.Version -Path $_.Path -InventoryCode $_.InventoryCode
-#     write-Host "Ok"
-# }
+# -----------------------------------------------------------------------------
+# Load plugins
+# -----------------------------------------------------------------------------
+Write-Host ""
+Write-Host "Load plugins" -ForegroundColor Green
+Write-Host $titleSeparator -ForegroundColor Green
+$configuration.plugins | Foreach-Object {
+    Write-Host "`t - plugin $($_.Name) : " -NoNewLine
+    $existingPlugin = Get-InventoryPlugin -Code $_.Code -ErrorAction SilentlyContinue
+    if ($null -eq $existingPlugin)
+    {
+        $result = New-InventoryPlugin -InputObject $_
+    }
+    else
+    {
+        $_ | Add-Member -MemberType NoteProperty -Name Id -Value $existingPlugin.id
+        $result = Update-InventoryPlugin -InputObject $_
+    }
+    write-Host "Ok"
+    write-Output $result
+}
 
 
 # -----------------------------------------------------------------------------
@@ -27,17 +37,78 @@ Write-Host "Load locations" -ForegroundColor Green
 Write-Host $titleSeparator -ForegroundColor Green
 $configuration.locations | Foreach-Object {
     Write-Host "`t - location $($_.Name) : " -NoNewLine
-    $existingLocation = Get-InventoryLocation -Name $_.Name
+    $existingLocation = Get-InventoryLocation -Name $_.Name -ErrorAction SilentlyContinue
     if ($null -eq $existingLocation)
     {
-        New-InventoryLocation -InputObject $_
+        $result = New-InventoryLocation -InputObject $_
     }
     else
     {
         $_ | Add-Member -MemberType NoteProperty -Name Id -Value $existingLocation.id
-        Update-InventoryLocation -InputObject $_
+        $result = Update-InventoryLocation -InputObject $_
     }
 
     write-Host "Ok"
+    write-Output $result
 }
 
+# -----------------------------------------------------------------------------
+# Load Datacenters
+# -----------------------------------------------------------------------------
+Write-Host ""
+Write-Host "Load Datacenters" -ForegroundColor Green
+Write-Host $titleSeparator -ForegroundColor Green
+$configuration.Datacenters | Foreach-Object {
+    Write-Host "`t - datacenter $($_.Name) : " -NoNewLine
+    $existingDatacenter = Get-InventoryDatacenter -Name $_.Name -ErrorAction SilentlyContinue
+    if ($null -eq $existingDatacenter)
+    {
+        $result = New-InventoryDatacenter -InputObject $_
+    }
+    else
+    {
+        $_ | Add-Member -MemberType NoteProperty -Name Id -Value $existingDatacenter.id
+        $result = Update-InventoryLocation -InputObject $_
+    }
+
+    write-Host "Ok"
+    write-Output $result
+}
+
+
+# -----------------------------------------------------------------------------
+# Load Credentials
+# -----------------------------------------------------------------------------
+Write-Host ""
+Write-Host "Load Credentials" -ForegroundColor Green
+Write-Host $titleSeparator -ForegroundColor Green
+$configuration.Credentials | Foreach-Object {
+    Write-Host "`t - credential $($_.Name) : " -NoNewLine
+    $existingCredential = Get-InventoryCredential -Name $_.Name -ErrorAction SilentlyContinue
+    if ($null -eq $existingCredential)
+    {
+        $result = New-InventoryCredential -InputObject $_
+    }
+    else
+    {
+        $_ | Add-Member -MemberType NoteProperty -Name Id -Value $existingCredential.id
+        $result = Update-InventoryCredential -InputObject $_
+    }
+
+    write-Host "Ok"
+    write-Output $result
+}
+
+# -----------------------------------------------------------------------------
+# Set Datacenter plugin endpoints
+# -----------------------------------------------------------------------------
+Write-Host ""
+Write-Host "Set Datacenter plugin endpoints" -ForegroundColor Green
+Write-Host $titleSeparator -ForegroundColor Green
+$configuration.DatacenterPluginEndpoints | Foreach-Object {
+    Write-Host "`t - Datacenter $($_.DatacenterCode) : " -NoNewLine
+    $result = Set-InventoryDatacenterPluginEndpoint -InputObject $_
+
+    write-Host "Ok"
+    write-Output $result
+}

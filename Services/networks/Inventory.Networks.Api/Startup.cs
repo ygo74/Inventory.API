@@ -38,7 +38,7 @@ namespace Inventory.Networks.Api
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Inventory.Networks.Api", Version = "v1" });
             });
 
-            services.AddSingleton<PluginResolver>();
+            services.AddSingleton<IPluginResolver, PluginResolver>();
 
             services.AddLogging();
 

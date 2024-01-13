@@ -24,6 +24,8 @@ namespace Inventory.Common.Domain.Models
 
         public void AddDomainEvent(Event eventItem)
         {
+            if (eventItem == null) return;
+                
             _domainEvents = _domainEvents ?? new List<Event>();
             _domainEvents.Add(eventItem);
         }

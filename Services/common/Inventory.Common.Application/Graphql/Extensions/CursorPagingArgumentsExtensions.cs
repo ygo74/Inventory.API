@@ -51,7 +51,7 @@ namespace Inventory.Common.Application.Graphql.Extensions
         {
             var pagingArguments = context.GetCursorPaggingArguments();
 
-            var size = default(int?);
+            var size = default(int);
             if (pagingArguments.First.HasValue)
             {
                 size = pagingArguments.First.Value;
@@ -74,11 +74,23 @@ namespace Inventory.Common.Application.Graphql.Extensions
 
 
         public static OffsetPagingArguments GetOffsetPagingArguments(
-            this IResolverContext context
-            )
+            this IResolverContext context,
+            int DefaultPageSize = 50
+        )
         {
+
+            var MaxPageSize = int.MaxValue;
+
+            if (MaxPageSize < DefaultPageSize)
+            {
+                DefaultPageSize = MaxPageSize;
+            }
+
             var skip = context.ArgumentValue<int?>(OffsetPagingArgumentNames.Skip);
             var take = context.ArgumentValue<int?>(OffsetPagingArgumentNames.Take);
+
+            if (!skip.HasValue) { skip = 0; }
+            if (!take.HasValue) {  take = DefaultPageSize; }
 
             return new OffsetPagingArguments(skip, take);
         }
@@ -90,10 +102,15 @@ namespace Inventory.Common.Application.Graphql.Extensions
 
             var pagingArguments = context.GetOffsetPagingArguments();
 
+            // calcul the page number from skip and take
+            var page = pagingArguments.Skip.HasValue && pagingArguments.Take.HasValue
+                ? (int)Math.Ceiling((double)pagingArguments.Skip.Value / pagingArguments.Take.Value) + 1
+                : 1;
+
             return new OffsetPaginationRequest
             {
-                Size = pagingArguments.Take,
-                Page = pagingArguments.Skip.HasValue ? pagingArguments.Skip.Value : 1
+                Size = pagingArguments.Take.Value,
+                Skip = pagingArguments.Skip.Value
             };
         }
 

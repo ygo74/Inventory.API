@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Inventory.Plugins.Azure.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Polly;
 using Polly.Extensions.Http;
 using System;
@@ -19,6 +20,7 @@ namespace Inventory.Plugins.Azure
         public static void UseInfrastructureAzureService(this IServiceCollection services)
         {
 
+            //services.TryAddEnumerable(services.AddAutoMapper(typeof(ServicesExtension)));
             services.AddAutoMapper(typeof(ServicesExtension));
 
             services.AddScoped<AuthenticationTokenService>()
