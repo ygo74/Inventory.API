@@ -31,7 +31,7 @@ steps:
     inputs:
       command: custom
       custom: 'tool '
-      arguments: install dotnet-ef -g
+      arguments: install dotnet-ef -g --version 7.0.15
 
   - script: echo "##vso[task.prependpath]$HOME/.dotnet/tools"
     displayName: 'Update PATH'
