@@ -22,9 +22,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    # - uses: '.github/workflows/composite/version'
-    #   with:
-    #     service: Inventory.Configuration.Api
+    - name: Importe version actions
+      uses: ./.github/workflows/composite/version
+      with:
+        service: Inventory.Configuration.Api
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
