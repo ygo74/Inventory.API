@@ -22,7 +22,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - uses: '${{ github.workspace }}/github/workflows/composite/version'
+    - uses: './../../github/workflows/composite/version'
       with:
         service: Inventory.Configuration.Api
 
