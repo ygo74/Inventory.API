@@ -1,0 +1,17 @@
+---
+name: "Calcul build version"
+description: "Identify build scope and calcul the build version"
+
+inputs:
+  service:
+    description: "Service to build"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get Last Branch and Semantic Version Containing String to ${{ inputs.service }}
+      id: lrb
+      uses: jessicalostinspace/github-action-get-regex-branch@v1.0.2
+      with:
+        regex-string: '^(.*/)?release(s)?/\d+\.\d+\.\d+$'
