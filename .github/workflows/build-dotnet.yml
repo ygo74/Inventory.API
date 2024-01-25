@@ -15,9 +15,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./Services/configuration
+    # defaults:
+    #   run:
+    #     working-directory: ./Services/configuration
 
     steps:
     - uses: actions/checkout@v3
@@ -30,13 +30,20 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
+
     - name: Restore dependencies
       run: dotnet restore ./Inventory.Configuration.Api/Inventory.Configuration.Api.csproj
+      working-directory: ./Services/configuration
+
     - name: Build
       run: dotnet build --no-restore ./Inventory.Configuration.Api/Inventory.Configuration.Api.csproj
+      working-directory: ./Services/configuration
+
     - name: Test
       # run: dotnet test --no-build --verbosity normal
       run: dotnet test --verbosity normal ./Inventory.Configuration.UnitTests/Inventory.Configuration.UnitTests.csproj --collect:"XPlat Code Coverage" --results-directory ./coverage
+      working-directory: ./Services/configuration
+
 
     - name: Code Coverage Report
       uses: irongut/CodeCoverageSummary@v1.3.0
@@ -50,6 +57,7 @@ jobs:
         indicators: true
         output: both
         thresholds: '60 80'
+
 
     - name: Write to Job Summary
       run: cat "$GITHUB_WORKSPACE/code-coverage-results.md" >> $GITHUB_STEP_SUMMARY
