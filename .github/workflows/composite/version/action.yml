@@ -18,8 +18,11 @@ runs:
         echo "BRANCH=$currentbranch" >> $GITHUB_ENV
       shell: bash
 
-    - name: Get Last Branch and Semantic Version Containing String to ${{ inputs.service }}
-      id: lrb
-      uses: jessicalostinspace/github-action-get-regex-branch@v1.0.2
+    - name: Bumping Major Index
+      id: bump_version_major
+      # if: contains(github.event.pull_request.title, 'major')
+      uses: christian-draeger/increment-semantic-version@1.1.0
       with:
-        regex-string: 'release'
+        current-version: 0.2.0
+        version-fragment: 'major'
+
