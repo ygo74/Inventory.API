@@ -11,6 +11,11 @@ runs:
   using: "composite"
   steps:
 
+    - name: checkout head
+      run: |
+        git checkout HEAD^
+      shell: bash
+
     # Install release-flow
     # https://github.com/release-flow/release-flow
     - name: Install release-flow
