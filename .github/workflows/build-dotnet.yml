@@ -20,7 +20,9 @@ jobs:
     #     working-directory: ./Services/configuration
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Importe version actions
       uses: ./.github/workflows/composite/version
