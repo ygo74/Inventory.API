@@ -13,7 +13,7 @@ runs:
 
     - name: checkout head
       run: |
-        git checkout HEAD^
+        git switch -c ${GITHUB_REF#refs/heads/}
       shell: bash
 
     # Install release-flow
