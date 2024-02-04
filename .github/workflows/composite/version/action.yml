@@ -11,18 +11,15 @@ runs:
   using: "composite"
   steps:
 
-    - name: Set branch name as env variable
+    # Install release-flow
+    # https://github.com/release-flow/release-flow
+    - name: Install release-flow
       run: |
-        currentbranch=$(echo ${GITHUB_REF##*/})
-        echo "running on $currentbranch"
-        echo "BRANCH=$currentbranch" >> $GITHUB_ENV
+        npm install @release-flow/release-flow
       shell: bash
 
-    - name: Bumping Major Index
-      id: bump_version_major
-      # if: contains(github.event.pull_request.title, 'major')
-      uses: christian-draeger/increment-semantic-version@1.1.0
-      with:
-        current-version: 0.2.0
-        version-fragment: 'major'
+    - name: Caluclate semver
+      run: |
+        npx rfver --pretty
+      shell: bash
 
