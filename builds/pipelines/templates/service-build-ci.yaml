@@ -70,6 +70,13 @@ stages:
               configurationPath: './VersionManagement.yml'
 
 
+          - task: ReleaseFlowGitVersion@0
+            inputs:
+              sourceBranch: '$(Build.SourceBranch)'
+              updateBuildNumber: true
+              # repoRoot: 'xxx'
+
+
       # ---------------------------------------------------------------------------
       # Build dotnet applications
       # - Update build number with next version and unique counter
