@@ -35,10 +35,10 @@ namespace Inventory.Devices.UnitTests.Tests.OperatingSystemTests
         }
 
         [TestCaseSource(typeof(OperatingSystemTestCases), nameof(OperatingSystemTestCases.GetOperatingSystemWithMissingMandatoryValues))]
-        public void Should_detect_create_operating_system_with_missing_mandatory_values(CreateOperatingSystem.Command2 newEntity)
+        public void Should_detect_create_operating_system_with_missing_mandatory_values(CreateOperatingSystemRequest newEntity)
         {
             // Arrange
-            var validator = this.GetService<CreateOperatingSystem.Validator>();
+            var validator = this.GetService<CreateOperatingSystemValidator>();
 
             // Act
             var testResult = validator.TestValidate(newEntity);
@@ -64,10 +64,10 @@ namespace Inventory.Devices.UnitTests.Tests.OperatingSystemTests
         }
 
         [TestCaseSource(typeof(OperatingSystemTestCases), nameof(OperatingSystemTestCases.GetOperatingSystemWithBadValues))]
-        public void Should_detect_create_operating_system_with_bad_values(CreateOperatingSystem.Command2 newEntity)
+        public void Should_detect_create_operating_system_with_bad_values(CreateOperatingSystemRequest newEntity)
         {
             // Arrange
-            var validator = this.GetService<CreateOperatingSystem.Validator>();
+            var validator = this.GetService<CreateOperatingSystemValidator>();
 
             // Act
             var testResult = validator.TestValidate(newEntity);
@@ -78,7 +78,7 @@ namespace Inventory.Devices.UnitTests.Tests.OperatingSystemTests
         }
 
         [TestCaseSource(typeof(OperatingSystemTestCases), nameof(OperatingSystemTestCases.GetOperatingSystemWithMissingMandatoryValues))]
-        public async Task Should_fail_create_operating_system_with_missing_mandatory_values(CreateOperatingSystem.Command2 newEntity)
+        public async Task Should_fail_create_operating_system_with_missing_mandatory_values(CreateOperatingSystemRequest newEntity)
         {
             // Act
             var result = await _mediator.Send(newEntity);
@@ -88,7 +88,7 @@ namespace Inventory.Devices.UnitTests.Tests.OperatingSystemTests
         }
 
         [TestCaseSource(typeof(OperatingSystemTestCases), nameof(OperatingSystemTestCases.GetOperatingSystemWithBadValues))]
-        public async Task  Should_fail_create_operating_system_with_bad_values(CreateOperatingSystem.Command2 newEntity)
+        public async Task  Should_fail_create_operating_system_with_bad_values(CreateOperatingSystemRequest newEntity)
         {
             // Act
             var result = await _mediator.Send(newEntity);
@@ -100,7 +100,7 @@ namespace Inventory.Devices.UnitTests.Tests.OperatingSystemTests
 
 
         [TestCaseSource(typeof(OperatingSystemTestCases), nameof(OperatingSystemTestCases.GetOperatingSystemWithValidValues))]
-        public async Task Should_successfull_create_operating_system_with_valid_values(CreateOperatingSystem.Command2 newEntity)
+        public async Task Should_successfull_create_operating_system_with_valid_values(CreateOperatingSystemRequest newEntity)
         {
             // act
             var actual = await _mediator.Send(newEntity);
@@ -125,7 +125,7 @@ namespace Inventory.Devices.UnitTests.Tests.OperatingSystemTests
                     model: ""AIX""
                     version: ""11""
                     deprecated: false
-                  }) 
+                  })
                   {
                     data {
                         operatingSystemFamily

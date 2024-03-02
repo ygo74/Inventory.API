@@ -12,7 +12,7 @@ namespace Inventory.Devices.Api.Applications.OperatingSystem
     {
         public OperatingSystemMappingProfile()
         {
-            CreateMap<CreateOperatingSystem.Command2, Inventory.Devices.Domain.Models.OperatingSystem>();
+            CreateMap<CreateOperatingSystemRequest, Inventory.Devices.Domain.Models.OperatingSystem>();
             CreateMap<Inventory.Devices.Domain.Models.OperatingSystem, OperatingSystemDto>()
                 .ForMember(d => d.OperatingSystemFamily, opts =>
                 {

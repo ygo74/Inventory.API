@@ -13,28 +13,28 @@ namespace Inventory.Devices.UnitTests.TestCases
 
         public static IEnumerable GetOperatingSystemWithMissingMandatoryValues()
         {
-            yield return new CreateOperatingSystem.Command2()
+            yield return new CreateOperatingSystemRequest()
             {
                 Model = "xxx",
                 Version = "xxx"
             };
-            yield return new CreateOperatingSystem.Command2()
+            yield return new CreateOperatingSystemRequest()
             {
                 OperatingSystemFamily = Api.Applications.OperatingSystem.Dto.OperatingSystemFamilyDto.Aix,
                 Version = "xxx"
             };
-            yield return new CreateOperatingSystem.Command2()
+            yield return new CreateOperatingSystemRequest()
             {
                 OperatingSystemFamily = Api.Applications.OperatingSystem.Dto.OperatingSystemFamilyDto.Aix,
                 Model="",
                 Version = "xxx"
             };
-            yield return new CreateOperatingSystem.Command2()
+            yield return new CreateOperatingSystemRequest()
             {
                 OperatingSystemFamily = Api.Applications.OperatingSystem.Dto.OperatingSystemFamilyDto.Aix,
                 Model = "xxx",
             };
-            yield return new CreateOperatingSystem.Command2()
+            yield return new CreateOperatingSystemRequest()
             {
                 OperatingSystemFamily = Api.Applications.OperatingSystem.Dto.OperatingSystemFamilyDto.Aix,
                 Model="xxx",
@@ -45,14 +45,14 @@ namespace Inventory.Devices.UnitTests.TestCases
 
         public static IEnumerable GetOperatingSystemWithBadValues()
         {
-            yield return new CreateOperatingSystem.Command2()
+            yield return new CreateOperatingSystemRequest()
             {
                 OperatingSystemFamily = Api.Applications.OperatingSystem.Dto.OperatingSystemFamilyDto.Aix,
                 Model = "Aix",
                 Version = "10",
                 ValidTo = DateTime.Today.AddDays(-1)
             };
-            yield return new CreateOperatingSystem.Command2()
+            yield return new CreateOperatingSystemRequest()
             {
                 OperatingSystemFamily = Api.Applications.OperatingSystem.Dto.OperatingSystemFamilyDto.Aix,
                 Model = "Aix",
@@ -65,7 +65,7 @@ namespace Inventory.Devices.UnitTests.TestCases
 
         public static IEnumerable GetOperatingSystemWithValidValues()
         {
-            yield return new CreateOperatingSystem.Command2()
+            yield return new CreateOperatingSystemRequest()
             {
                 OperatingSystemFamily = Api.Applications.OperatingSystem.Dto.OperatingSystemFamilyDto.Windows,
                 Model = "Server",

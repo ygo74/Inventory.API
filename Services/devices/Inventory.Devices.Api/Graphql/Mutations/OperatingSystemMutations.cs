@@ -16,7 +16,7 @@ namespace Inventory.Devices.Api.Graphql.Mutations
     {
 
         public async Task<Payload<OperatingSystemDto>> CreateOperatingSystem(
-            CreateOperatingSystem.Command2 command,
+            CreateOperatingSystemRequest command,
             [Service] IMediator _mediator
             )
         {

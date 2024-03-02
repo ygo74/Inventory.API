@@ -1,0 +1,30 @@
+---
+name: "Calcul build version"
+description: "Identify build scope and calcul the build version"
+
+inputs:
+  service:
+    description: "Service to build"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: checkout head
+      run: |
+        git checkout -b ${GITHUB_REF#refs/heads/}
+      shell: bash
+
+    # Install release-flow
+    # https://github.com/release-flow/release-flow
+    - name: Install release-flow
+      run: |
+        npm install @release-flow/release-flow
+      shell: bash
+
+    - name: Caluclate semver
+      run: |
+        npx rfver --pretty
+      shell: bash
+
