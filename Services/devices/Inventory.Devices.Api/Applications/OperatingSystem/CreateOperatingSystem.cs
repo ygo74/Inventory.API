@@ -16,88 +16,83 @@ using Inventory.Common.Application.Core;
 
 namespace Inventory.Devices.Api.Applications.OperatingSystem
 {
-    public class CreateOperatingSystem
+    public class CreateOperatingSystemRequest : CreateConfigurationEntityRequest<OperatingSystemDto>
+    {
+        public OperatingSystemFamilyDto OperatingSystemFamily { get; set; }
+        public string Model { get; set; }
+        public string Version { get; set; }
+    }
+
+    public class CreateOperatingSystemValidator : AbstractValidator<CreateOperatingSystemRequest>
+    {
+        public CreateOperatingSystemValidator()
+        {
+
+            RuleFor(e => e.OperatingSystemFamily).Cascade(CascadeMode.Stop)
+                .NotNull()
+                .NotEmpty()
+                .Must(e => e > 0)
+                .WithMessage("{PropertyName} is mandatory");
+
+            RuleFor(e => e.Model).Cascade(CascadeMode.Stop)
+                .NotNull()
+                .NotEmpty()
+                .WithMessage("{PropertyName} is mandatory");
+
+            RuleFor(e => e.Version).Cascade(CascadeMode.Stop)
+                .NotNull()
+                .NotEmpty()
+                .WithMessage("{PropertyName} is mandatory");
+
+            Include(new ConfigurationEntityDtoValidator<CreateOperatingSystemRequest>());
+
+        }
+    }
+
+    public class CreateOperatingSystemHandler : IRequestHandler<CreateOperatingSystemRequest, Payload<OperatingSystemDto>>
     {
 
-        public class Command2 : CreateConfigurationEntityRequest<OperatingSystemDto>
+        private readonly IAsyncRepositoryWithSpecification<Inventory.Devices.Domain.Models.OperatingSystem> _repository;
+        private readonly ILogger<CreateOperatingSystemHandler> _logger;
+        private readonly IMapper _mapper;
+
+        public CreateOperatingSystemHandler(IAsyncRepositoryWithSpecification<Inventory.Devices.Domain.Models.OperatingSystem> repository,
+                                            ILogger<CreateOperatingSystemHandler> logger, IMapper mapper)
         {
-            public OperatingSystemFamilyDto OperatingSystemFamily { get; set; }
-            public string Model { get; set; }
-            public string Version { get; set; }
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public class Validator : AbstractValidator<Command2>
+        public async Task<Payload<OperatingSystemDto>> Handle(CreateOperatingSystemRequest request, CancellationToken cancellationToken)
         {
-            public Validator()
+            _logger.LogInformation($"Start adding Operating system '{request.OperatingSystemFamily}' with Model '{request.Model}' and version '{request.Version}'");
+
+            bool success = false;
+            try
             {
+                // Map request to Domain entity
+                var osFamily = OperatingSystemFamily.FromValue< OperatingSystemFamily>((int)request.OperatingSystemFamily);
+                var newEntity = new Inventory.Devices.Domain.Models.OperatingSystem(osFamily, request.Model, request.Version,
+                                                                                    request.Deprecated, request.ValidFrom, request.ValidTo);
 
-                RuleFor(e => e.OperatingSystemFamily).Cascade(CascadeMode.Stop)
-                    .NotNull()
-                    .NotEmpty()
-                    .Must(e => e > 0)
-                    .WithMessage("{PropertyName} is mandatory");
+                // Add entity
+                var result = await _repository.AddAsync(newEntity, cancellationToken);
 
-                RuleFor(e => e.Model).Cascade(CascadeMode.Stop)
-                    .NotNull()
-                    .NotEmpty()
-                    .WithMessage("{PropertyName} is mandatory");
-
-                RuleFor(e => e.Version).Cascade(CascadeMode.Stop)
-                    .NotNull()
-                    .NotEmpty()
-                    .WithMessage("{PropertyName} is mandatory");
-
-                Include(new ConfigurationEntityDtoValidator<Command2>());
+                // Map response
+                var resultDto = _mapper.Map<OperatingSystemDto>(result);
+                success = true;
+                return Payload<OperatingSystemDto>.Success(resultDto);
 
             }
+            finally
+            {
+                if (success)
+                    _logger.LogInformation($"Successfully adding Operating system '{request.OperatingSystemFamily}' with Model '{request.Model}' and version '{request.Version}'");
+                else
+                    _logger.LogInformation($"Error when adding Operating system '{request.OperatingSystemFamily}' with Model '{request.Model}' and version '{request.Version}'");
+            }
+
         }
-
-        public class Handler : IRequestHandler<Command2, Payload<OperatingSystemDto>>
-        {
-
-            private readonly IAsyncRepositoryWithSpecification<Inventory.Devices.Domain.Models.OperatingSystem> _repository;
-            private readonly ILogger<Handler> _logger;
-            private readonly IMapper _mapper;
-
-            public Handler(IAsyncRepositoryWithSpecification<Inventory.Devices.Domain.Models.OperatingSystem> repository, ILogger<Handler> logger, IMapper mapper)
-            {
-                _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-                _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-                _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            }
-
-            public async Task<Payload<OperatingSystemDto>> Handle(Command2 request, CancellationToken cancellationToken)
-            {
-                _logger.LogInformation($"Start adding Operating system '{request.OperatingSystemFamily}' with Model '{request.Model}' and version '{request.Version}'");
-
-                bool success = false;
-                try
-                {
-                    // Map request to Domain entity
-                    var osFamily = OperatingSystemFamily.FromValue< OperatingSystemFamily>((int)request.OperatingSystemFamily);
-                    var newEntity = new Inventory.Devices.Domain.Models.OperatingSystem(osFamily, request.Model, request.Version, 
-                                                                                        request.Deprecated, request.ValidFrom, request.ValidTo);
-
-                    // Add entity
-                    var result = await _repository.AddAsync(newEntity, cancellationToken);
-
-                    // Map response
-                    var resultDto = _mapper.Map<OperatingSystemDto>(result);
-                    success = true;
-                    return Payload<OperatingSystemDto>.Success(resultDto);
-
-                }
-                finally
-                {
-                    if (success)
-                        _logger.LogInformation($"Successfully adding Operating system '{request.OperatingSystemFamily}' with Model '{request.Model}' and version '{request.Version}'");
-                    else
-                        _logger.LogInformation($"Error when adding Operating system '{request.OperatingSystemFamily}' with Model '{request.Model}' and version '{request.Version}'");
-                }
-
-            }
-        }
-
-
     }
 }
