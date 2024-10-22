@@ -29,7 +29,7 @@
     <PackageReference Include="HotChocolate.Data" Version="13.2.0" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="13.2.0" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.2.0" />
-    <PackageReference Include="HotChocolate.Types.CursorPagination" Version="13.2.0" />
+    <PackageReference Include="HotChocolate.Types.CursorPagination" Version="14.0.0" />
     <PackageReference Include="HotChocolate.Diagnostics" Version="13.2.0" />
 
   </ItemGroup>
