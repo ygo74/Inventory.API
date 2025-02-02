@@ -63,114 +63,107 @@ stages:
             fetchDepth: 0
 
 
+
           - script: |
               echo "=== Début du calcul de version ==="
 
-              # Détection si le build provient d'une Pull Request
               if [ -n "$SYSTEM_PULLREQUEST_SOURCEBRANCH" ]; then
                 echo "Build déclenché par une Pull Request"
-                # Récupérer la branche source et la branche cible de la PR
                 SOURCE_BRANCH_ORIG="${SYSTEM_PULLREQUEST_SOURCEBRANCH#refs/heads/}"
                 TARGET_BRANCH_ORIG="${SYSTEM_PULLREQUEST_TARGETBRANCH#refs/heads/}"
                 echo "Branche source de la PR : $SOURCE_BRANCH_ORIG"
                 echo "Branche cible de la PR : $TARGET_BRANCH_ORIG"
               else
-                # Sinon, utiliser la branche classique du build
                 SOURCE_BRANCH_ORIG="${BUILD_SOURCEBRANCH#refs/heads/}"
                 echo "Build sur la branche : $SOURCE_BRANCH_ORIG"
               fi
 
-              # Nettoyage du nom de branche pour les metadata
               SOURCE_BRANCH=$(echo "$SOURCE_BRANCH_ORIG" | sed 's/[\/:<>\\|?@*]/-/g')
               TARGET_BRANCH=$(echo "$TARGET_BRANCH_ORIG" | sed 's/[\/:<>\\|?@*]/-/g')
 
-              # Récupérer la dernière version depuis les branches de release
-              LATEST_RELEASE_VERSION=$(git ls-remote --heads origin "refs/heads/releases/*" \
-                | awk '{print $2}' \
-                | sed 's#refs/heads/releases/##' \
-                | sort -V \
-                | tail -n 1)
-
-              if [ -z "$LATEST_RELEASE_VERSION" ]; then
-                echo "Aucune branche release trouvée. On part de 0.0.0."
-                LATEST_RELEASE_VERSION="0.0.0"
+              # 🟢 Détection de la branche release cible (releases/x.y ou release/x.y)
+              if [[ "$SOURCE_BRANCH_ORIG" =~ ^releases?/([0-9]+\.[0-9]+)$ ]]; then
+                RELEASE_VERSION="${BASH_REMATCH[1]}"
+              elif [[ "$TARGET_BRANCH_ORIG" =~ ^releases?/([0-9]+\.[0-9]+)$ ]]; then
+                RELEASE_VERSION="${BASH_REMATCH[1]}"
+              else
+                RELEASE_VERSION=""
               fi
 
-              echo "Dernière version release trouvée: $LATEST_RELEASE_VERSION"
+              if [ -n "$RELEASE_VERSION" ]; then
+                # 🔥 Compter les merges pour définir le PATCH
+                MERGE_COUNT=$(git rev-list --merges --count origin/releases/${RELEASE_VERSION})
+                PATCH=$((MERGE_COUNT))
 
-              # Extraction des composantes de la version release
-              IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_RELEASE_VERSION"
-              if [ -z "$PATCH" ]; then PATCH=0; fi
-
-              # Calcul de la nouvelle version en fonction du type de branche
-              if [[ "$SOURCE_BRANCH_ORIG" == releases/* ]]; then
-                # Pour les branches release : le numéro de patch correspond au nombre de commits dans la branche
-                COMMIT_COUNT=$(git rev-list --count HEAD)
-                if [ "$COMMIT_COUNT" -eq 1 ]; then
-                  PATCH=0
-                else
-                  PATCH=$COMMIT_COUNT
-                fi
-                NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
-                echo "Branche release détectée. Nouvelle version calculée: $NEW_VERSION"
-
-              elif [[ "$SOURCE_BRANCH_ORIG" == hotfix/* ]]; then
-                # Pour une branche hotfix, on incrémente le patch
-                PATCH=$((PATCH + 1))
-                NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
-                echo "Branche hotfix détectée. Nouvelle version calculée: $NEW_VERSION"
-
-              elif [[ "$SOURCE_BRANCH_ORIG" == feature/* ]]; then
-                # Pour une branche feature, on incrémente le minor et remet le patch à 0.
-                MINOR=$((MINOR + 1))
-                PATCH=0
-                NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
-                echo "Branche feature détectée. Nouvelle version calculée: $NEW_VERSION"
-
-              elif [[ "$TARGET_BRANCH_ORIG" == releases/* ]]; then
-                # 🚀 Cas PR vers une branche release (ex: master → releases/0.4) → Incrémentation du PATCH
-                PATCH=$((PATCH + 1))
-                NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
-                echo "PR vers une branche release détectée. Nouvelle version calculée: $NEW_VERSION"
+                echo "Branche release détectée (${RELEASE_VERSION}). Nombre de merges : $MERGE_COUNT. Nouvelle version calculée: ${RELEASE_VERSION}.${PATCH}"
+                NEW_VERSION="${RELEASE_VERSION}.${PATCH}"
 
               else
-                # Par défaut : incrémentation du MINOR
-                MINOR=$((MINOR + 1))
-                PATCH=0
-                NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
-                echo "Branche de développement détectée. Nouvelle version calculée: $NEW_VERSION"
+                # 🔴 Trouver la dernière version release
+                LATEST_RELEASE_VERSION=$(git ls-remote --heads origin "refs/heads/releases/*" "refs/heads/release/*" \
+                  | awk '{print $2}' \
+                  | sed -E 's#refs/heads/releases?/##' \
+                  | sort -V \
+                  | tail -n 1)
+
+                if [ -z "$LATEST_RELEASE_VERSION" ]; then
+                  echo "Aucune branche release trouvée. On part de 0.0.0."
+                  LATEST_RELEASE_VERSION="0.0.0"
+                fi
+
+                echo "Dernière version release trouvée: $LATEST_RELEASE_VERSION"
+                IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_RELEASE_VERSION"
+
+                if [[ "$SOURCE_BRANCH_ORIG" == hotfix/* ]]; then
+                  # 🔥 Hotfix : On récupère le dernier PATCH en comptant les merges dans la dernière release
+                  PATCH_COUNT=$(git rev-list --merges --count origin/releases/${MAJOR}.${MINOR})
+                  PATCH=$((PATCH_COUNT + 1))
+                  NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+                  echo "Branche hotfix détectée. Nouvelle version calculée: $NEW_VERSION"
+
+                elif [[ "$SOURCE_BRANCH_ORIG" == feature/* ]]; then
+                  MINOR=$((MINOR + 1))
+                  PATCH=0
+                  NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+                  echo "Branche feature détectée. Nouvelle version calculée: $NEW_VERSION"
+
+                elif [[ "$TARGET_BRANCH_ORIG" =~ ^releases?/ ]]; then
+                  PATCH=$((PATCH + 1))
+                  NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+                  echo "PR vers une branche release détectée. Nouvelle version calculée: $NEW_VERSION"
+
+                else
+                  MINOR=$((MINOR + 1))
+                  PATCH=0
+                  NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+                  echo "Branche de développement détectée. Nouvelle version calculée: $NEW_VERSION"
+                fi
               fi
 
-              # Récupération du commit court
               COMMIT_SHORT=$(echo $BUILD_SOURCEVERSION | cut -c1-7)
               METADATA=""
 
               if [ -n "$SYSTEM_PULLREQUEST_SOURCEBRANCH" ]; then
-                # Cas d'un build PR
                 if [[ "$TARGET_BRANCH_ORIG" == "main" || "$TARGET_BRANCH_ORIG" == "master" ]]; then
                   METADATA="pr-${SYSTEM_PULLREQUEST_PULLREQUESTID}.${SOURCE_BRANCH}.${COMMIT_SHORT}"
-                elif [[ "$TARGET_BRANCH_ORIG" == releases/* ]]; then
+                elif [[ "$TARGET_BRANCH_ORIG" =~ ^releases?/ ]]; then
                   METADATA="beta-pr-${SYSTEM_PULLREQUEST_PULLREQUESTID}.${SOURCE_BRANCH}.${COMMIT_SHORT}"
                 else
                   METADATA="${SOURCE_BRANCH}.${COMMIT_SHORT}"
                 fi
               else
-                # Cas des builds directs (hors PR)
                 if [[ "$SOURCE_BRANCH_ORIG" == "main" || "$SOURCE_BRANCH_ORIG" == "master" ]]; then
                   METADATA="alpha.${SOURCE_BRANCH}.${COMMIT_SHORT}"
-                elif [[ "$SOURCE_BRANCH_ORIG" != releases/* ]]; then
+                elif [[ ! "$SOURCE_BRANCH_ORIG" =~ ^releases?/ ]]; then
                   METADATA="${SOURCE_BRANCH}.${COMMIT_SHORT}"
                 fi
               fi
 
-              # Ajout des metadata à la version
               if [ -n "$METADATA" ]; then
                 NEW_VERSION="${NEW_VERSION}+${METADATA}"
               fi
 
               echo "Version finale calculée: $NEW_VERSION"
-
-              # Mise à jour des variables Azure DevOps
               echo "##vso[task.setvariable variable=VERSION]$NEW_VERSION"
               echo "##vso[build.updatebuildnumber]$NEW_VERSION"
 
