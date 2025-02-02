@@ -7,12 +7,15 @@ trigger:
   branches:
     include:
       # for new release to production: release flow strategy
-      - refs/release?/*
-      - refs/heads/release?/*
-      - release?/*
+      # - refs/release?/*
+      # - refs/heads/release?/*
+      # - release?/*
+      - release/*
       - master
       - feature/*
       - feature/devices/*
+      - hotfix/*
+      - hotfix/devices/*
       - topic/devices/*
       - Onion-Architecture
   paths:
