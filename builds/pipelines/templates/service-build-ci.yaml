@@ -170,11 +170,12 @@ stages:
               fi
 
               echo "Version finale calculée: $NEW_VERSION"
-              echo "##vso[task.setvariable variable=VERSION]$NEW_VERSION"
+              echo "##vso[task.setvariable variable=NEW_VERSION;isOutput=true]$NEW_VERSION"
               echo "##vso[build.updatebuildnumber]$NEW_VERSION"
 
               echo "=== Fin du calcul de version ==="
             displayName: 'Calculer et définir le numéro de version'
+            name: CalculateNextVersion
 
 
 
@@ -193,127 +194,127 @@ stages:
           #     # repoRoot: 'xxx'
 
 
-  #     # ---------------------------------------------------------------------------
-  #     # Build dotnet applications
-  #     # - Update build number with next version and unique counter
-  #     # - Build application
-  #     # ---------------------------------------------------------------------------
-  #     - job: DotnetBuild
-  #       displayName: Build Service
-  #       dependsOn:
-  #         - IdentifyContext
+      # ---------------------------------------------------------------------------
+      # Build dotnet applications
+      # - Update build number with next version and unique counter
+      # - Build application
+      # ---------------------------------------------------------------------------
+      - job: DotnetBuild
+        displayName: Build Service
+        dependsOn:
+          - IdentifyContext
 
-  #       variables:
-  #         NextVersion: $[ dependencies.IdentifyContext.outputs['CalculateNextVersion.version'] ]
-  #         BuildCounter: $[counter(variables['NextVersion'], 0)]
+        variables:
+          NextVersion: $[ dependencies.IdentifyContext.outputs['CalculateNextVersion.NEW_VERSION'] ]
+          BuildCounter: $[counter(variables['NextVersion'], 0)]
 
-  #       steps:
-  #         - checkout: self
-  #           fetchDepth: 0
+        steps:
+          - checkout: self
+            fetchDepth: 0
 
-  #         - task: PublishBuildNumber@0
-  #           name: PublishBuildNumber
-  #           displayName: Publish build numbers
-  #           inputs:
-  #             semanticVersioning: '$(NextVersion)'
-  #             uniqueCounter: '$(BuildCounter)'
+          - task: PublishBuildNumber@0
+            name: PublishBuildNumber
+            displayName: Publish build numbers
+            inputs:
+              semanticVersioning: '$(NextVersion)'
+              uniqueCounter: '$(BuildCounter)'
 
-  #         - template: ./steps/dotnet-ci-steps.yaml
-  #           parameters:
-  #             serviceName:       ${{ parameters.serviceName }}
-  #             projectPath:       ${{ parameters.projectPath }}
-  #             # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+          - template: ./steps/dotnet-ci-steps.yaml
+            parameters:
+              serviceName:       ${{ parameters.serviceName }}
+              projectPath:       ${{ parameters.projectPath }}
+              # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
-  #     - ${{ if parameters.testsProjectPath }}:
-  #       # ---------------------------------------------------------------------------
-  #       # Execute unit tests
-  #       # ---------------------------------------------------------------------------
-  #       - job: DotnetUnitTests
-  #         displayName: Tests Service
-  #         dependsOn:
-  #           - DotnetBuild
+      - ${{ if parameters.testsProjectPath }}:
+        # ---------------------------------------------------------------------------
+        # Execute unit tests
+        # ---------------------------------------------------------------------------
+        - job: DotnetUnitTests
+          displayName: Tests Service
+          dependsOn:
+            - DotnetBuild
 
-  #         steps:
-  #           - template: ./steps/dotnet-unittests-ci-steps.yaml
-  #             parameters:
-  #               serviceName:       ${{ parameters.serviceName }}
-  #               projectPath:       ${{ parameters.projectPath }}
-  #               testsProjectPath:  ${{ parameters.testsProjectPath }}
-  #               preTest:           ${{ parameters.preTest }}
-  #               # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+          steps:
+            - template: ./steps/dotnet-unittests-ci-steps.yaml
+              parameters:
+                serviceName:       ${{ parameters.serviceName }}
+                projectPath:       ${{ parameters.projectPath }}
+                testsProjectPath:  ${{ parameters.testsProjectPath }}
+                preTest:           ${{ parameters.preTest }}
+                # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
-  # # ---------------------------------------------------------------------------
-  # # Build Container image and chart
-  # # - Build when Pull request to Master or branch != feature/, topic/, hotfix/
-  # # ---------------------------------------------------------------------------
-  # - ${{ if or(not(or(startsWith(variables['Build.SourceBranch'],'refs/heads/feature/'), startsWith(variables['Build.SourceBranch'],'refs/heads/topic/'), startsWith(variables['Build.SourceBranch'],'refs/heads/hotfix/'))), and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master'))) }}:
-  #   - stage: BuildImages
-  #     displayName: Build image and chart
-  #     dependsOn:
-  #       - BuildApplication
+  # ---------------------------------------------------------------------------
+  # Build Container image and chart
+  # - Build when Pull request to Master or branch != feature/, topic/, hotfix/
+  # ---------------------------------------------------------------------------
+  - ${{ if or(not(or(startsWith(variables['Build.SourceBranch'],'refs/heads/feature/'), startsWith(variables['Build.SourceBranch'],'refs/heads/topic/'), startsWith(variables['Build.SourceBranch'],'refs/heads/hotfix/'))), and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master'))) }}:
+    - stage: BuildImages
+      displayName: Build image and chart
+      dependsOn:
+        - BuildApplication
 
-  #     jobs:
-  #       # ---------------------------------------------------------------------------
-  #       # Build and publish container image
-  #       # ---------------------------------------------------------------------------
-  #       - job: DockerBuild
-  #         displayName: Build and publish docker images
-  #         variables:
-  #           tag: $[ stageDependencies.BuildApplication.DotnetBuild.outputs['PublishBuildNumber.CleanedVersion'] ]
+      jobs:
+        # ---------------------------------------------------------------------------
+        # Build and publish container image
+        # ---------------------------------------------------------------------------
+        - job: DockerBuild
+          displayName: Build and publish docker images
+          variables:
+            tag: $[ stageDependencies.BuildApplication.DotnetBuild.outputs['PublishBuildNumber.CleanedVersion'] ]
 
-  #         steps:
-  #           - template: ./steps/container-ci-steps.yaml
-  #             parameters:
-  #               serviceName:           ${{ parameters.serviceName }}
-  #               repositoryName:        ${{ parameters.repositoryName }}
-  #               dockerFile:            ${{ parameters.dockerFile }}
-  #               dockerTags:            $(tag)
-  #               containerRegistry:     ${{ parameters.containerRegistry }}
-  #               containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
-  #               # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+          steps:
+            - template: ./steps/container-ci-steps.yaml
+              parameters:
+                serviceName:           ${{ parameters.serviceName }}
+                repositoryName:        ${{ parameters.repositoryName }}
+                dockerFile:            ${{ parameters.dockerFile }}
+                dockerTags:            $(tag)
+                containerRegistry:     ${{ parameters.containerRegistry }}
+                containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
+                # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
-  #       # ---------------------------------------------------------------------------
-  #       # Build and publish helm chart
-  #       # ---------------------------------------------------------------------------
-  #       - job: HelmBuild
-  #         displayName: Build and publish Helm chart
-  #         dependsOn:
-  #           - DockerBuild
+        # ---------------------------------------------------------------------------
+        # Build and publish helm chart
+        # ---------------------------------------------------------------------------
+        - job: HelmBuild
+          displayName: Build and publish Helm chart
+          dependsOn:
+            - DockerBuild
 
-  #         variables:
-  #           tag: $[ stageDependencies.BuildApplication.DotnetBuild.outputs['PublishBuildNumber.SemanticVersion'] ]
+          variables:
+            tag: $[ stageDependencies.BuildApplication.DotnetBuild.outputs['PublishBuildNumber.SemanticVersion'] ]
 
-  #         steps:
-  #           - template: ./steps/chart-ci-steps.yaml
-  #             parameters:
-  #               serviceName:           ${{ parameters.serviceName }}
-  #               chartPath:             ${{ parameters.chartPath }}
-  #               chartName:             ${{ parameters.chartName }}
-  #               chartVersion:          $(tag)
-  #               containerRegistry:     ${{ parameters.containerRegistry }}
-  #               containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
-  #               # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+          steps:
+            - template: ./steps/chart-ci-steps.yaml
+              parameters:
+                serviceName:           ${{ parameters.serviceName }}
+                chartPath:             ${{ parameters.chartPath }}
+                chartName:             ${{ parameters.chartName }}
+                chartVersion:          $(tag)
+                containerRegistry:     ${{ parameters.containerRegistry }}
+                containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
+                # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
-  # # ---------------------------------------------------------------------------
-  # # Build Databases scripts
-  # # ---------------------------------------------------------------------------
-  # - ${{ if parameters.infrastructureProjectPath }}:
-  #   - stage: BuildDbScripts
-  #     displayName: Build database scripts
-  #     dependsOn:
-  #       - BuildApplication
+  # ---------------------------------------------------------------------------
+  # Build Databases scripts
+  # ---------------------------------------------------------------------------
+  - ${{ if parameters.infrastructureProjectPath }}:
+    - stage: BuildDbScripts
+      displayName: Build database scripts
+      dependsOn:
+        - BuildApplication
 
-  #     jobs:
-  #       - job: DatabaseBuild
-  #         displayName: Build database scripts
-  #         variables:
-  #           tag: $(Build.BuildId)
+      jobs:
+        - job: DatabaseBuild
+          displayName: Build database scripts
+          variables:
+            tag: $(Build.BuildId)
 
-  #         steps:
-  #           - template: ./steps/databases-ci-steps.yaml
-  #             parameters:
-  #               serviceName:               ${{ parameters.serviceName }}
-  #               projectPath:               ${{ parameters.projectPath }}
-  #               infrastructureProjectPath: ${{ parameters.infrastructureProjectPath }}
-  #               # debugPipelineFlow:         ${{ parameters.debugPipelineFlow }}
+          steps:
+            - template: ./steps/databases-ci-steps.yaml
+              parameters:
+                serviceName:               ${{ parameters.serviceName }}
+                projectPath:               ${{ parameters.projectPath }}
+                infrastructureProjectPath: ${{ parameters.infrastructureProjectPath }}
+                # debugPipelineFlow:         ${{ parameters.debugPipelineFlow }}
 
