@@ -63,6 +63,7 @@ stages:
             fetchDepth: 0
 
 
+
           - script: |
               echo "=== Début du calcul de version ==="
 
@@ -90,17 +91,15 @@ stages:
               fi
 
               if [ -n "$RELEASE_VERSION" ]; then
-                # On récupère uniquement les tags de la branche ciblée
-                LATEST_RELEASE_VERSION="$RELEASE_VERSION"
-
-                # 🔥 Compter les merges dans cette branche pour définir le patch
+                # 🔥 Compter les merges pour définir le PATCH
                 MERGE_COUNT=$(git rev-list --merges --count origin/releases/${RELEASE_VERSION})
                 PATCH=$((MERGE_COUNT))
 
                 echo "Branche release détectée (${RELEASE_VERSION}). Nombre de merges : $MERGE_COUNT. Nouvelle version calculée: ${RELEASE_VERSION}.${PATCH}"
                 NEW_VERSION="${RELEASE_VERSION}.${PATCH}"
+
               else
-                # 🔴 Si aucune branche release détectée, on prend la dernière version globale
+                # 🔴 Trouver la dernière version release
                 LATEST_RELEASE_VERSION=$(git ls-remote --heads origin "refs/heads/releases/*" "refs/heads/release/*" \
                   | awk '{print $2}' \
                   | sed -E 's#refs/heads/releases?/##' \
@@ -116,7 +115,9 @@ stages:
                 IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_RELEASE_VERSION"
 
                 if [[ "$SOURCE_BRANCH_ORIG" == hotfix/* ]]; then
-                  PATCH=$((PATCH + 1))
+                  # 🔥 Hotfix : On récupère le dernier PATCH en comptant les merges dans la dernière release
+                  PATCH_COUNT=$(git rev-list --merges --count origin/releases/${MAJOR}.${MINOR})
+                  PATCH=$((PATCH_COUNT + 1))
                   NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
                   echo "Branche hotfix détectée. Nouvelle version calculée: $NEW_VERSION"
 
