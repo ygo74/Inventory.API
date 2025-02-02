@@ -67,6 +67,7 @@ stages:
           - script: |
               echo "=== Début du calcul de version ==="
 
+              # 🟢 Detection build on pull request or on branch
               if [ -n "$SYSTEM_PULLREQUEST_SOURCEBRANCH" ]; then
                 echo "Build déclenché par une Pull Request"
                 SOURCE_BRANCH_ORIG="${SYSTEM_PULLREQUEST_SOURCEBRANCH#refs/heads/}"
@@ -94,6 +95,11 @@ stages:
                 # 🔥 Compter les merges pour définir le PATCH
                 MERGE_COUNT=$(git rev-list --merges --count origin/releases/${RELEASE_VERSION})
                 PATCH=$((MERGE_COUNT))
+
+                if [ -n "$SYSTEM_PULLREQUEST_SOURCEBRANCH" ]; then
+                  # 🚧 PR vers une branche release, on ajoute +1 pour le prochain numéro de PATCH
+                  PATCH=$((PATCH + 1))
+                fi
 
                 echo "Branche release détectée (${RELEASE_VERSION}). Nombre de merges : $MERGE_COUNT. Nouvelle version calculée: ${RELEASE_VERSION}.${PATCH}"
                 NEW_VERSION="${RELEASE_VERSION}.${PATCH}"
