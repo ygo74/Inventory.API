@@ -175,6 +175,7 @@ stages:
 
               echo "=== Fin du calcul de version ==="
             displayName: 'Calculer et définir le numéro de version'
+            name: CalculateNextVersion
 
 
 
@@ -204,7 +205,7 @@ stages:
           - IdentifyContext
 
         variables:
-          NextVersion: $[ dependencies.IdentifyContext.outputs['CalculateNextVersion.version'] ]
+          NextVersion: $[ dependencies.IdentifyContext.outputs['CalculateNextVersion.NEW_VERSION'] ]
           BuildCounter: $[counter(variables['NextVersion'], 0)]
 
         steps:
