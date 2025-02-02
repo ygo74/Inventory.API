@@ -81,8 +81,7 @@ stages:
               fi
 
               # Pour la partie metadata, on remplace les caractères interdits (exemple: '/' par '-')
-              SOURCE_BRANCH=$(echo "$SOURCE_BRANCH_ORIG" | sed 's/[\/:<>\\|?@*]/-/g')
-              TARGET_BRANCH=$(echo "$TARGET_BRANCH_ORIG" | sed 's/[\/:<>\\|?@*]/-/g')
+              SOURCE_BRANCH_SANITIZED=$(echo "$SOURCE_BRANCH" | sed 's/[\/:<>\\|?@*]/-/g')
 
               # Récupérer la dernière version depuis les branches de release
               LATEST_RELEASE_VERSION=$(git ls-remote --heads origin "refs/heads/releases/*" \
@@ -145,26 +144,26 @@ stages:
                 # Le build est issu d'une PR
                 if [[ "$TARGET_BRANCH" == "main" || "$TARGET_BRANCH" == "master" ]]; then
                   # PR vers main/master
-                  METADATA="pr-${SYSTEM_PULLREQUEST_PULLREQUESTID}.${SOURCE_BRANCH}.${COMMIT_SHORT}"
+                  METADATA="pr-${SYSTEM_PULLREQUEST_PULLREQUESTID}.${SOURCE_BRANCH_SANITIZED}.${COMMIT_SHORT}"
                   echo "Build PR vers $TARGET_BRANCH détecté. Metadata: $METADATA"
                 elif [[ "$TARGET_BRANCH" == releases/* ]]; then
                   # PR vers une branche release: version buildable du prochain déploiement, on ajoute 'beta'
-                  METADATA="beta-pr-${SYSTEM_PULLREQUEST_PULLREQUESTID}.${SOURCE_BRANCH}.${COMMIT_SHORT}"
+                  METADATA="beta-pr-${SYSTEM_PULLREQUEST_PULLREQUESTID}.${SOURCE_BRANCH_SANITIZED}.${COMMIT_SHORT}"
                   echo "Build PR vers une branche release détecté. Metadata: $METADATA"
                 else
                   # Pour une PR vers toute autre branche
-                  METADATA="${SOURCE_BRANCH}.${COMMIT_SHORT}"
+                  METADATA="${SOURCE_BRANCH_SANITIZED}.${COMMIT_SHORT}"
                   echo "Build PR vers une branche autre que main/master/release. Metadata: $METADATA"
                 fi
               else
                 # Pour les builds classiques (non PR)
                 if [[ "$SOURCE_BRANCH" == "main" || "$SOURCE_BRANCH" == "master" ]]; then
                   # Pour main/master, on ajoute la mention alpha indiquant une version buildable pour tests
-                  METADATA="alpha.${SOURCE_BRANCH}.${COMMIT_SHORT}"
+                  METADATA="alpha.${SOURCE_BRANCH_SANITIZED}.${COMMIT_SHORT}"
                   echo "Build sur main/master détecté. Metadata: $METADATA"
                 elif [[ "$SOURCE_BRANCH" != releases/* ]]; then
                   # Pour toute autre branche de développement non-release
-                  METADATA="${SOURCE_BRANCH}.${COMMIT_SHORT}"
+                  METADATA="${SOURCE_BRANCH_SANITIZED}.${COMMIT_SHORT}"
                   echo "Metadata ajoutée pour build sur branche de développement: $METADATA"
                 fi
               fi
