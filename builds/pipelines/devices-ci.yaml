@@ -22,10 +22,10 @@ trigger:
       - /builds/pipelines/templates/*
       - VersionManagement.yml
 
-# parameters:
-#   - name: debugPipelineFlow
-#     type: boolean
-#     default: false
+parameters:
+  - name: debugPipelineFlow
+    type: boolean
+    default: false
 
 variables:
   - group: Azure_Credential
@@ -62,4 +62,4 @@ stages:
       repositoryName:            $(repositoryName)
       dockerFile:                $(dockerFile)
       chartName:                 $(chartName)
-      # debugPipelineFlow:         $({{ parameters.debugPipelineFlow }})
+      debugPipelineFlow:         $({{ parameters.debugPipelineFlow }})
