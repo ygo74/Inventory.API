@@ -170,7 +170,7 @@ stages:
               fi
 
               echo "Version finale calculée: $NEW_VERSION"
-              echo "##vso[task.setvariable variable=VERSION]$NEW_VERSION"
+              echo "##vso[task.setvariable variable=NEW_VERSION;isOutput=true]$NEW_VERSION"
               echo "##vso[build.updatebuildnumber]$NEW_VERSION"
 
               echo "=== Fin du calcul de version ==="
