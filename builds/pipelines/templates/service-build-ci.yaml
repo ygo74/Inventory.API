@@ -85,9 +85,9 @@ stages:
               TARGET_BRANCH=$(echo "$TARGET_BRANCH_ORIG" | sed 's/[\/:<>\\|?@*]/-/g')
 
               # Récupérer la dernière version depuis les branches de release
-              LATEST_RELEASE_VERSION=$(git ls-remote --heads origin "refs/heads/release/*" \
+              LATEST_RELEASE_VERSION=$(git ls-remote --heads origin "refs/heads/releases/*" \
                 | awk '{print $2}' \
-                | sed 's#refs/heads/release/##' \
+                | sed 's#refs/heads/releases/##' \
                 | sort -V \
                 | tail -n 1)
 
@@ -103,7 +103,7 @@ stages:
               if [ -z "$PATCH" ]; then PATCH=0; fi
 
               # Calcul de la nouvelle version en fonction du type de branche
-              if [[ "$SOURCE_BRANCH_ORIG" == release/* ]]; then
+              if [[ "$SOURCE_BRANCH_ORIG" == releases/* ]]; then
                 # Pour les branches release : le numéro de patch correspond au nombre de commits dans la branche
                 COMMIT_COUNT=$(git rev-list --count HEAD)
                 if [ "$COMMIT_COUNT" -eq 1 ]; then
@@ -127,8 +127,8 @@ stages:
                 NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
                 echo "Branche feature détectée. Nouvelle version calculée: $NEW_VERSION"
 
-              elif [[ "$TARGET_BRANCH_ORIG" == release/* ]]; then
-                # 🚀 Cas PR vers une branche release (ex: master → release/0.4) → Incrémentation du PATCH
+              elif [[ "$TARGET_BRANCH_ORIG" == releases/* ]]; then
+                # 🚀 Cas PR vers une branche release (ex: master → releases/0.4) → Incrémentation du PATCH
                 PATCH=$((PATCH + 1))
                 NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
                 echo "PR vers une branche release détectée. Nouvelle version calculée: $NEW_VERSION"
@@ -149,7 +149,7 @@ stages:
                 # Cas d'un build PR
                 if [[ "$TARGET_BRANCH_ORIG" == "main" || "$TARGET_BRANCH_ORIG" == "master" ]]; then
                   METADATA="pr-${SYSTEM_PULLREQUEST_PULLREQUESTID}.${SOURCE_BRANCH}.${COMMIT_SHORT}"
-                elif [[ "$TARGET_BRANCH_ORIG" == release/* ]]; then
+                elif [[ "$TARGET_BRANCH_ORIG" == releases/* ]]; then
                   METADATA="beta-pr-${SYSTEM_PULLREQUEST_PULLREQUESTID}.${SOURCE_BRANCH}.${COMMIT_SHORT}"
                 else
                   METADATA="${SOURCE_BRANCH}.${COMMIT_SHORT}"
@@ -158,7 +158,7 @@ stages:
                 # Cas des builds directs (hors PR)
                 if [[ "$SOURCE_BRANCH_ORIG" == "main" || "$SOURCE_BRANCH_ORIG" == "master" ]]; then
                   METADATA="alpha.${SOURCE_BRANCH}.${COMMIT_SHORT}"
-                elif [[ "$SOURCE_BRANCH_ORIG" != release/* ]]; then
+                elif [[ "$SOURCE_BRANCH_ORIG" != releases/* ]]; then
                   METADATA="${SOURCE_BRANCH}.${COMMIT_SHORT}"
                 fi
               fi
