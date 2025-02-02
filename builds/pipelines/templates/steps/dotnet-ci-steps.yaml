@@ -55,7 +55,7 @@ steps:
       command: 'build'
       projects: '${{ parameters.projectPath }}'
       versioningScheme: byEnvVar
-      versionEnvVar: 'CalculateNextVersion.version'
+      versionEnvVar: 'CalculateNextVersion.NEW_VERSION'
 
   - task: SnykSecurityScan@1
     inputs:
@@ -76,7 +76,7 @@ steps:
         projects: '${{ parameters.projectPath }}'
         publishWebProjects: false
         versioningScheme: byEnvVar
-        versionEnvVar: 'CalculateNextVersion.version'
+        versionEnvVar: 'CalculateNextVersion.NEW_VERSION'
         arguments: '-o $(Build.ArtifactStagingDirectory)/services/${{ parameters.serviceName }}'
         zipAfterPublish: true
         modifyOutputPath: true
