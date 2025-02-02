@@ -62,142 +62,262 @@ stages:
           - checkout: self
             fetchDepth: 0
 
-          - task: CalculateNextVersionTest@1
-            name: CalculateNextVersion
-            displayName: Determine Version
-            inputs:
-              configurationLocation: 'configurationPath'
-              configurationPath: './VersionManagement.yml'
+
+          - script: |
+              echo "=== Début du calcul de version ==="
+
+              # Détection si le build provient d'une Pull Request
+              if [ -n "$SYSTEM_PULLREQUEST_SOURCEBRANCH" ]; then
+                echo "Build déclenché par une Pull Request"
+                # Récupérer la branche source et la branche cible de la PR
+                SOURCE_BRANCH="${SYSTEM_PULLREQUEST_SOURCEBRANCH#refs/heads/}"
+                TARGET_BRANCH="${SYSTEM_PULLREQUEST_TARGETBRANCH#refs/heads/}"
+                echo "Branche source de la PR : $SOURCE_BRANCH"
+                echo "Branche cible de la PR : $TARGET_BRANCH"
+              else
+                # Sinon, utiliser la branche classique du build
+                SOURCE_BRANCH="${BUILD_SOURCEBRANCH#refs/heads/}"
+                echo "Build sur la branche : $SOURCE_BRANCH"
+              fi
+
+              # Récupérer la dernière version depuis les branches de release
+              LATEST_RELEASE_VERSION=$(git ls-remote --heads origin "refs/heads/release/*" \
+                | awk '{print $2}' \
+                | sed 's#refs/heads/release/##' \
+                | sort -V \
+                | tail -n 1)
+
+              if [ -z "$LATEST_RELEASE_VERSION" ]; then
+                echo "Aucune branche release trouvée. On part de 0.0.0."
+                LATEST_RELEASE_VERSION="0.0.0"
+              fi
+
+              echo "Dernière version release trouvée: $LATEST_RELEASE_VERSION"
+
+              # Extraction des composantes de la version release
+              IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_RELEASE_VERSION"
+              if [ -z "$PATCH" ]; then PATCH=0; fi
+
+              # Calcul de la nouvelle version en fonction du type de branche
+              if [[ "$SOURCE_BRANCH" == release/* ]]; then
+                # Pour les branches release : le numéro de patch correspond au nombre de commits dans la branche
+                COMMIT_COUNT=$(git rev-list --count HEAD)
+                echo "Nombre de commits dans la branche release: $COMMIT_COUNT"
+                if [ "$COMMIT_COUNT" -eq 1 ]; then
+                  PATCH=0
+                else
+                  PATCH=$COMMIT_COUNT
+                fi
+                NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+                echo "Branche release détectée. Nouvelle version calculée: $NEW_VERSION"
+
+              elif [[ "$SOURCE_BRANCH" == hotfix/* ]]; then
+                # Pour une branche hotfix, on incrémente le patch par rapport à la dernière version release
+                PATCH=$((PATCH + 1))
+                NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+                echo "Branche hotfix détectée. Nouvelle version calculée: $NEW_VERSION"
+
+              elif [[ "$SOURCE_BRANCH" == feature/* ]]; then
+                # Pour une branche feature, on incrémente le minor et on remet le patch à 0.
+                MINOR=$((MINOR + 1))
+                PATCH=0
+                NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+                echo "Branche feature détectée. Nouvelle version calculée: $NEW_VERSION"
+
+              else
+                # Pour toute autre branche de développement (ex: main, master ou autre)
+                MINOR=$((MINOR + 1))
+                PATCH=0
+                NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+                echo "Branche de développement (non classée) détectée. Nouvelle version calculée: $NEW_VERSION"
+              fi
+
+              # Construction des metadata
+              # Récupération du commit court (7 premiers caractères)
+              COMMIT_SHORT=$(echo $BUILD_SOURCEVERSION | cut -c1-7)
+              METADATA=""
+
+              if [ -n "$SYSTEM_PULLREQUEST_SOURCEBRANCH" ]; then
+                # Le build est issu d'une PR
+                if [[ "$TARGET_BRANCH" == "main" || "$TARGET_BRANCH" == "master" ]]; then
+                  # PR vers main/master
+                  METADATA="pr-${SYSTEM_PULLREQUEST_PULLREQUESTID}.${SOURCE_BRANCH}.${COMMIT_SHORT}"
+                  echo "Build PR vers $TARGET_BRANCH détecté. Metadata: $METADATA"
+                elif [[ "$TARGET_BRANCH" == release/* ]]; then
+                  # PR vers une branche release: version buildable du prochain déploiement, on ajoute 'beta'
+                  METADATA="beta-pr-${SYSTEM_PULLREQUEST_PULLREQUESTID}.${SOURCE_BRANCH}.${COMMIT_SHORT}"
+                  echo "Build PR vers une branche release détecté. Metadata: $METADATA"
+                else
+                  # Pour une PR vers toute autre branche
+                  METADATA="${SOURCE_BRANCH}.${COMMIT_SHORT}"
+                  echo "Build PR vers une branche autre que main/master/release. Metadata: $METADATA"
+                fi
+              else
+                # Pour les builds classiques (non PR)
+                if [[ "$SOURCE_BRANCH" == "main" || "$SOURCE_BRANCH" == "master" ]]; then
+                  # Pour main/master, on ajoute la mention alpha indiquant une version buildable pour tests
+                  METADATA="alpha.${SOURCE_BRANCH}.${COMMIT_SHORT}"
+                  echo "Build sur main/master détecté. Metadata: $METADATA"
+                elif [[ "$SOURCE_BRANCH" != release/* ]]; then
+                  # Pour toute autre branche de développement non-release
+                  METADATA="${SOURCE_BRANCH}.${COMMIT_SHORT}"
+                  echo "Metadata ajoutée pour build sur branche de développement: $METADATA"
+                fi
+              fi
+
+              # Ajout des metadata à la version, si elles existent
+              if [ -n "$METADATA" ]; then
+                NEW_VERSION="${NEW_VERSION}+${METADATA}"
+              fi
+
+              echo "Version finale calculée: $NEW_VERSION"
+
+              # Mise à jour de la variable de pipeline pour les étapes suivantes
+              echo "##vso[task.setvariable variable=VERSION]$NEW_VERSION"
+              # Mise à jour du numéro de build affiché dans l'interface Azure DevOps
+              echo "##vso[build.updatebuildnumber]$NEW_VERSION"
+
+              echo "=== Fin du calcul de version ==="
+            displayName: 'Calculer et définir le numéro de version'
 
 
-          - task: ReleaseFlowGitVersion@0
-            inputs:
-              sourceBranch: '$(Build.SourceBranch)'
-              updateBuildNumber: true
-              # repoRoot: 'xxx'
+
+          # - task: CalculateNextVersionTest@1
+          #   name: CalculateNextVersion
+          #   displayName: Determine Version
+          #   inputs:
+          #     configurationLocation: 'configurationPath'
+          #     configurationPath: './VersionManagement.yml'
 
 
-      # ---------------------------------------------------------------------------
-      # Build dotnet applications
-      # - Update build number with next version and unique counter
-      # - Build application
-      # ---------------------------------------------------------------------------
-      - job: DotnetBuild
-        displayName: Build Service
-        dependsOn:
-          - IdentifyContext
+          # - task: ReleaseFlowGitVersion@0
+          #   inputs:
+          #     sourceBranch: '$(Build.SourceBranch)'
+          #     updateBuildNumber: true
+          #     # repoRoot: 'xxx'
 
-        variables:
-          NextVersion: $[ dependencies.IdentifyContext.outputs['CalculateNextVersion.version'] ]
-          BuildCounter: $[counter(variables['NextVersion'], 0)]
 
-        steps:
-          - checkout: self
-            fetchDepth: 0
+  #     # ---------------------------------------------------------------------------
+  #     # Build dotnet applications
+  #     # - Update build number with next version and unique counter
+  #     # - Build application
+  #     # ---------------------------------------------------------------------------
+  #     - job: DotnetBuild
+  #       displayName: Build Service
+  #       dependsOn:
+  #         - IdentifyContext
 
-          - task: PublishBuildNumber@0
-            name: PublishBuildNumber
-            displayName: Publish build numbers
-            inputs:
-              semanticVersioning: '$(NextVersion)'
-              uniqueCounter: '$(BuildCounter)'
+  #       variables:
+  #         NextVersion: $[ dependencies.IdentifyContext.outputs['CalculateNextVersion.version'] ]
+  #         BuildCounter: $[counter(variables['NextVersion'], 0)]
 
-          - template: ./steps/dotnet-ci-steps.yaml
-            parameters:
-              serviceName:       ${{ parameters.serviceName }}
-              projectPath:       ${{ parameters.projectPath }}
-              # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+  #       steps:
+  #         - checkout: self
+  #           fetchDepth: 0
 
-      - ${{ if parameters.testsProjectPath }}:
-        # ---------------------------------------------------------------------------
-        # Execute unit tests
-        # ---------------------------------------------------------------------------
-        - job: DotnetUnitTests
-          displayName: Tests Service
-          dependsOn:
-            - DotnetBuild
+  #         - task: PublishBuildNumber@0
+  #           name: PublishBuildNumber
+  #           displayName: Publish build numbers
+  #           inputs:
+  #             semanticVersioning: '$(NextVersion)'
+  #             uniqueCounter: '$(BuildCounter)'
 
-          steps:
-            - template: ./steps/dotnet-unittests-ci-steps.yaml
-              parameters:
-                serviceName:       ${{ parameters.serviceName }}
-                projectPath:       ${{ parameters.projectPath }}
-                testsProjectPath:  ${{ parameters.testsProjectPath }}
-                preTest:           ${{ parameters.preTest }}
-                # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+  #         - template: ./steps/dotnet-ci-steps.yaml
+  #           parameters:
+  #             serviceName:       ${{ parameters.serviceName }}
+  #             projectPath:       ${{ parameters.projectPath }}
+  #             # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
-  # ---------------------------------------------------------------------------
-  # Build Container image and chart
-  # - Build when Pull request to Master or branch != feature/, topic/, hotfix/
-  # ---------------------------------------------------------------------------
-  - ${{ if or(not(or(startsWith(variables['Build.SourceBranch'],'refs/heads/feature/'), startsWith(variables['Build.SourceBranch'],'refs/heads/topic/'), startsWith(variables['Build.SourceBranch'],'refs/heads/hotfix/'))), and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master'))) }}:
-    - stage: BuildImages
-      displayName: Build image and chart
-      dependsOn:
-        - BuildApplication
+  #     - ${{ if parameters.testsProjectPath }}:
+  #       # ---------------------------------------------------------------------------
+  #       # Execute unit tests
+  #       # ---------------------------------------------------------------------------
+  #       - job: DotnetUnitTests
+  #         displayName: Tests Service
+  #         dependsOn:
+  #           - DotnetBuild
 
-      jobs:
-        # ---------------------------------------------------------------------------
-        # Build and publish container image
-        # ---------------------------------------------------------------------------
-        - job: DockerBuild
-          displayName: Build and publish docker images
-          variables:
-            tag: $[ stageDependencies.BuildApplication.DotnetBuild.outputs['PublishBuildNumber.CleanedVersion'] ]
+  #         steps:
+  #           - template: ./steps/dotnet-unittests-ci-steps.yaml
+  #             parameters:
+  #               serviceName:       ${{ parameters.serviceName }}
+  #               projectPath:       ${{ parameters.projectPath }}
+  #               testsProjectPath:  ${{ parameters.testsProjectPath }}
+  #               preTest:           ${{ parameters.preTest }}
+  #               # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
-          steps:
-            - template: ./steps/container-ci-steps.yaml
-              parameters:
-                serviceName:           ${{ parameters.serviceName }}
-                repositoryName:        ${{ parameters.repositoryName }}
-                dockerFile:            ${{ parameters.dockerFile }}
-                dockerTags:            $(tag)
-                containerRegistry:     ${{ parameters.containerRegistry }}
-                containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
-                # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+  # # ---------------------------------------------------------------------------
+  # # Build Container image and chart
+  # # - Build when Pull request to Master or branch != feature/, topic/, hotfix/
+  # # ---------------------------------------------------------------------------
+  # - ${{ if or(not(or(startsWith(variables['Build.SourceBranch'],'refs/heads/feature/'), startsWith(variables['Build.SourceBranch'],'refs/heads/topic/'), startsWith(variables['Build.SourceBranch'],'refs/heads/hotfix/'))), and(eq(variables['Build.Reason'],'PullRequest'), eq(variables['System.PullRequest.TargetBranchName'], 'master'))) }}:
+  #   - stage: BuildImages
+  #     displayName: Build image and chart
+  #     dependsOn:
+  #       - BuildApplication
 
-        # ---------------------------------------------------------------------------
-        # Build and publish helm chart
-        # ---------------------------------------------------------------------------
-        - job: HelmBuild
-          displayName: Build and publish Helm chart
-          dependsOn:
-            - DockerBuild
+  #     jobs:
+  #       # ---------------------------------------------------------------------------
+  #       # Build and publish container image
+  #       # ---------------------------------------------------------------------------
+  #       - job: DockerBuild
+  #         displayName: Build and publish docker images
+  #         variables:
+  #           tag: $[ stageDependencies.BuildApplication.DotnetBuild.outputs['PublishBuildNumber.CleanedVersion'] ]
 
-          variables:
-            tag: $[ stageDependencies.BuildApplication.DotnetBuild.outputs['PublishBuildNumber.SemanticVersion'] ]
+  #         steps:
+  #           - template: ./steps/container-ci-steps.yaml
+  #             parameters:
+  #               serviceName:           ${{ parameters.serviceName }}
+  #               repositoryName:        ${{ parameters.repositoryName }}
+  #               dockerFile:            ${{ parameters.dockerFile }}
+  #               dockerTags:            $(tag)
+  #               containerRegistry:     ${{ parameters.containerRegistry }}
+  #               containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
+  #               # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
-          steps:
-            - template: ./steps/chart-ci-steps.yaml
-              parameters:
-                serviceName:           ${{ parameters.serviceName }}
-                chartPath:             ${{ parameters.chartPath }}
-                chartName:             ${{ parameters.chartName }}
-                chartVersion:          $(tag)
-                containerRegistry:     ${{ parameters.containerRegistry }}
-                containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
-                # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
+  #       # ---------------------------------------------------------------------------
+  #       # Build and publish helm chart
+  #       # ---------------------------------------------------------------------------
+  #       - job: HelmBuild
+  #         displayName: Build and publish Helm chart
+  #         dependsOn:
+  #           - DockerBuild
 
-  # ---------------------------------------------------------------------------
-  # Build Databases scripts
-  # ---------------------------------------------------------------------------
-  - ${{ if parameters.infrastructureProjectPath }}:
-    - stage: BuildDbScripts
-      displayName: Build database scripts
-      dependsOn:
-        - BuildApplication
+  #         variables:
+  #           tag: $[ stageDependencies.BuildApplication.DotnetBuild.outputs['PublishBuildNumber.SemanticVersion'] ]
 
-      jobs:
-        - job: DatabaseBuild
-          displayName: Build database scripts
-          variables:
-            tag: $(Build.BuildId)
+  #         steps:
+  #           - template: ./steps/chart-ci-steps.yaml
+  #             parameters:
+  #               serviceName:           ${{ parameters.serviceName }}
+  #               chartPath:             ${{ parameters.chartPath }}
+  #               chartName:             ${{ parameters.chartName }}
+  #               chartVersion:          $(tag)
+  #               containerRegistry:     ${{ parameters.containerRegistry }}
+  #               containerRegistryFqdn: ${{ parameters.containerRegistryFqdn }}
+  #               # debugPipelineFlow: ${{ parameters.debugPipelineFlow }}
 
-          steps:
-            - template: ./steps/databases-ci-steps.yaml
-              parameters:
-                serviceName:               ${{ parameters.serviceName }}
-                projectPath:               ${{ parameters.projectPath }}
-                infrastructureProjectPath: ${{ parameters.infrastructureProjectPath }}
-                # debugPipelineFlow:         ${{ parameters.debugPipelineFlow }}
+  # # ---------------------------------------------------------------------------
+  # # Build Databases scripts
+  # # ---------------------------------------------------------------------------
+  # - ${{ if parameters.infrastructureProjectPath }}:
+  #   - stage: BuildDbScripts
+  #     displayName: Build database scripts
+  #     dependsOn:
+  #       - BuildApplication
+
+  #     jobs:
+  #       - job: DatabaseBuild
+  #         displayName: Build database scripts
+  #         variables:
+  #           tag: $(Build.BuildId)
+
+  #         steps:
+  #           - template: ./steps/databases-ci-steps.yaml
+  #             parameters:
+  #               serviceName:               ${{ parameters.serviceName }}
+  #               projectPath:               ${{ parameters.projectPath }}
+  #               infrastructureProjectPath: ${{ parameters.infrastructureProjectPath }}
+  #               # debugPipelineFlow:         ${{ parameters.debugPipelineFlow }}
 
